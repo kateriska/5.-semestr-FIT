@@ -1,4 +1,4 @@
-// Smoothing images
+# Smoothing images
 
 import sys
 
@@ -40,3 +40,4 @@ HPF - helps in finding edges in the images
 Gaussian filter - using different-weight-lernel in both x and y direction, pixel is center have heigher width, on edges lower
 Median filter - replace each pixel's value with the median of its neighboring pixels, great method for salt and pepper noise
 Bilatteral - edges are softer, higly effective in noise removel but keeping edges sharp
+'''
