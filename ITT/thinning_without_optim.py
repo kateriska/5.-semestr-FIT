@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
 
-img = cv2.imread('images.jpeg',0) # grayscale image
+img = cv2.imread('fg.jpg',0) # grayscale image
 size = np.size(img)
-skel = np.zeros(img.shape,np.uint8) # skeleton, in the beginning black picture
+skel = np.zeros(img.shape, np.uint8) # skeleton, in the beginning black picture
 
-ret,img = cv2.threshold(img,127,255,0) #transform to binary image
+ret,img = cv2.threshold(img, 0, 255,
+                            cv2.THRESH_BINARY +
+                            cv2.THRESH_OTSU) #transform to binary image
 element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3)) # We have to declare the structuring element we will use for our morphological operations, here we use a 3x3 cross-shaped structure element
 done = False
 
@@ -20,7 +22,7 @@ while( not done):
     if zeros==size:
         done = True
 
-
+skel = cv2.bitwise_not(skel)
 cv2.imshow("skel",skel)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
