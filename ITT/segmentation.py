@@ -33,5 +33,11 @@ ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
 sure_fg = np.uint8(sure_fg)
 unknown = cv2.subtract(sure_bg,sure_bg)
 cv2.imshow('image', sure_bg) # foreground
+
+#adding_img = cv2.bitwise_and(img, sure_bg)
+
+#cv2.imshow('RESULT', adding_img)
+result = cv2.add(gray, sure_bg)
+cv2.imshow('RESULT', result)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
