@@ -1,9 +1,14 @@
+/*
+TO - DO resolve segfault when you enter numbers instead of strings (f.e. -q 55555)
+*/
 #include <iostream>
 #include <string>
 #include <vector>
 #include <getopt.h>
 #include <regex.h>
 #include <string.h>
+
+/*
 
 void IpRegexParsing(std::string input_ip)
 {
@@ -26,52 +31,66 @@ void IpRegexParsing(std::string input_ip)
 
   return false;
 }
+*/
 
 
 
 int main(int argc, char **argv)
 {
   int opt;
-  std::string ip;
-  std::string host_name_whois;
-  std::string host_name_dns;
+  std::string ipq_input;
+  std::string whois_input;
+  std::string dns_input;
+  bool q = false; // mandatory option
+  bool w = false;
 
-  while ((opt = getopt (argc, argv, "qwd")) != -1)
+  if ((argc < 5 ) || (argc > 7))
+  {
+        std::cerr << "Error - Wrong count of arguments!\n";
+        exit(EXIT_FAILURE);
+  }
+
+  while ((opt = getopt (argc, argv, ":q:w:d:")) != -1)
   {
     switch (opt)
     {
       case 'q':
         printf("input argument -q <IP|hostname> \n");
-        if (argc != 3)
-        {
-          std::cerr << "Error - Wrong count of arguments!\n";
-          exit(EXIT_FAILURE);
-        }
-
+        ipq_input = optarg;
+        std::cout << ipq_input + "\n";
+        q = true;
       break;
+
       case 'w':
         printf("input argument -w <IP|hostname WHOIS serveru>\n");
-        if (argc != 3)
-        {
-          std::cerr << "Error - Wrong count of arguments!\n";
-          exit(EXIT_FAILURE);
-        }
+        whois_input = optarg;
+        std::cout << whois_input + "\n";
+        w = true;
       break;
+
       case 'd':
         printf("input argument -d <IP|hostname DNS serveru>\n");
-        if (argc == 2)
-        {
-          host_name_dns = "1.1.1.1";
-          std::cout << host_name_dns + "\n";
-        }
-        if (argc > 3 || argc < 2)
-        {
-          std::cerr << "Error - Wrong count of arguments!\n";
-          exit(EXIT_FAILURE);
-        }
+        std::cout << optarg;
+        dns_input = optarg;
+        std::cout << dns_input + "\n";
       break;
+
+      default:
+        printf("usage default\n");
+        std::cerr << "Error - Bad parametres!\n";
+        exit(EXIT_FAILURE);
+      break;
+      
+
     }
   }
+
+    // Check mandatory (povinne) parameters:
+    if ((w == false) || (q == false))
+    {
+      std::cerr << "Error - Missing mandatory options!\n";
+      exit(EXIT_FAILURE);
+    }
 
 
 }
