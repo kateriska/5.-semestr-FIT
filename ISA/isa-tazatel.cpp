@@ -7,31 +7,49 @@ TO - DO resolve segfault when you enter numbers instead of strings (f.e. -q 5555
 #include <getopt.h>
 #include <regex.h>
 #include <string.h>
+#include <regex>
+#include <arpa/inet.h>
+#include <netdb.h>
 
-/*
 
-void IpRegexParsing(std::string input_ip)
+
+std::string IpValidate(std::string input_ip)
 {
-  bool ipv4_input = false;
-  bool ipv6_input = false;
-  bool hostname_input = false;
-  std::string ipv4_regex = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-  std::string ipv6_regex = "^([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}$";
-
-  if (std::regex_match(input_ip, ipv4_regex))
+  struct sockaddr_in sa;
+  std::string input_validate;
+  //int test_ipv4 = inet_pton(AF_INET, input_ip.c_str(), &(sa.sin_addr)); // 1 - network is ipv4 or ipv6, 0 - error
+  if (inet_pton(AF_INET, input_ip.c_str(), &(sa.sin_addr)) == 1)
   {
-    ipv4_input = true;
-    return true;
+    input_validate = "ipv4_input";
   }
-  else if (std::regex_match(input_ip, ipv6_regex))
+  else if (inet_pton(AF_INET6, input_ip.c_str(), &(sa.sin_addr)) == 1)
   {
-    ipv6_input = true;
-    return true;
+    input_validate = "ipv6_input";
+  }
+  else
+  {
+    input_validate = "hostname_input";
   }
 
-  return false;
+  return input_validate;
 }
-*/
+
+struct input_data
+{
+  //vector<int> udp_ports;
+  //vector<int> tcp_ports;
+  //string interface;
+  std::string skenned_ipv4;
+  std::string skenned_ipv6;
+  std::string skenned_hostname;
+  std::string whois_ipv4;
+  std::string whois_ipv6;
+  std::string skenned_whois;
+  std::string dns_ipv4;
+  std::string dns_ipv6;
+  std::string dns_hostname;
+  //string domain;
+};
 
 
 
@@ -43,6 +61,11 @@ int main(int argc, char **argv)
   std::string dns_input;
   bool q = false; // mandatory option
   bool w = false;
+  std:: string input_validate_ipq;
+  std:: string input_validate_whois;
+  std:: string input_validate_dns;
+
+  struct input_data i_data;
 
   if ((argc < 5 ) || (argc > 7))
   {
@@ -80,7 +103,6 @@ int main(int argc, char **argv)
         std::cerr << "Error - Bad parametres!\n";
         exit(EXIT_FAILURE);
       break;
-      
 
     }
   }
@@ -91,6 +113,26 @@ int main(int argc, char **argv)
       std::cerr << "Error - Missing mandatory options!\n";
       exit(EXIT_FAILURE);
     }
+
+    input_validate_ipq = IpValidate(ipq_input);
+    std::cout << input_validate_ipq + "\n";
+    if (input_validate_ipq == "hostname_input")
+    {
+      struct hostent *host;
+      char *IPbuffer; 
+      host = gethostbyname((char *)ipq_input.c_str());
+      if (host == NULL)
+      {
+        printf("Error:Hostname is wrong\n");
+      }
+      IPbuffer = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
+      printf("Host IP: %s", IPbuffer);
+    }
+    input_validate_whois = IpValidate(whois_input);
+    std::cout << input_validate_whois + "\n";
+    input_validate_dns = IpValidate(dns_input);
+    std::cout << input_validate_dns + "\n";
+
 
 
 }
