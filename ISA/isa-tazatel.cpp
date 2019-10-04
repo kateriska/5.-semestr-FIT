@@ -7,6 +7,12 @@
 #include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
+//#include<netinet/in.h>
+
+#define WHOIS_PORT 43
+#define WHOIS_IPV4_LENGTH 32
+#define WHOIS_MESSAGE_LENGTH 100
+#define WHOIS_BUFFER_LENGTH 1500
 
 struct input_data
 {
@@ -75,10 +81,26 @@ void PrintInputData(struct input_data i_data)
   std::cout << "DNS IPV6: " + i_data.dns_ipv6 + "\n";
   std::cout << "DNS hostname: " + i_data.dns_hostname + "\n";
 
+}
+
+/*
+void WhoisConnectIPV4(struct input_data i_data, std::string response)
+{
+    struct sockaddr_in sw4;
+    int socket_whois_ipv4 = 0;
+    char message[WHOIS_MESSAGE_LENGTH];
+    char buffer[WHOIS_BUFFER_LENGTH];
+
+    socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
+    memset(buffer, 0, sizeof(sw4));
+    sw4.sin_family = AF_INET;
+    sw4.sin_port = htons(WHOIS_PORT);
+    connect(socket_whois_ipv4, (struct sockaddr *)&serv_addr, sizeof(serv_addr);
+    sprintf(message , "%s\r\n" , i_data.whois_ipv4);
 
 }
 
-
+*/
 
 
 int main(int argc, char **argv)
