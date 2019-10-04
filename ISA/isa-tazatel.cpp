@@ -1,6 +1,3 @@
-/*
-TO - DO resolve segfault when you enter numbers instead of strings (f.e. -q 55555)
-*/
 #include <iostream>
 #include <string>
 #include <vector>
@@ -11,6 +8,18 @@ TO - DO resolve segfault when you enter numbers instead of strings (f.e. -q 5555
 #include <arpa/inet.h>
 #include <netdb.h>
 
+struct input_data
+{
+  std::string skenned_ipv4;
+  std::string skenned_ipv6;
+  std::string skenned_hostname;
+  std::string whois_ipv4;
+  std::string whois_ipv6;
+  std::string whois_hostname;
+  std::string dns_ipv4;
+  std::string dns_ipv6;
+  std::string dns_hostname;
+};
 
 
 std::string IpValidate(std::string input_ip)
@@ -33,23 +42,42 @@ std::string IpValidate(std::string input_ip)
 
   return input_validate;
 }
-
-struct input_data
+std::string ConvertHostname(std::string hostname)
 {
-  //vector<int> udp_ports;
-  //vector<int> tcp_ports;
-  //string interface;
-  std::string skenned_ipv4;
-  std::string skenned_ipv6;
-  std::string skenned_hostname;
-  std::string whois_ipv4;
-  std::string whois_ipv6;
-  std::string skenned_whois;
-  std::string dns_ipv4;
-  std::string dns_ipv6;
-  std::string dns_hostname;
-  //string domain;
-};
+  std::string converted_ip;
+  struct hostent *host;
+  char *converted_ip_array;
+  host = gethostbyname((char *)hostname.c_str());
+  if (host == NULL)
+  {
+      std::cerr << "Error - Hostname doesn't exist!\n";
+    exit(EXIT_FAILURE);
+  }
+  converted_ip_array = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
+  converted_ip = converted_ip_array;
+  //std::cout << converted_ip + "\n";
+  return converted_ip;
+}
+
+void PrintInputData(struct input_data i_data)
+{
+  printf("--------Input data:--------\n");
+
+  std::cout << "Skenned IPV4: " + i_data.skenned_ipv4 + "\n";
+  std::cout << "Skenned IPV6: " + i_data.skenned_ipv6 + "\n";
+  std::cout << "Skenned hostname: " + i_data.skenned_hostname + "\n";
+
+  std::cout << "Whois IPV4: " + i_data.whois_ipv4 + "\n";
+  std::cout << "Whois IPV6: " + i_data.whois_ipv6 + "\n";
+  std::cout << "Whois hostname: " + i_data.whois_hostname + "\n";
+
+  std::cout << "DNS IPV4: " + i_data.dns_ipv4 + "\n";
+  std::cout << "DNS IPV6: " + i_data.dns_ipv6 + "\n";
+  std::cout << "DNS hostname: " + i_data.dns_hostname + "\n";
+
+
+}
+
 
 
 
@@ -60,12 +88,18 @@ int main(int argc, char **argv)
   std::string whois_input;
   std::string dns_input;
   bool q = false; // mandatory option
-  bool w = false;
+  bool w = false; // mandatory option
+  bool d = false; // chosen option
   std:: string input_validate_ipq;
   std:: string input_validate_whois;
   std:: string input_validate_dns;
-
   struct input_data i_data;
+  std:: string ipq_converted;
+  std:: string whois_converted;
+  std:: string dns_converted;
+  std:: string ipq_converted_response;
+  std:: string whois_converted_response;
+  std:: string dns_converted_response;
 
   if ((argc < 5 ) || (argc > 7))
   {
@@ -78,28 +112,25 @@ int main(int argc, char **argv)
     switch (opt)
     {
       case 'q':
-        printf("input argument -q <IP|hostname> \n");
         ipq_input = optarg;
-        std::cout << ipq_input + "\n";
+        //std::cout << ipq_input + "\n";
         q = true;
       break;
 
       case 'w':
-        printf("input argument -w <IP|hostname WHOIS serveru>\n");
         whois_input = optarg;
-        std::cout << whois_input + "\n";
+        //std::cout << whois_input + "\n";
         w = true;
       break;
 
       case 'd':
-        printf("input argument -d <IP|hostname DNS serveru>\n");
-        std::cout << optarg;
+        //std::cout << optarg;
         dns_input = optarg;
-        std::cout << dns_input + "\n";
+        //std::cout << dns_input + "\n";
+        d = true;
       break;
 
       default:
-        printf("usage default\n");
         std::cerr << "Error - Bad parametres!\n";
         exit(EXIT_FAILURE);
       break;
@@ -113,25 +144,91 @@ int main(int argc, char **argv)
       std::cerr << "Error - Missing mandatory options!\n";
       exit(EXIT_FAILURE);
     }
+    // default dns
+    if (d == false)
+    {
+      i_data.dns_ipv4 = "1.1.1.1";
+    }
 
     input_validate_ipq = IpValidate(ipq_input);
-    std::cout << input_validate_ipq + "\n";
-    if (input_validate_ipq == "hostname_input")
+    if (input_validate_ipq == "ipv6_input" )
     {
-      struct hostent *host;
-      char *IPbuffer; 
-      host = gethostbyname((char *)ipq_input.c_str());
-      if (host == NULL)
-      {
-        printf("Error:Hostname is wrong\n");
-      }
-      IPbuffer = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
-      printf("Host IP: %s", IPbuffer);
+      i_data.skenned_ipv6 = ipq_input;
     }
+    else if ( input_validate_ipq == "ipv4_input" )
+    {
+      i_data.skenned_ipv4 = ipq_input;
+    }
+    else
+    {
+      i_data.skenned_hostname = ipq_input;
+      ipq_converted = ConvertHostname(ipq_input);
+      std::cout << ipq_converted + "\n";
+      input_validate_ipq = IpValidate(ipq_converted);
+      if (input_validate_ipq == "ipv6_input" )
+      {
+        i_data.skenned_ipv6 = ipq_converted;
+      }
+      else if ( input_validate_ipq == "ipv4_input" )
+      {
+        i_data.skenned_ipv4 = ipq_converted;
+      }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
     input_validate_whois = IpValidate(whois_input);
-    std::cout << input_validate_whois + "\n";
+    if (input_validate_whois == "ipv6_input" )
+    {
+      i_data.whois_ipv6 = whois_input;
+    }
+    else if ( input_validate_whois == "ipv4_input" )
+    {
+      i_data.skenned_ipv4 = whois_input;
+    }
+    else
+    {
+      i_data.whois_hostname = whois_input;
+      whois_converted = ConvertHostname(whois_input);
+      std::cout << whois_converted + "\n";
+      input_validate_whois = IpValidate(whois_converted);
+      if (input_validate_whois == "ipv6_input" )
+      {
+        i_data.whois_ipv6 = whois_converted;
+      }
+      else if ( input_validate_whois == "ipv4_input" )
+      {
+        i_data.whois_ipv4 = whois_converted;
+      }
+    }
+
     input_validate_dns = IpValidate(dns_input);
-    std::cout << input_validate_dns + "\n";
+    if (input_validate_dns == "ipv6_input" )
+    {
+      i_data.dns_ipv6 = dns_input;
+    }
+    else if ( input_validate_dns == "ipv4_input" )
+    {
+      i_data.dns_ipv4 = dns_input;
+    }
+    else
+    {
+      i_data.dns_hostname = dns_input;
+      dns_converted = ConvertHostname(dns_input);
+      std::cout << dns_converted + "\n";
+      input_validate_dns = IpValidate(dns_converted);
+      if (input_validate_dns == "ipv6_input" )
+      {
+        i_data.dns_ipv6 = dns_converted;
+      }
+      else if ( input_validate_dns == "ipv4_input" )
+      {
+        i_data.dns_ipv4 = dns_converted;
+      }
+    }
+
+    PrintInputData(i_data);
+
+
 
 
 
