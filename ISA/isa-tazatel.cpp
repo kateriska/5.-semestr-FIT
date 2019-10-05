@@ -7,12 +7,17 @@
 #include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
-//#include<netinet/in.h>
+#include<unistd.h>
+
+
+#include<netinet/in.h>
+#include<netinet/in.h> //sockaddr_in
+#include<sys/socket.h>	//socket
 
 #define WHOIS_PORT 43
 #define WHOIS_IPV4_LENGTH 32
 #define WHOIS_MESSAGE_LENGTH 100
-#define WHOIS_BUFFER_LENGTH 1500
+#define WHOIS_BUFFER_LENGTH 20000
 
 struct input_data
 {
@@ -83,24 +88,41 @@ void PrintInputData(struct input_data i_data)
 
 }
 
-/*
-void WhoisConnectIPV4(struct input_data i_data, std::string response)
+
+std::string WhoisConnectIPV4(struct input_data i_data)
 {
     struct sockaddr_in sw4;
     int socket_whois_ipv4 = 0;
     char message[WHOIS_MESSAGE_LENGTH];
     char buffer[WHOIS_BUFFER_LENGTH];
+    int read_size = 0;
+    int total_size = 0;
+    std::string reply_from_server;
+    std::string sent_message_string;
+
 
     socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
-    memset(buffer, 0, sizeof(sw4));
+    //memset(buffer, 0, sizeof(sw4));
+    memset( &sw4 , 0 , sizeof(sw4) );
     sw4.sin_family = AF_INET;
+    sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
-    connect(socket_whois_ipv4, (struct sockaddr *)&serv_addr, sizeof(serv_addr);
-    sprintf(message , "%s\r\n" , i_data.whois_ipv4);
+    connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
+    std::cout << "Quering for: " + i_data.whois_ipv4+ "\n";
+    sprintf(message , "%s\r\n" , (i_data.skenned_ipv4).c_str());
+    sent_message_string = message;
+    std::cout << "Send message is: " +sent_message_string + "\n";
+    send(socket_whois_ipv4 , message , strlen(message) , 0);
+    read_size = recv(socket_whois_ipv4 , buffer , sizeof(buffer) , 0);
+    reply_from_server = buffer;
+    std::cout << reply_from_server+ "\n";
+    close(socket_whois_ipv4);
+    return reply_from_server;
+
 
 }
 
-*/
+
 
 
 int main(int argc, char **argv)
@@ -249,6 +271,7 @@ int main(int argc, char **argv)
     }
 
     PrintInputData(i_data);
+    WhoisConnectIPV4(i_data);
 
 
 
