@@ -8,6 +8,8 @@
 #include<unistd.h>
 #include <sstream>
 #include<sys/socket.h>
+using namespace std;
+
 
 /*
 #include<netinet/in.h>
@@ -34,6 +36,18 @@ struct input_data
   std::string dns_ipv6;
   std::string dns_hostname;
 };
+
+// https://stackoverflow.com/questions/25829143/trim-whitespace-from-a-string/25829178
+string TrimWhitespaces(const string& str)
+{
+    size_t first = str.find_first_not_of(' ');
+    if (string::npos == first)
+    {
+        return str;
+    }
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, (last - first + 1));
+}
 
 
 std::string IpValidate(std::string input_ip)
@@ -67,6 +81,7 @@ std::string ConvertHostname(std::string hostname)
       std::cerr << "Error - Hostname doesn't exist!\n";
     exit(EXIT_FAILURE);
   }
+  // https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/
   converted_ip_array = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
   converted_ip = converted_ip_array;
   //std::cout << converted_ip + "\n";
@@ -91,7 +106,7 @@ void PrintInputData(struct input_data i_data)
 
 }
 
-
+// https://www.geeksforgeeks.org/socket-programming-cc/
 std::string WhoisConnectIPV4(struct input_data i_data)
 {
     struct sockaddr_in sw4;
@@ -111,10 +126,10 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     sprintf(message , "%s\r\n", (i_data.skenned_ipv4).c_str());
     send(socket_whois_ipv4 , message , strlen(message) , 0);
 
-    recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0);
+    read(socket_whois_ipv4 , buffer , sizeof(buffer));
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
-    recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0);
+    read(socket_whois_ipv4 , buffer , sizeof(buffer));
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
 
@@ -176,6 +191,53 @@ void ProcessResponseFromWhois(std::string whois_server_response)
     {
       std::cout << line + "\n";
     }
+  }
+}
+
+void ProcessParentServer(struct input_data i_data, std::string whois_answer)
+{
+  std::istringstream stream{whois_answer};
+  std::string line;
+  std::string refer_hostname;
+  std::size_t found_parent_server = whois_answer.find("whois.");
+  //std::size_t found_parent_server_line = line.find("refer:");
+  bool parent_server_is_found = false;
+
+  if (found_parent_server!=std::string::npos)
+  {
+    printf("Tohle byl detsky server - je potreba zjistit matersky\n");
+    while (std::getline(stream, line)) // nacitam radek
+    {
+      printf("printing line\n");
+      std::cout << line+ "\n";
+      std::size_t found_parent_server_line = line.find("whois."); // hledam
+      if (found_parent_server_line!=std::string::npos)
+      {
+        printf("Processing paren server hostname\n");
+        refer_hostname = line.substr(line.find(":") + 1);
+        printf("===Processing parent hostname===\n");
+        refer_hostname = TrimWhitespaces(refer_hostname);
+        std::cout << refer_hostname+ "\n";
+        printf("===Processing parent hostname===\n");
+        refer_hostname = ConvertHostname(refer_hostname);
+        i_data.whois_ipv4 = refer_hostname;
+        parent_server_is_found = true; // najdu rodice u serveru
+        break;
+      }
+
+    }
+    if (parent_server_is_found == true)
+    {
+      printf("Zpracovavani materskeho serveru\n");
+      whois_answer = WhoisConnectIPV4(i_data);
+      ProcessParentServer(i_data, whois_answer);
+      //ProcessResponseFromWhois(whois_server_response);
+    }
+
+  }
+  else
+  { // rodic - okamzite zpracovani
+    ProcessResponseFromWhois(whois_answer);
   }
 }
 
@@ -327,10 +389,12 @@ int main(int argc, char **argv)
 
     PrintInputData(i_data);
     whois_server_response = WhoisConnectIPV4(i_data);
+    ProcessParentServer(i_data, whois_server_response);
+    /*
     std::istringstream stream{whois_server_response};
     std::string line;
     std::string refer_hostname;
-    std::size_t found_parent_server = whois_server_response.find("refer:");
+    std::size_t found_parent_server = whois_server_response.find("whois.");
     //std::size_t found_parent_server_line = line.find("refer:");
     if (found_parent_server!=std::string::npos)
     {
@@ -339,12 +403,13 @@ int main(int argc, char **argv)
       {
         printf("printing line\n");
         std::cout << line+ "\n";
-        std::size_t found_parent_server_line = line.find("refer:");
+        std::size_t found_parent_server_line = line.find("whois.");
         if (found_parent_server_line!=std::string::npos)
         {
           printf("Processing paren server hostname\n");
-          refer_hostname = line.substr(14);
-          //printf("===Processing parent hostname===\n");
+          refer_hostname = line.substr(line.find(":") + 1);
+          printf("===Processing parent hostname===\n");
+          refer_hostname = TrimWhitespaces(refer_hostname);
           std::cout << refer_hostname+ "\n";
           printf("===Processing parent hostname===\n");
           refer_hostname = ConvertHostname(refer_hostname);
