@@ -9,15 +9,16 @@
 #include <netdb.h>
 #include<unistd.h>
 
-
+/*
 #include<netinet/in.h>
 #include<netinet/in.h> //sockaddr_in
 #include<sys/socket.h>	//socket
+*/
 
 #define WHOIS_PORT 43
 #define WHOIS_IPV4_LENGTH 32
 #define WHOIS_MESSAGE_LENGTH 100
-#define WHOIS_BUFFER_LENGTH 20000
+#define WHOIS_BUFFER_LENGTH 1500
 
 struct input_data
 {
@@ -99,6 +100,9 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     int total_size = 0;
     std::string reply_from_server;
     std::string sent_message_string;
+    std::string skenned_ipv4_resolve = i_data.skenned_ipv4;
+    char* message_char = const_cast<char*>(skenned_ipv4_resolve.c_str());
+    //std::string request = "--resource " + i_data.skenned_ipv4;
 
 
     socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
@@ -108,15 +112,35 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
     connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
-    std::cout << "Quering for: " + i_data.whois_ipv4+ "\n";
-    sprintf(message , "%s\r\n" , (i_data.skenned_ipv4).c_str());
-    sent_message_string = message;
-    std::cout << "Send message is: " +sent_message_string + "\n";
-    send(socket_whois_ipv4 , message , strlen(message) , 0);
-    read_size = recv(socket_whois_ipv4 , buffer , sizeof(buffer) , 0);
+    //std::cout << "Quering for: " + i_data.skenned_ipv4+ "\n";
+    //sprintf(message , "%s\r\n" , message_char);
+    sprintf(message , "77.65.12.44\r\n");
+    //--resource 77.65.12.44
+    //sprintf(message , "%s\r\n" , (request).c_str());
+    //sent_message_string = message;
+  //  std::cout << "Send message is: " +sent_message_string + "\n";
+    if( send(socket_whois_ipv4 , message , strlen(message) , 0) < 0)
+    {
+      perror("send failed");
+    }
+    //read_size = recv(socket_whois_ipv4 , buffer , sizeof(buffer) , 0);
+    /*
+    while (read_size = recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0))
+    {
+      printf("Bytes received: %d\n", read_size);
+    }
+    */
+    recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0);
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
+    recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0);
+    reply_from_server = buffer;
+    std::cout << reply_from_server+ "\n";
+
+    //reply_from_server = buffer;
+    //std::cout << reply_from_server+ "\n";
     close(socket_whois_ipv4);
+    //std::cout << reply_from_server+ "\n";
     return reply_from_server;
 
 
@@ -144,6 +168,7 @@ int main(int argc, char **argv)
   std:: string ipq_converted_response;
   std:: string whois_converted_response;
   std:: string dns_converted_response;
+  std:: string whois_server_response;
 
   if ((argc < 5 ) || (argc > 7))
   {
@@ -272,6 +297,9 @@ int main(int argc, char **argv)
 
     PrintInputData(i_data);
     WhoisConnectIPV4(i_data);
+
+
+
 
 
 
