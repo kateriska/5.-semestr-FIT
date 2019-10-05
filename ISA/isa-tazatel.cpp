@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include<unistd.h>
+#include <sstream>
 
 /*
 #include<netinet/in.h>
@@ -96,40 +97,19 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     int socket_whois_ipv4 = 0;
     char message[WHOIS_MESSAGE_LENGTH];
     char buffer[WHOIS_BUFFER_LENGTH];
-    int read_size = 0;
-    int total_size = 0;
     std::string reply_from_server;
     std::string sent_message_string;
-    std::string skenned_ipv4_resolve = i_data.skenned_ipv4;
-    char* message_char = const_cast<char*>(skenned_ipv4_resolve.c_str());
-    //std::string request = "--resource " + i_data.skenned_ipv4;
-
 
     socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
-    //memset(buffer, 0, sizeof(sw4));
-    memset( &sw4 , 0 , sizeof(sw4) );
+    memset(buffer, 0, sizeof(sw4));
     sw4.sin_family = AF_INET;
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
     connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
     //std::cout << "Quering for: " + i_data.skenned_ipv4+ "\n";
-    //sprintf(message , "%s\r\n" , message_char);
-    sprintf(message , "77.65.12.44\r\n");
-    //--resource 77.65.12.44
-    //sprintf(message , "%s\r\n" , (request).c_str());
-    //sent_message_string = message;
-  //  std::cout << "Send message is: " +sent_message_string + "\n";
-    if( send(socket_whois_ipv4 , message , strlen(message) , 0) < 0)
-    {
-      perror("send failed");
-    }
-    //read_size = recv(socket_whois_ipv4 , buffer , sizeof(buffer) , 0);
-    /*
-    while (read_size = recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0))
-    {
-      printf("Bytes received: %d\n", read_size);
-    }
-    */
+    sprintf(message , "%s\r\n", (i_data.skenned_ipv4).c_str());
+    send(socket_whois_ipv4 , message , strlen(message) , 0);
+
     recv(socket_whois_ipv4 , buffer , sizeof(buffer), 0);
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
@@ -137,13 +117,65 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
 
-    //reply_from_server = buffer;
-    //std::cout << reply_from_server+ "\n";
     close(socket_whois_ipv4);
-    //std::cout << reply_from_server+ "\n";
+
+
     return reply_from_server;
 
 
+}
+
+void ProcessResponseFromWhois(std::string whois_server_response)
+{
+  std::istringstream response_stream{whois_server_response};
+  std::string line;
+  /*
+  std::size_t found_intetnum = line.find("inetnum:");
+  std::size_t found_netname = line.find("netname:");
+  std::size_t found_descr = line.find("descr:");
+  std::size_t found_country = line.find("country:");
+  std::size_t found_admin = line.find("admin-c:");
+  std::size_t found_adress = line.find("adress:");
+  std::size_t found_phone = line.find("phone:");
+  */
+  while (std::getline(response_stream, line))
+  {
+    std::size_t found_intetnum = line.find("inetnum:");
+    std::size_t found_netname = line.find("netname:");
+    std::size_t found_descr = line.find("descr:");
+    std::size_t found_country = line.find("country:");
+    std::size_t found_admin = line.find("admin-c:");
+    std::size_t found_adress = line.find("adress:");
+    std::size_t found_phone = line.find("phone:");
+    if (found_intetnum!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+    if (found_netname!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+    if (found_descr!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+    if (found_country!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+    if (found_admin!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+    if (found_adress!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+    if (found_phone!=std::string::npos)
+    {
+      std::cout << line + "\n";
+    }
+  }
 }
 
 
@@ -165,9 +197,6 @@ int main(int argc, char **argv)
   std:: string ipq_converted;
   std:: string whois_converted;
   std:: string dns_converted;
-  std:: string ipq_converted_response;
-  std:: string whois_converted_response;
-  std:: string dns_converted_response;
   std:: string whois_server_response;
 
   if ((argc < 5 ) || (argc > 7))
@@ -296,7 +325,76 @@ int main(int argc, char **argv)
     }
 
     PrintInputData(i_data);
-    WhoisConnectIPV4(i_data);
+    whois_server_response = WhoisConnectIPV4(i_data);
+    std::istringstream stream{whois_server_response};
+    std::string line;
+    std::string refer_hostname;
+    std::size_t found_parent_server = whois_server_response.find("refer:");
+    //std::size_t found_parent_server_line = line.find("refer:");
+    if (found_parent_server!=std::string::npos)
+    {
+      printf("Tohle byl detsky server - je potreba zjistit matersky\n");
+      while (std::getline(stream, line))
+      {
+        printf("printing line\n");
+        std::cout << line+ "\n";
+        std::size_t found_parent_server_line = line.find("refer:");
+        if (found_parent_server_line!=std::string::npos)
+        {
+          printf("Processing paren server hostname\n");
+          refer_hostname = line.substr(14);
+          //printf("===Processing parent hostname===\n");
+          std::cout << refer_hostname+ "\n";
+          printf("===Processing parent hostname===\n");
+          refer_hostname = ConvertHostname(refer_hostname);
+          i_data.whois_ipv4 = refer_hostname;
+          break;
+        }
+
+      }
+      printf("Zpracovavani materskeho serveru\n");
+      whois_server_response = WhoisConnectIPV4(i_data);
+      ProcessResponseFromWhois(whois_server_response);
+
+    }
+    else
+    {
+      ProcessResponseFromWhois(whois_server_response);
+    }
+
+    /*
+    std::istringstream stream{whois_server_response};
+    std::string line;
+    std::string refer_hostname;
+    std::size_t found = line.find("refer:");
+
+
+
+    while (std::getline(stream, line))
+    {
+        //printf("===Processing line===\n");
+        //std::cout << line+ "\n";
+
+        if (found!=std::string::npos)
+        {
+          printf("Tohle byl detsky server - je potreba zjistit matersky\n");
+          refer_hostname = line.substr(14);
+          printf("===Processing parent hostname===\n");
+          std::cout << refer_hostname+ "\n";
+          refer_hostname = ConvertHostname(refer_hostname);
+          i_data.whois_ipv4 = refer_hostname;
+          printf("Zpracovavani materskeho serveru\n");
+          whois_server_response = WhoisConnectIPV4(i_data);
+          ProcessResponseFromWhois(whois_server_response);
+
+        }
+        else
+        {
+          ProcessResponseFromWhois(whois_server_response);
+          break;
+        }
+    }
+*/
 
 
 
