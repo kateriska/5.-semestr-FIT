@@ -2,18 +2,19 @@
 #include <string>
 #include <vector>
 #include <getopt.h>
-//#include <regex.h>
 #include <string.h>
-//#include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include<unistd.h>
 #include <sstream>
+#include<sys/socket.h>
 
 /*
 #include<netinet/in.h>
 #include<netinet/in.h> //sockaddr_in
 #include<sys/socket.h>	//socket
+#include <regex>
+#include <regex.h>
 */
 
 #define WHOIS_PORT 43
@@ -100,7 +101,7 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     std::string reply_from_server;
     std::string sent_message_string;
 
-    socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
+    socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , 0);
     memset(buffer, 0, sizeof(sw4));
     sw4.sin_family = AF_INET;
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
