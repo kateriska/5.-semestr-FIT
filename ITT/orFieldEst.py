@@ -3,7 +3,7 @@ import cv2
 #from matplotlib import pyplot as plt
 
 
-img = cv2.imread("nwmPa.png", 0)  # uint8 image
+img = cv2.imread("104_1.tif", 0)  # uint8 image
 height_orig = np.size(img, 0)
 width_orig = np.size(img, 1)
 print(height_orig)
@@ -43,15 +43,84 @@ while y < height:
     y += step
 
 cv2.imshow('Norm Image With Grid', norm_image)
+
+
+array_I = norm_image.astype(np.float)
+
+
+for i in range(start_x, width - step + 1, step):
+    for j in range(start_y, height - step + 1, step):
+        D_x = cv2.Sobel(norm_image[i:i+step,j:j+step],-1,1,0)
+        D_y = cv2.Sobel(norm_image[i:i+step,j:j+step],-1,1,0)
+        #print(pixel_sobel_x)
+        #print(pixel_sobel_y)
+
 '''
-for (start_x, width, step):
-    for (start_y, height, step):
+array_I = np.array([width][height])
+row, col = array_I.shape
+array_I = array_I.astype(np.float)
+w = 17
+h = 17
+Ox = array_I[0:row-h+1:h,0:col-w+1:w].copy()
+Ox[:] = 0.0
+Vx = Ox.copy()
+Vy = Vx.copy()
+Oy = Ox.copy()
+angle = Vx.copy()#array to contain all the 17*17 blocks's orientatons
+c = r = -1
+for i in xrange(0, row-h+1, h):
+    r+=1
+    for j in xrange(0, col-w+1, w):
+        c+=1
+        Dx = cv2.Sobel(array_I[i:i+h,j:j+w],-1,1,0)#gradient component x for a 17*17block
+        Dy = cv2.Sobel(array_I[i:i+h,j:j+w],-1,0,1)#gradient component y for 17*17 block
+        for k in range(0,h):
+            for l in range(0,w):
+                Vy[r][c] += ((Dx[k][l])*(Dy[k][l]))**2
+                Vx[r][c] += 2*(Dx[k][l])*(Dy[k][l])
+    angle[r][c] = 0.5*(math.atan(Vy[r][c]/Vx[r][c]))#get the orientation angle for the given 16*16 block
 '''
+'''
+def compute_real_orientation(array_I, w=17, h=17, low_pass_filter=cv2.blur,filter_size=(5,5),blur_size=(5,5)):
+    row, col = array_I.shape
+    array_I = array_I.astype(np.float)
+    Ox = array_I[0:row-h+1:h,0:col-w+1:w].copy()
+    Ox[:] = 0.0
+    Vx = Ox.copy()
+    Vy = Vx.copy()
+    Oy = Ox.copy()
+    angle = Vx.copy()#array to contain all the 17*17 blocks's orientatons
+    c = r = -1
+    for i in xrange(0, row-h+1, h):
+        r+=1
+        for j in xrange(0, col-w+1, w):
+            c+=1
+            Dx = cv2.Sobel(array_I[i:i+h,j:j+w],-1,1,0)#gradient component x for a 17*17block
+            Dy = cv2.Sobel(array_I[i:i+h,j:j+w],-1,0,1)#gradient component y for 17*17 block
+            for k in range(0,h):
+                for l in range(0,w):
+                    Vy[r][c] += ((Dx[k][l])*(Dy[k][l]))**2
+                    Vx[r][c] += 2*(Dx[k][l])*(Dy[k][l])
+        angle[r][c] = 0.5*(math.atan(Vy[r][c]/Vx[r][c]))#get the orientation angle for the given 16*16 block
+    c = -1
+    #smoothing process of the whole array angle
+    row, col = angle.shape
+    for i in range(0, row):
+        for j in range(0, col):
+            Ox[i][j] = math.cos(2*angle[i][j])
+            Oy[i][j] = math.sin(2*angle[i][j])
+    Ox = low_pass_filter(Ox, blur_size)
+    Oy = low_pass_filter(Oy, blur_size)
+    for i in range(0, row):
+        for j in range(0, col):
+            angle[i][j] = 0.5*math.atan(Oy[i][j]/Ox[i][j])#take the final orientation of all 17*17 blocks
+    return angle
 
 
 
 
 
+'''
 
 
 
