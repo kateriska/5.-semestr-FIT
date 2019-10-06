@@ -115,6 +115,7 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     char buffer[WHOIS_BUFFER_LENGTH];
     std::string reply_from_server;
     std::string sent_message_string;
+    int count_respond = 0;
 
     socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , 0);
     memset(buffer, 0, sizeof(sw4));
@@ -126,12 +127,19 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     sprintf(message , "%s\r\n", (i_data.skenned_ipv4).c_str());
     send(socket_whois_ipv4 , message , strlen(message) , 0);
 
-    read(socket_whois_ipv4 , buffer , sizeof(buffer));
+    count_respond = read(socket_whois_ipv4 , buffer , sizeof(buffer));
+    std::cout << count_respond+ "\n";
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
-    read(socket_whois_ipv4 , buffer , sizeof(buffer));
+    count_respond = read(socket_whois_ipv4 , buffer , sizeof(buffer));
+    std::cout << count_respond+ "\n";
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
+    count_respond = read(socket_whois_ipv4 , buffer , sizeof(buffer));
+    std::cout << count_respond+ "\n";
+    reply_from_server = buffer;
+    std::cout << reply_from_server+ "\n";
+  
 
     close(socket_whois_ipv4);
 
@@ -214,7 +222,14 @@ void ProcessParentServer(struct input_data i_data, std::string whois_answer)
       if (found_parent_server_line!=std::string::npos)
       {
         printf("Processing paren server hostname\n");
-        refer_hostname = line.substr(line.find(":") + 1);
+        refer_hostname = line.substr(line.find("whois."));
+        std::cout << refer_hostname+ "\n";
+        /*
+        if (refer_hostname.find(" ")!=std::string::npos)
+        {
+          refer_hostname = refer_hostname.substr(refer_hostname.find(" "));
+        }
+        */
         printf("===Processing parent hostname===\n");
         refer_hostname = TrimWhitespaces(refer_hostname);
         std::cout << refer_hostname+ "\n";
