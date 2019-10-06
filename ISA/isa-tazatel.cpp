@@ -219,11 +219,13 @@ void ProcessParentServer(struct input_data i_data, std::string whois_answer)
         refer_hostname = line.substr(line.find("whois."));
         std::cout << refer_hostname+ "\n";
         /*
-        if (refer_hostname.find(" ")!=std::string::npos)
+        if (refer_hostname.compare("whois.lacnic.net accepts only direct match queries.\n") != 0)
         {
-          refer_hostname = refer_hostname.substr(refer_hostname.find(" "));
+          parent_server_is_found = true;
+          break;
         }
         */
+
         printf("===Processing parent hostname===\n");
         refer_hostname = TrimWhitespaces(refer_hostname);
         std::cout << refer_hostname+ "\n";
@@ -231,10 +233,19 @@ void ProcessParentServer(struct input_data i_data, std::string whois_answer)
         refer_hostname = ConvertHostname(refer_hostname);
         i_data.whois_ipv4 = refer_hostname;
         parent_server_is_found = true; // najdu rodice u serveru
+        whois_answer = WhoisConnectIPV4(i_data);
+        //ProcessParentServer(i_data, whois_answer);
+        if (whois_answer.find("ResourceLink:") !=std::string::npos)
+        {
+          ProcessParentServer(i_data, whois_answer);
+          break;
+        }
+        ProcessResponseFromWhois(whois_answer);
         break;
       }
 
     }
+    /*
     if (parent_server_is_found == true)
     {
       printf("Zpracovavani materskeho serveru\n");
@@ -242,6 +253,7 @@ void ProcessParentServer(struct input_data i_data, std::string whois_answer)
       ProcessParentServer(i_data, whois_answer);
       //ProcessResponseFromWhois(whois_server_response);
     }
+    */
 
   }
   else
