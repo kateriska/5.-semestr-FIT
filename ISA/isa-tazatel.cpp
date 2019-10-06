@@ -135,7 +135,7 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     std::cout << count_respond+ "\n";
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
-    
+
 
     close(socket_whois_ipv4);
 
@@ -184,7 +184,7 @@ void ProcessResponseFromWhois(std::string whois_server_response)
     {
       std::cout << line + "\n";
     }
-    else if ((line.find("adress:")!=std::string::npos) || (line.find("Adress:")!=std::string::npos))
+    else if ((line.find("address:")!=std::string::npos) || (line.find("Address:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
