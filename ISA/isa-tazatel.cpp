@@ -135,11 +135,7 @@ std::string WhoisConnectIPV4(struct input_data i_data)
     std::cout << count_respond+ "\n";
     reply_from_server = buffer;
     std::cout << reply_from_server+ "\n";
-    count_respond = read(socket_whois_ipv4 , buffer , sizeof(buffer));
-    std::cout << count_respond+ "\n";
-    reply_from_server = buffer;
-    std::cout << reply_from_server+ "\n";
-  
+    
 
     close(socket_whois_ipv4);
 
@@ -153,17 +149,11 @@ void ProcessResponseFromWhois(std::string whois_server_response)
 {
   std::istringstream response_stream{whois_server_response};
   std::string line;
-  /*
-  std::size_t found_intetnum = line.find("inetnum:");
-  std::size_t found_netname = line.find("netname:");
-  std::size_t found_descr = line.find("descr:");
-  std::size_t found_country = line.find("country:");
-  std::size_t found_admin = line.find("admin-c:");
-  std::size_t found_adress = line.find("adress:");
-  std::size_t found_phone = line.find("phone:");
-  */
+
+  printf("=====Printing output information========\n");
   while (std::getline(response_stream, line))
   {
+    /*
     std::size_t found_intetnum = line.find("inetnum:");
     std::size_t found_netname = line.find("netname:");
     std::size_t found_descr = line.find("descr:");
@@ -171,34 +161,38 @@ void ProcessResponseFromWhois(std::string whois_server_response)
     std::size_t found_admin = line.find("admin-c:");
     std::size_t found_adress = line.find("adress:");
     std::size_t found_phone = line.find("phone:");
-    if (found_intetnum!=std::string::npos)
+
+    */
+
+    if ((line.find("inetnum:")!=std::string::npos) || (line.find("NetRange:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
-    if (found_netname!=std::string::npos)
+    else if ((line.find("netname:")!=std::string::npos) || (line.find("NetName:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
-    if (found_descr!=std::string::npos)
+    else if ((line.find("descr:")!=std::string::npos) || (line.find("Organization:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
-    if (found_country!=std::string::npos)
+    else if ((line.find("country:")!=std::string::npos) || (line.find("Country:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
-    if (found_admin!=std::string::npos)
+    else if ((line.find("admin-c:")!=std::string::npos) || (line.find("OrgTechHandle:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
-    if (found_adress!=std::string::npos)
+    else if ((line.find("adress:")!=std::string::npos) || (line.find("Adress:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
-    if (found_phone!=std::string::npos)
+    else if ((line.find("phone:")!=std::string::npos) || (line.find("OrgTechPhone:")!=std::string::npos))
     {
       std::cout << line + "\n";
     }
+
   }
 }
 
