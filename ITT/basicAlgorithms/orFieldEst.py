@@ -28,16 +28,16 @@ while y < cols:
 cv2.imshow('Norm Image With Grid', norm_image)
 
 block_div = 8
-size_img = norm_image.shape;
+shape_img = norm_image.shape
 
 print(norm_image.shape)
 print(norm_image.dtype)
 
-grad_x = np.zeros(size_img, dtype=np.uint8)
-grad_y = np.zeros(size_img, dtype=np.uint8)
-Vx = np.zeros(size_img, dtype=np.uint8)
-Vy = np.zeros(size_img, dtype=np.uint8)
-theta = np.zeros(size_img, dtype=np.uint8)
+grad_x = np.zeros(shape_img, dtype=np.uint8)
+grad_y = np.zeros(shape_img, dtype=np.uint8)
+Vx = np.zeros(shape_img, dtype=np.uint8)
+Vy = np.zeros(shape_img, dtype=np.uint8)
+theta = np.zeros(shape_img, dtype=np.uint8)
 
 #compute gradients for each pixel
 grad_x = cv2.Sobel(norm_image,cv2.CV_64F,1,0,ksize=5)
@@ -60,7 +60,7 @@ for i in range(block_div, rows-block_div, step):
 
         if (sum_Vx != 0 ):
             theta_calculation = 0.5 * math.atan(sum_Vy / sum_Vx)
-            print(theta_calculation)
+            #print(theta_calculation)
 
         theta[i][j] = theta_calculation
 
