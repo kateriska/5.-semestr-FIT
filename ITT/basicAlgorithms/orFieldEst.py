@@ -38,6 +38,10 @@ grad_y = np.zeros(shape_img, dtype=np.uint8)
 Vx = np.zeros(shape_img, dtype=np.uint8)
 Vy = np.zeros(shape_img, dtype=np.uint8)
 theta = np.zeros(shape_img, dtype=np.uint8)
+phi_x = np.zeros(shape_img, dtype=np.uint8)
+phi_y = np.zeros(shape_img, dtype=np.uint8)
+Orientation = np.zeros(shape_img, dtype=np.uint8)
+
 
 #compute gradients for each pixel
 grad_x = cv2.Sobel(norm_image,cv2.CV_64F,1,0,ksize=5)
@@ -64,25 +68,23 @@ for i in range(block_div, rows-block_div, step):
 
         theta[i][j] = theta_calculation
 
+rows_theta, cols_theta = theta.shape
+print(theta.shape)
+for i in range(0, rows_theta):
+    for j in range(0, cols_theta):
+        phi_x[i][j] = math.cos(2*theta[i][j])
+        phi_y[i][j] = math.sin(2*theta[i][j])
+        print(phi_x)
 
+#phi_x = cv2.blur(phi_x, (5,5))
+#phi_y = cv2.blur(phi_y, (5,5))
 
-
-
-
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-
-
+'''
+for i in range(0, rows):
+    for j in range(0, cols):
+        Orientation[i][j] = 0.5 * math.atan(phi_y[i][j] / phi_x[i][j] )
+        print(Orientation)
+'''
 
 
 cv2.waitKey(0)
