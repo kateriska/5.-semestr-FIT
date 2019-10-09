@@ -16,7 +16,7 @@ print(cols)
 step = 16
 x = 16
 y = 16
-
+# draw grid for squares 16 x 16
 while x < rows:
     cv2.line(norm_image, (x, 0), (x, rows), color=(0, 0, 0), lineType=cv2.LINE_AA, thickness=1)
     x += step
@@ -41,6 +41,10 @@ theta = np.zeros(shape_img, dtype=np.uint8)
 phi_x = np.zeros(shape_img, dtype=np.uint8)
 phi_y = np.zeros(shape_img, dtype=np.uint8)
 Orientation = np.zeros(shape_img, dtype=np.uint8)
+filtering_x = np.zeros(shape_img, dtype=np.uint8)
+filtering_y = np.zeros(shape_img, dtype=np.uint8)
+filtering = 5
+filtering_div = 2.5
 
 
 #compute gradients for each pixel
@@ -54,7 +58,7 @@ for i in range(block_div, rows-block_div, step):
         for u in range(i-block_div, i+block_div):
             for v in range(j-block_div, j+block_div):
                 sum_Vy = sum_Vy + (2 * grad_x[u][v] * grad_y[u][v])
-                sum_Vx = sum_Vx + (grad_x[u][v]**2 - grad_y[u][v]**2)
+                sum_Vx = sum_Vx + (grad_x[u][v]**2 * grad_y[u][v]**2)
                 #print(sum_Vx)
                 #print(sum_Vy)
 
@@ -64,28 +68,38 @@ for i in range(block_div, rows-block_div, step):
 
         if (sum_Vx != 0 ):
             theta_calculation = 0.5 * math.atan(sum_Vy / sum_Vx)
-            #print(theta_calculation)
+            print(theta_calculation)
 
         theta[i][j] = theta_calculation
 
-rows_theta, cols_theta = theta.shape
-print(theta.shape)
-for i in range(0, rows_theta):
-    for j in range(0, cols_theta):
+        rows_theta, cols_theta = theta.shape
+        #print(theta.shape)
+
         phi_x[i][j] = math.cos(2*theta[i][j])
         phi_y[i][j] = math.sin(2*theta[i][j])
-        print(phi_x)
+        #print(phi_x)
 
-#phi_x = cv2.blur(phi_x, (5,5))
-#phi_y = cv2.blur(phi_y, (5,5))
+        sum_filter_x = 0.0
+        sum_filter_y = 0.0
+        '''
 
-'''
-for i in range(0, rows):
-    for j in range(0, cols):
-        Orientation[i][j] = 0.5 * math.atan(phi_y[i][j] / phi_x[i][j] )
-        print(Orientation)
-'''
+        for u in np.arange (-filtering_div, filtering_div):
+            for v in np.arange (-filtering_div, filtering_div):
+                i_matrix = i - u*filtering
+                j_matrix = j - v*filtering
+                sum_filter_x = sum_filter_x + phi_x[i_matrix][j_matrix]
+                sum_filter_y = sum_filter_y + (phi_y[i_matrix][j_matrix])
 
+        filtering_x[i][j] = sum_filter_x
+        filtering_y[i][j] = sum_filter_y
 
+        #phi_x = cv2.blur(phi_x, (5,5))
+        #phi_y = cv2.blur(phi_y, (5,5))
+
+        if (phi_x[i][j] != 0):
+            Orientation[i][j] = 0.5 * math.atan(phi_y[i][j] / phi_x[i][j] )
+            #print(Orientation)
+        '''
+    
 cv2.waitKey(0)
 cv2.destroyAllWindows()
