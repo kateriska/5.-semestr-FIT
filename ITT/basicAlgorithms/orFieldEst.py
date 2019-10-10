@@ -43,13 +43,14 @@ phi_y = np.zeros(shape_img, dtype=np.uint8)
 Orientation = np.zeros(shape_img, dtype=np.uint8)
 filtering_x = np.zeros(shape_img, dtype=np.uint8)
 filtering_y = np.zeros(shape_img, dtype=np.uint8)
+
 filtering = 5
 filtering_div = 2.5
 
 
 #compute gradients for each pixel
-grad_x = cv2.Sobel(norm_image,cv2.CV_64F,1,0,ksize=5)
-grad_y = cv2.Sobel(norm_image,cv2.CV_64F,0,1,ksize=5)
+grad_x = cv2.Sobel(norm_image,cv2.CV_8UC1,1,0,ksize=5)
+grad_y = cv2.Sobel(norm_image,cv2.CV_8UC1,0,1,ksize=5)
 
 for i in range(block_div, rows-block_div, step):
     for j in range(block_div, cols-block_div, step):
@@ -68,7 +69,7 @@ for i in range(block_div, rows-block_div, step):
 
         if (sum_Vx != 0 ):
             theta_calculation = 0.5 * math.atan(sum_Vy / sum_Vx)
-            print(theta_calculation)
+            #print(theta_calculation)
 
         theta[i][j] = theta_calculation
 
@@ -77,7 +78,7 @@ for i in range(block_div, rows-block_div, step):
 
         phi_x[i][j] = math.cos(2*theta[i][j])
         phi_y[i][j] = math.sin(2*theta[i][j])
-        #print(phi_x)
+        #print(phi_x[i][j])
 
         sum_filter_x = 0.0
         sum_filter_y = 0.0
@@ -100,6 +101,6 @@ for i in range(block_div, rows-block_div, step):
             Orientation[i][j] = 0.5 * math.atan(phi_y[i][j] / phi_x[i][j] )
             #print(Orientation)
         '''
-    
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
