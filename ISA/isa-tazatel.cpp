@@ -18,7 +18,7 @@ using namespace std;
 #define WHOIS_MESSAGE_LENGTH 100
 #define WHOIS_BUFFER_LENGTH 1500
 #define DNS_MESSAGE_LENGTH 100
-#define DNS_BUFFER_LENGTH 1500
+#define DNS_BUFFER_LENGTH 4096
 
 struct input_data
 {
@@ -355,10 +355,10 @@ string DNSConnectIPV4(struct input_data i_data)
 
   const char *dname = (i_data.skenned_ipv4).c_str();
   int type = T_PTR;
-  unsigned char *answer;
-  int anslen;
-  //res_init();
-  //res_query(&dname, C_IN, type, &answer, anslen);
+  unsigned char buffer[DNS_BUFFER_LENGTH];
+  //int anslen;
+  res_init();
+  int query = res_query(i_data.skenned_ipv4.c_str(), C_IN, type, buffer, sizeof(buffer));
 
 
 
