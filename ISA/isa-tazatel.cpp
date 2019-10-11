@@ -9,6 +9,7 @@
 #include <sstream>
 #include<sys/socket.h>
 #include <resolv.h>
+#include <netinet/in.h>
 using namespace std;
 
 #define WHOIS_PORT 43
@@ -80,6 +81,39 @@ string ConvertHostname(string hostname)
   converted_ip = converted_ip_array;
   return converted_ip;
 }
+string ConvertHostnameIPV6(string hostname)
+{
+  struct addrinfo hints, *infoptr;
+  char *host;
+  memset(&hints, 0, sizeof(struct addrinfo));
+
+  hints.ai_family = AF_INET6;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE;
+  hints.ai_protocol = 0;
+
+  host = (char *)hostname.c_str();
+  int converted_ip = getaddrinfo(host, NULL, &hints, &infoptr);
+  if (converted_ip != 0)
+  {
+    cerr << "Error - IPV6 for hostname doesn't exist!\n";
+    exit(EXIT_FAILURE);
+  }
+
+  char converted_ip_array[256] = { 0 };
+  for(struct addrinfo *p = infoptr; p != NULL; p = p->ai_next)
+  {
+    if (p->ai_family == AF_INET6)
+    {
+      getnameinfo(p->ai_addr, p->ai_addrlen, converted_ip_array, sizeof (converted_ip_array), NULL, 0, NI_NUMERICHOST);
+      break;
+    }
+  }
+
+  freeaddrinfo(infoptr);
+  cout << converted_ip_array;
+  return converted_ip_array;
+}
 
 void PrintInputData(struct input_data i_data)
 {
@@ -129,6 +163,41 @@ string WhoisConnectIPV4(struct input_data i_data)
     //cout << reply_from_server+ "\n";
 
     close(socket_whois_ipv4);
+
+    return reply_from_server;
+
+
+}
+string WhoisConnectIPV6(struct input_data i_data)
+{
+    struct sockaddr_in6 sw6;
+    int socket_whois_ipv6 = 0;
+    char message[WHOIS_MESSAGE_LENGTH];
+    char buffer[WHOIS_BUFFER_LENGTH];
+    string reply_from_server;
+    string sent_message_string;
+    int count_respond = 0;
+
+    socket_whois_ipv6 = socket(AF_INET6 , SOCK_STREAM , 0);
+    memset(buffer, 0, sizeof(sw6));
+    sw6.sin6_family = AF_INET6;
+    inet_pton(AF_INET6, (i_data.whois_ipv6).c_str(), &sw6.sin6_addr);
+    sw6.sin6_port = htons(WHOIS_PORT);
+    connect(socket_whois_ipv6, (struct sockaddr *)&sw6, sizeof(sw6));
+    sprintf(message , "%s\r\n", (i_data.skenned_ipv6).c_str());
+    send(socket_whois_ipv6 , message , strlen(message) , 0);
+
+    count_respond = read(socket_whois_ipv6 , buffer , sizeof(buffer));
+    cout << count_respond+ "\n";
+    reply_from_server = buffer;
+    cout << reply_from_server+ "\n";
+    count_respond = read(socket_whois_ipv6 , buffer , sizeof(buffer));
+    cout << count_respond+ "\n";
+    reply_from_server = buffer;
+    cout << reply_from_server+ "\n";
+
+    close(socket_whois_ipv6);
+
 
     return reply_from_server;
 
@@ -409,8 +478,38 @@ int main(int argc, char **argv)
   }
 
     PrintInputData(i_data);
-    whois_server_response = WhoisConnectIPV4(i_data);
-    ProcessParentServer(i_data, whois_server_response);
-    dns_server_response = DNSConnectIPV4(i_data);
+    if (   !((i_data.skenned_ipv6).empty()) ||  !((i_data.whois_ipv6).empty())  ||  !((i_data.dns_ipv6).empty())    )
+    {
+      if (!(i_data.skenned_hostname).empty())
+      {
+        i_data.skenned_ipv6 = ConvertHostnameIPV6(i_data.skenned_hostname);
+      }
+      if (!(i_data.whois_hostname).empty())
+      {
+        i_data.whois_ipv6 = ConvertHostnameIPV6(i_data.whois_hostname);
+      }
+      if (!(i_data.dns_hostname).empty())
+      {
+        i_data.dns_ipv6 = ConvertHostnameIPV6(i_data.dns_hostname);
+      }
+
+
+    }
+    PrintInputData(i_data);
+
+    if (!(i_data.whois_ipv4).empty())
+    {
+      printf("Processing IPV4\n");
+      whois_server_response = WhoisConnectIPV4(i_data);
+      ProcessParentServer(i_data, whois_server_response);
+    }
+    else if (!(i_data.whois_ipv6).empty())
+    {
+      printf("Processing IPV6dundudu\n");
+      WhoisConnectIPV6(i_data);
+      //ProcessParentServer(i_data, whois_server_response);
+    }
+    //dns_server_response = DNSConnectIPV4(i_data);
+
 
 }
