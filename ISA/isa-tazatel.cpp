@@ -10,6 +10,7 @@
 #include<sys/socket.h>
 #include <resolv.h>
 #include <netinet/in.h>
+#include <arpa/nameser.h>
 using namespace std;
 
 #define WHOIS_PORT 43
@@ -289,42 +290,82 @@ void ProcessParentServer(struct input_data i_data, string whois_answer)
   }
 }
 
+void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
+{
+  istringstream stream{whois_answer};
+  string line;
+  string refer_hostname;
+  size_t found_parent_server = whois_answer.find("whois.");
+
+  bool parent_server_is_found = false;
+
+  if (found_parent_server!=std::string::npos)
+  {
+    //printf("Tohle byl detsky server - je potreba zjistit matersky\n");
+    while (std::getline(stream, line))
+    {
+      //cout << line+ "\n";
+      size_t found_parent_server_line = line.find("whois.");
+      if (found_parent_server_line!=std::string::npos)
+      {
+        refer_hostname = line.substr(line.find("whois."));
+        //cout << refer_hostname+ "\n";
+        refer_hostname = TrimWhitespaces(refer_hostname);
+        //cout << refer_hostname+ "\n";
+        refer_hostname = ConvertHostname(refer_hostname);
+        i_data.whois_ipv6 = refer_hostname;
+        parent_server_is_found = true;
+        break;
+      }
+
+    }
+    if (parent_server_is_found == true)
+    {
+      //printf("Zpracovavani materskeho serveru\n");
+      whois_answer = WhoisConnectIPV6(i_data);
+      ProcessParentServerIPV6(i_data, whois_answer);
+    }
+
+  }
+  else
+  { // rodic - okamzite zpracovani
+    ProcessResponseFromWhois(whois_answer);
+  }
+}
+
 string DNSConnectIPV4(struct input_data i_data)
 {
-  struct sockaddr_in sd4;
-  int socket_dns_ipv4 = 0;
-  char message_dns[DNS_MESSAGE_LENGTH];
-  char buffer_dns[DNS_BUFFER_LENGTH];
-  string reply_from_server_dns4;
-  string sent_message_string;
-  int count_respond_dns = 0;
-  socket_dns_ipv4 = socket(AF_INET , SOCK_STREAM , 0);
-  memset(buffer_dns, 0, sizeof(sd4));
-  sd4.sin_family = AF_INET;
-  sd4.sin_addr.s_addr = inet_addr((i_data.dns_ipv4).c_str());
-  sd4.sin_port = htons(DNS_PORT);
-  if ((connect(socket_dns_ipv4, (struct sockaddr *)&sd4, sizeof(sd4))) < 0)
-  {
-    printf("Connection to DNS server failed\n");
-  }
-  sprintf(message_dns , "%s\r\n", (i_data.skenned_ipv4).c_str());
-  if ((send(socket_dns_ipv4 , message_dns , strlen(message_dns) , 0)) < 0)
-  {
-    printf("Send message to DNS server failed\n");
-  }
+  //struct __res_state statp;
+  /*
+  string input_ip_dns;
+  input_ip_dns = i_data.skenned_ipv4;
+  std::cout << input_ip_dns + "\n";
+  const char *dname = (input_ip_dns).c_str();
+  int type = T_PTR;
+  unsigned char *answer;
+  int anslen;
+  res_init();
+  res_query(*dname, C_IN, type,*answer,anslen);
+  */
+  printf("DNSconnect\n");
+  res_init();
+  _res.nsaddr.sin_addr.s_addr = inet_addr((i_data.dns_ipv4).c_str());
+  _res.nsaddr.sin_family = AF_INET;
+  _res.nsaddr.sin_port = htons(DNS_PORT);
 
-  count_respond_dns = read(socket_dns_ipv4 , buffer_dns , sizeof(buffer_dns));
-  cout << count_respond_dns+ "\n";
-  reply_from_server_dns4 = buffer_dns;
-  cout << reply_from_server_dns4+ "\n";
-  count_respond_dns = read(socket_dns_ipv4 , buffer_dns , sizeof(buffer_dns));
-  cout << count_respond_dns+ "\n";
-  reply_from_server_dns4 = buffer_dns;
-  cout << reply_from_server_dns4+ "\n";
+  const char *dname = (i_data.skenned_ipv4).c_str();
+  int type = T_PTR;
+  unsigned char *answer;
+  int anslen;
+  //res_init();
+  //res_query(&dname, C_IN, type, &answer, anslen);
 
-  close(socket_dns_ipv4);
 
-  return reply_from_server_dns4;
+
+
+
+
+  return "dns";
 }
 
 
@@ -506,10 +547,11 @@ int main(int argc, char **argv)
     else if (!(i_data.whois_ipv6).empty())
     {
       printf("Processing IPV6dundudu\n");
-      WhoisConnectIPV6(i_data);
-      //ProcessParentServer(i_data, whois_server_response);
+      whois_server_response = WhoisConnectIPV6(i_data);
+      ProcessParentServerIPV6(i_data, whois_server_response);
     }
-    //dns_server_response = DNSConnectIPV4(i_data);
+    printf("Connecting to DNS");
+    DNSConnectIPV4(i_data);
 
 
 }
