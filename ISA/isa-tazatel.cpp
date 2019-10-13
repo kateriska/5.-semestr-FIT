@@ -5,20 +5,21 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include<unistd.h>
+#include <unistd.h>
 #include <sstream>
 #include<sys/socket.h>
 #include <resolv.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
+#include <stdio.h>
+#include <stdlib.h>
 using namespace std;
 
 #define WHOIS_PORT 43
 #define DNS_PORT 53
 #define WHOIS_MESSAGE_LENGTH 100
 #define WHOIS_BUFFER_LENGTH 1500
-#define DNS_MESSAGE_LENGTH 100
-#define DNS_BUFFER_LENGTH 4096
+#define DNS_BUFFER_LENGTH 1500
 
 struct input_data
 {
@@ -210,7 +211,7 @@ void ProcessResponseFromWhois(string whois_server_response)
   istringstream response_stream{whois_server_response};
   string line;
 
-  printf("=====Printing output information========\n");
+  printf("=== WHOIS ===\n");
   while (getline(response_stream, line))
   {
 
@@ -333,39 +334,78 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
   }
 }
 
-string DNSConnectIPV4(struct input_data i_data)
+int DNSConnectIPV4(struct input_data i_data)
 {
-  //struct __res_state statp;
+    printf("=== DNS ===\n");
+    u_char buffer_a[DNS_BUFFER_LENGTH];
+    res_init();
+    _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
+    ns_msg msg_a;
+    int query_a = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a));
+    ns_initparse(buffer_a, query_a, &msg_a);
+
+    ns_rr rr_a;
+
+    int msg_count_a = ns_msg_count(msg_a, ns_s_an);
+    for (int i = 0; i < msg_count_a; i++)
+    {
+        ns_parserr(&msg_a,ns_s_an,i,&rr_a);
+
+        if (ns_rr_type(rr_a) == ns_t_a)
+        {
+          struct in_addr result_a_struct;
+          memcpy(&result_a_struct.s_addr, ns_rr_rdata(rr_a), sizeof(result_a_struct.s_addr));
+          char *result_a = inet_ntoa(result_a_struct);
+          string result_a_string = result_a;
+          cout << "A:              " + result_a_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
+
   /*
-  string input_ip_dns;
-  input_ip_dns = i_data.skenned_ipv4;
-  std::cout << input_ip_dns + "\n";
-  const char *dname = (input_ip_dns).c_str();
-  int type = T_PTR;
-  unsigned char *answer;
-  int anslen;
+  union
+  {
+    HEADER header_a;
+    u_char buffer_a[NS_PACKETSZ];
+  } struct_message_a;
+
+  ns_msg msg_a;
+  ns_rr rr_a;
+
   res_init();
-  res_query(*dname, C_IN, type,*answer,anslen);
+
+  //_res.nsaddr_list[0].sin_family = AF_INET;
+  /*
+  cout << _res.nsaddr_list[0].sin_addr.s_addr;
+  printf("\n");
+  cout << _res.nsaddr_list[0].sin_family;
+  printf("\n");
+  cout << _res.nsaddr_list[0].sin_port;
+  printf("\n");
+  _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
+    cout << _res.nsaddr_list[0].sin_addr.s_addr;
+  _res.nsaddr_list[0].sin_port = htons(53);
+  _res.nsaddr_list[0].sin_family = AF_INET;
   */
-  printf("DNSconnect\n");
-  res_init();
-  _res.nsaddr.sin_addr.s_addr = inet_addr((i_data.dns_ipv4).c_str());
-  _res.nsaddr.sin_family = AF_INET;
-  _res.nsaddr.sin_port = htons(DNS_PORT);
+/*
+  int query_a = res_query(i_data.skenned_hostname.c_str(), ns_c_any, ns_t_a, (u_char *)&struct_message_a, sizeof(struct_message_a));
+  ns_initparse(struct_message_a.buffer_a, query_a, &msg_a);
 
-  const char *dname = (i_data.skenned_ipv4).c_str();
-  int type = T_PTR;
-  unsigned char buffer[DNS_BUFFER_LENGTH];
-  //int anslen;
-  res_init();
-  int query = res_query(i_data.skenned_ipv4.c_str(), C_IN, type, buffer, sizeof(buffer));
+  int msg_count_a = ns_msg_count(msg_a, ns_s_an);
+  for (int i = 0; i < msg_count_a; i++)
+  {
+      if (ns_rr_type(rr_a) == ns_t_a)
+      {
+        printf("Printing IP");
+        struct in_addr in;
+        memcpy(&in.s_addr, ns_rr_rdata(rr_a), sizeof(in.s_addr));
+        fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+      }
+  }
 
 
-
-
-
-
-  return "dns";
+*/
+  return 0;
 }
 
 
@@ -550,7 +590,6 @@ int main(int argc, char **argv)
       whois_server_response = WhoisConnectIPV6(i_data);
       ProcessParentServerIPV6(i_data, whois_server_response);
     }
-    printf("Connecting to DNS");
     DNSConnectIPV4(i_data);
 
 
