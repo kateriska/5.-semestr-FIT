@@ -142,7 +142,7 @@ string WhoisConnectIPV4(struct input_data i_data)
     int socket_whois_ipv4 = 0;
     char message[WHOIS_MESSAGE_LENGTH];
     char buffer[WHOIS_BUFFER_LENGTH];
-    string reply_from_server;
+    string reply_from_server = "";
     string sent_message_string;
     int count_respond = 0;
 
@@ -155,14 +155,13 @@ string WhoisConnectIPV4(struct input_data i_data)
     sprintf(message , "%s\r\n", (i_data.skenned_ipv4).c_str());
     send(socket_whois_ipv4 , message , strlen(message) , 0);
 
-    count_respond = read(socket_whois_ipv4 , buffer , sizeof(buffer));
-    //cout << count_respond+ "\n";
-    reply_from_server = buffer;
-    //cout << reply_from_server+ "\n";
-    count_respond = read(socket_whois_ipv4 , buffer , sizeof(buffer));
-    //cout << count_respond+ "\n";
-    reply_from_server = buffer;
-    //cout << reply_from_server+ "\n";
+    while (recv(socket_whois_ipv4 , buffer , sizeof(buffer),0))
+    {
+      //cout << buffer << endl;
+      reply_from_server = reply_from_server + buffer;
+      memset(buffer, 0, sizeof(buffer));
+    }
+    cout << reply_from_server+ "\n";
 
     close(socket_whois_ipv4);
 
@@ -176,7 +175,7 @@ string WhoisConnectIPV6(struct input_data i_data)
     int socket_whois_ipv6 = 0;
     char message[WHOIS_MESSAGE_LENGTH];
     char buffer[WHOIS_BUFFER_LENGTH];
-    string reply_from_server;
+    string reply_from_server = "";
     string sent_message_string;
     int count_respond = 0;
 
@@ -189,13 +188,12 @@ string WhoisConnectIPV6(struct input_data i_data)
     sprintf(message , "%s\r\n", (i_data.skenned_ipv6).c_str());
     send(socket_whois_ipv6 , message , strlen(message) , 0);
 
-    count_respond = read(socket_whois_ipv6 , buffer , sizeof(buffer));
-    cout << count_respond+ "\n";
-    reply_from_server = buffer;
-    cout << reply_from_server+ "\n";
-    count_respond = read(socket_whois_ipv6 , buffer , sizeof(buffer));
-    cout << count_respond+ "\n";
-    reply_from_server = buffer;
+    while (recv(socket_whois_ipv6 , buffer , sizeof(buffer),0))
+    {
+      //cout << buffer << endl;
+      reply_from_server = reply_from_server + buffer;
+      memset(buffer, 0, sizeof(buffer));
+    }
     cout << reply_from_server+ "\n";
 
     close(socket_whois_ipv6);
@@ -253,38 +251,37 @@ void ProcessParentServer(struct input_data i_data, string whois_answer)
   istringstream stream{whois_answer};
   string line;
   string refer_hostname;
-  size_t found_parent_server = whois_answer.find("whois.");
 
   bool parent_server_is_found = false;
 
-  if (found_parent_server!=std::string::npos)
+  while (std::getline(stream, line))
   {
-    //printf("Tohle byl detsky server - je potreba zjistit matersky\n");
-    while (std::getline(stream, line))
+    //cout << line+ "\n";
+    size_t found_parent_server_line = line.find("whois.");
+    size_t found_refer = line.find("refer:");
+    //size_t found_resource = line.find("resource:");
+    size_t found_resource_link = line.find("ResourceLink:");
+    if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos)))
     {
-      //cout << line+ "\n";
-      size_t found_parent_server_line = line.find("whois.");
-      if (found_parent_server_line!=std::string::npos)
-      {
-        refer_hostname = line.substr(line.find("whois."));
-        //cout << refer_hostname+ "\n";
-        refer_hostname = TrimWhitespaces(refer_hostname);
-        //cout << refer_hostname+ "\n";
-        refer_hostname = ConvertHostname(refer_hostname);
-        i_data.whois_ipv4 = refer_hostname;
-        parent_server_is_found = true;
-        break;
-      }
-
-    }
-    if (parent_server_is_found == true)
-    {
-      //printf("Zpracovavani materskeho serveru\n");
-      whois_answer = WhoisConnectIPV4(i_data);
-      ProcessParentServer(i_data, whois_answer);
+      refer_hostname = line.substr(line.find("whois."));
+      cout << refer_hostname;
+      refer_hostname = TrimWhitespaces(refer_hostname);
+      //cout << refer_hostname;
+      refer_hostname = ConvertHostname(refer_hostname);
+      i_data.whois_ipv4 = refer_hostname;
+      parent_server_is_found = true;
+      break;
     }
 
   }
+
+  if (parent_server_is_found == true)
+  {
+    //printf("Zpracovavani materskeho serveru\n");
+    whois_answer = WhoisConnectIPV4(i_data);
+    ProcessParentServer(i_data, whois_answer);
+  }
+
   else
   { // rodic - okamzite zpracovani
     ProcessResponseFromWhois(whois_answer);
@@ -296,38 +293,37 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
   istringstream stream{whois_answer};
   string line;
   string refer_hostname;
-  size_t found_parent_server = whois_answer.find("whois.");
 
   bool parent_server_is_found = false;
 
-  if (found_parent_server!=std::string::npos)
+  while (std::getline(stream, line))
   {
-    //printf("Tohle byl detsky server - je potreba zjistit matersky\n");
-    while (std::getline(stream, line))
+    //cout << line+ "\n";
+    size_t found_parent_server_line = line.find("whois.");
+    size_t found_refer = line.find("refer:");
+    //size_t found_resource = line.find("resource:");
+    size_t found_resource_link = line.find("ResourceLink:");
+    if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos)))
     {
-      //cout << line+ "\n";
-      size_t found_parent_server_line = line.find("whois.");
-      if (found_parent_server_line!=std::string::npos)
-      {
-        refer_hostname = line.substr(line.find("whois."));
-        //cout << refer_hostname+ "\n";
-        refer_hostname = TrimWhitespaces(refer_hostname);
-        //cout << refer_hostname+ "\n";
-        refer_hostname = ConvertHostname(refer_hostname);
-        i_data.whois_ipv6 = refer_hostname;
-        parent_server_is_found = true;
-        break;
-      }
-
-    }
-    if (parent_server_is_found == true)
-    {
-      //printf("Zpracovavani materskeho serveru\n");
-      whois_answer = WhoisConnectIPV6(i_data);
-      ProcessParentServerIPV6(i_data, whois_answer);
+      refer_hostname = line.substr(line.find("whois."));
+      cout << refer_hostname;
+      refer_hostname = TrimWhitespaces(refer_hostname);
+      //cout << refer_hostname;
+      refer_hostname = ConvertHostname(refer_hostname);
+      i_data.whois_ipv6 = refer_hostname;
+      parent_server_is_found = true;
+      break;
     }
 
   }
+
+  if (parent_server_is_found == true)
+  {
+    //printf("Zpracovavani materskeho serveru\n");
+    whois_answer = WhoisConnectIPV6(i_data);
+    ProcessParentServerIPV6(i_data, whois_answer);
+  }
+
   else
   { // rodic - okamzite zpracovani
     ProcessResponseFromWhois(whois_answer);
@@ -413,7 +409,7 @@ int DNSConnectIPV4(struct input_data i_data)
     {
       printf("neco spatnen\n");
     }
-  
+
 
     int msg_count_soa = ns_msg_count(msg_soa, ns_s_an);
     cout << msg_count_soa;
@@ -421,12 +417,10 @@ int DNSConnectIPV4(struct input_data i_data)
     for (int i = 0; i < msg_count_soa; i++)
     {
         ns_parserr(&msg_soa,ns_s_an,i,&rr_soa);
-
         if (ns_rr_type(rr_soa) == ns_t_soa)
         {
           printf("SOA info found\n");
           char result_soa[25000];
-
           memcpy(&result_soa, ns_rr_rdata(rr_soa), sizeof(result_soa));
           string result_soa_string = result_soa;
           cout << "SOA:           " + result_soa_string + "\n";
