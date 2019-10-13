@@ -337,9 +337,11 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 int DNSConnectIPV4(struct input_data i_data)
 {
     printf("=== DNS ===\n");
-    u_char buffer_a[DNS_BUFFER_LENGTH];
+
     res_init();
     _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
+  ///////////////////////////// A //////////////////////////////////////
+    u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
     int query_a = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a));
     ns_initparse(buffer_a, query_a, &msg_a);
@@ -362,49 +364,78 @@ int DNSConnectIPV4(struct input_data i_data)
         }
     }
 
-  /*
-  union
-  {
-    HEADER header_a;
-    u_char buffer_a[NS_PACKETSZ];
-  } struct_message_a;
+///////////////////////////// AAAA ////////////////////////////////
+    u_char buffer_aaaa[DNS_BUFFER_LENGTH];
+    ns_msg msg_aaaa;
+    int query_aaaa = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_aaaa, buffer_aaaa, sizeof(buffer_aaaa));
+    ns_initparse(buffer_aaaa, query_aaaa, &msg_aaaa);
 
-  ns_msg msg_a;
-  ns_rr rr_a;
+    ns_rr rr_aaaa;
 
-  res_init();
+    int msg_count_aaaa = ns_msg_count(msg_aaaa, ns_s_an);
+    for (int i = 0; i < msg_count_aaaa; i++)
+    {
+        ns_parserr(&msg_aaaa,ns_s_an,i,&rr_aaaa);
 
-  //_res.nsaddr_list[0].sin_family = AF_INET;
-  /*
-  cout << _res.nsaddr_list[0].sin_addr.s_addr;
-  printf("\n");
-  cout << _res.nsaddr_list[0].sin_family;
-  printf("\n");
-  cout << _res.nsaddr_list[0].sin_port;
-  printf("\n");
-  _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
-    cout << _res.nsaddr_list[0].sin_addr.s_addr;
-  _res.nsaddr_list[0].sin_port = htons(53);
-  _res.nsaddr_list[0].sin_family = AF_INET;
-  */
-/*
-  int query_a = res_query(i_data.skenned_hostname.c_str(), ns_c_any, ns_t_a, (u_char *)&struct_message_a, sizeof(struct_message_a));
-  ns_initparse(struct_message_a.buffer_a, query_a, &msg_a);
+        if (ns_rr_type(rr_aaaa) == ns_t_aaaa)
+        {
+          struct in6_addr result_aaaa_struct;
+          const void *src;
+          char dst[46];
 
-  int msg_count_a = ns_msg_count(msg_a, ns_s_an);
-  for (int i = 0; i < msg_count_a; i++)
-  {
-      if (ns_rr_type(rr_a) == ns_t_a)
-      {
-        printf("Printing IP");
-        struct in_addr in;
-        memcpy(&in.s_addr, ns_rr_rdata(rr_a), sizeof(in.s_addr));
-        fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
-      }
-  }
+          memcpy(&result_aaaa_struct.s6_addr, ns_rr_rdata(rr_aaaa), sizeof(result_aaaa_struct.s6_addr));
+          memcpy(&src, result_aaaa_struct.s6_addr , sizeof(result_aaaa_struct.s6_addr));
+          const char *result_aaaa = inet_ntop(AF_INET6, &src, dst, sizeof(dst));
+          //cout << dst;
+          string result_aaaa_string = result_aaaa;
+          cout << "AAAA:           " + result_aaaa_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
+
+    ///////////////////////////// SOA ////////////////////////////////
+    u_char buffer_soa[1024];
+    u_char response_soa[1024];
+    ns_msg msg_soa;
+    int query_soa = res_mkquery(ns_o_query, i_data.skenned_hostname.c_str(), ns_c_in, ns_t_soa, NULL,0, NULL,buffer_soa, sizeof(buffer_soa));
+    int response_length_soa = res_send(buffer_soa, sizeof(buffer_soa),response_soa, sizeof(response_soa) );
+    cout << query_soa;
+    printf("blblblbl\n");
+    cout << response_length_soa;
+
+    int soa_parsing = ns_initparse(response_soa, response_length_soa, &msg_soa);
+    printf("blblblbl\n");
+    cout << soa_parsing;
+    printf("blblblbl\n");
+
+    ns_rr rr_soa;
+    if (!ns_msg_getflag(msg_soa, ns_f_aa))
+    {
+      printf("neco spatnen\n");
+    }
+  
+
+    int msg_count_soa = ns_msg_count(msg_soa, ns_s_an);
+    cout << msg_count_soa;
+    /*
+    for (int i = 0; i < msg_count_soa; i++)
+    {
+        ns_parserr(&msg_soa,ns_s_an,i,&rr_soa);
+
+        if (ns_rr_type(rr_soa) == ns_t_soa)
+        {
+          printf("SOA info found\n");
+          char result_soa[25000];
+
+          memcpy(&result_soa, ns_rr_rdata(rr_soa), sizeof(result_soa));
+          string result_soa_string = result_soa;
+          cout << "SOA:           " + result_soa_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
+    */
 
 
-*/
   return 0;
 }
 
