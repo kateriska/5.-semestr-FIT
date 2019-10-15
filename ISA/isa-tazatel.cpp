@@ -161,7 +161,7 @@ string WhoisConnectIPV4(struct input_data i_data)
       reply_from_server = reply_from_server + buffer;
       memset(buffer, 0, sizeof(buffer));
     }
-    cout << reply_from_server+ "\n";
+    //cout << reply_from_server+ "\n";
 
     close(socket_whois_ipv4);
 
@@ -194,7 +194,7 @@ string WhoisConnectIPV6(struct input_data i_data)
       reply_from_server = reply_from_server + buffer;
       memset(buffer, 0, sizeof(buffer));
     }
-    cout << reply_from_server+ "\n";
+    //cout << reply_from_server+ "\n";
 
     close(socket_whois_ipv6);
 
@@ -213,7 +213,7 @@ void ProcessResponseFromWhois(string whois_server_response)
   while (getline(response_stream, line))
   {
 
-    if ((line.find("inetnum:")!=std::string::npos) || (line.find("NetRange:")!=std::string::npos))
+    if ((line.find("inetnum:")!=std::string::npos) || (line.find("NetRange:")!=std::string::npos) || (line.find("inet6num:")!=std::string::npos))
     {
       cout << line + "\n";
     }
@@ -264,7 +264,7 @@ void ProcessParentServer(struct input_data i_data, string whois_answer)
     if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos)))
     {
       refer_hostname = line.substr(line.find("whois."));
-      cout << refer_hostname;
+      //cout << refer_hostname;
       refer_hostname = TrimWhitespaces(refer_hostname);
       //cout << refer_hostname;
       refer_hostname = ConvertHostname(refer_hostname);
@@ -301,9 +301,9 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
     //cout << line+ "\n";
     size_t found_parent_server_line = line.find("whois.");
     size_t found_refer = line.find("refer:");
-    //size_t found_resource = line.find("resource:");
+    //size_t found_whois_refer = line.find("whois:");
     size_t found_resource_link = line.find("ResourceLink:");
-    if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos)))
+    if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos) ))
     {
       refer_hostname = line.substr(line.find("whois."));
       cout << refer_hostname;
@@ -390,45 +390,154 @@ int DNSConnectIPV4(struct input_data i_data)
     }
 
     ///////////////////////////// SOA ////////////////////////////////
-    u_char buffer_soa[1024];
-    u_char response_soa[1024];
+    u_char buffer_soa[DNS_BUFFER_LENGTH];
     ns_msg msg_soa;
-    int query_soa = res_mkquery(ns_o_query, i_data.skenned_hostname.c_str(), ns_c_in, ns_t_soa, NULL,0, NULL,buffer_soa, sizeof(buffer_soa));
-    int response_length_soa = res_send(buffer_soa, sizeof(buffer_soa),response_soa, sizeof(response_soa) );
-    cout << query_soa;
-    printf("blblblbl\n");
-    cout << response_length_soa;
-
-    int soa_parsing = ns_initparse(response_soa, response_length_soa, &msg_soa);
-    printf("blblblbl\n");
-    cout << soa_parsing;
-    printf("blblblbl\n");
+    int query_soa = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_soa, buffer_soa, sizeof(buffer_soa));
+    ns_initparse(buffer_soa, query_soa, &msg_soa);
 
     ns_rr rr_soa;
-    if (!ns_msg_getflag(msg_soa, ns_f_aa))
-    {
-      printf("neco spatnen\n");
-    }
-
 
     int msg_count_soa = ns_msg_count(msg_soa, ns_s_an);
-    cout << msg_count_soa;
-    /*
+
+
     for (int i = 0; i < msg_count_soa; i++)
     {
         ns_parserr(&msg_soa,ns_s_an,i,&rr_soa);
         if (ns_rr_type(rr_soa) == ns_t_soa)
         {
-          printf("SOA info found\n");
-          char result_soa[25000];
-          memcpy(&result_soa, ns_rr_rdata(rr_soa), sizeof(result_soa));
+          char result_soa[DNS_BUFFER_LENGTH];
+          //printf("SOA info found\n");
+          ns_sprintrr(&msg_soa, &rr_soa, NULL, NULL, result_soa, sizeof(result_soa));
           string result_soa_string = result_soa;
-          cout << "SOA:           " + result_soa_string + "\n";
+          result_soa_string = result_soa_string.substr(result_soa_string.find("SOA"), result_soa_string.find("("));
+          result_soa_string = result_soa_string.substr(4, result_soa_string.find("("));
+          result_soa_string = result_soa_string.substr(0, result_soa_string.find("("));
+          //cout << result_soa_string;
+
+          //printf ("%s\n", result_soa);
+
+
+          cout << "SOA:            " + result_soa_string + "\n";
           //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
         }
     }
-    */
 
+    /////////////////////// MX ///////////////////////////////////////
+
+    u_char buffer_mx[DNS_BUFFER_LENGTH];
+    ns_msg msg_mx;
+    int query_mx = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_mx, buffer_mx, sizeof(buffer_mx));
+    ns_initparse(buffer_mx, query_mx, &msg_mx);
+
+    ns_rr rr_mx;
+
+    int msg_count_mx = ns_msg_count(msg_mx, ns_s_an);
+
+
+    for (int i = 0; i < msg_count_mx; i++)
+    {
+        ns_parserr(&msg_mx,ns_s_an,i,&rr_mx);
+        if (ns_rr_type(rr_mx) == ns_t_mx)
+        {
+          //printf("MX info found\n");
+          char result_mx[DNS_BUFFER_LENGTH];
+          ns_sprintrr(&msg_mx, &rr_mx, NULL, NULL, result_mx, sizeof(result_mx));
+          string result_mx_string = result_mx;
+          result_mx_string = result_mx_string.substr(result_mx_string.find("MX"));
+          result_mx_string = result_mx_string.substr(5);
+          result_mx_string = result_mx_string.substr(0, result_mx_string.size()-1);
+          //cout << result_mx_string;
+          cout << "MX:            " + result_mx_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
+
+    ///////////////////////////////// CNAME ////////////////////////////////////////
+    u_char buffer_cname[DNS_BUFFER_LENGTH];
+    ns_msg msg_cname;
+    int query_cname = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_cname, buffer_cname, sizeof(buffer_cname));
+    ns_initparse(buffer_cname, query_cname, &msg_cname);
+
+    ns_rr rr_cname;
+
+    int msg_count_cname = ns_msg_count(msg_cname, ns_s_an);
+
+
+    for (int i = 0; i < msg_count_cname; i++)
+    {
+        ns_parserr(&msg_cname,ns_s_an,i,&rr_cname);
+        if (ns_rr_type(rr_cname) == ns_t_cname)
+        {
+          //printf("CNAME info found\n");
+          char result_cname[DNS_BUFFER_LENGTH];
+          ns_sprintrr(&msg_cname, &rr_cname, NULL, NULL, result_cname, sizeof(result_cname));
+          string result_cname_string = result_cname;
+          result_cname_string = result_cname_string.substr(result_cname_string.find("CNAME"));
+          result_cname_string = result_cname_string.substr(5);
+          result_cname_string = result_cname_string.substr(0, result_cname_string.size()-1);
+          //cout << result_mx_string;
+          cout << "CNAME:        " + result_cname_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
+
+    ////////////////////////////////// NS ///////////////////////////////////////
+    u_char buffer_ns[DNS_BUFFER_LENGTH];
+    ns_msg msg_ns;
+    int query_ns = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_ns, buffer_ns, sizeof(buffer_ns));
+    ns_initparse(buffer_ns, query_ns, &msg_ns);
+
+    ns_rr rr_ns;
+
+    int msg_count_ns = ns_msg_count(msg_ns, ns_s_an);
+
+
+    for (int i = 0; i < msg_count_ns; i++)
+    {
+        ns_parserr(&msg_ns,ns_s_an,i,&rr_ns);
+        if (ns_rr_type(rr_ns) == ns_t_ns)
+        {
+          //printf("NS info found\n");
+          char result_ns[DNS_BUFFER_LENGTH];
+          ns_sprintrr(&msg_ns, &rr_ns, NULL, NULL, result_ns, sizeof(result_ns));
+          string result_ns_string = result_ns;
+          result_ns_string = result_ns_string.substr(result_ns_string.find("NS"));
+          result_ns_string = result_ns_string.substr(2);
+          result_ns_string = result_ns_string.substr(0, result_ns_string.size()-1);
+          //cout << result_mx_string;
+          cout << "NS:        " + result_ns_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
+
+    ///////////////// PTR ////////////////////////////////////////////////
+    u_char buffer_ptr[DNS_BUFFER_LENGTH];
+    ns_msg msg_ptr;
+    int query_ptr = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_ptr, buffer_ptr, sizeof(buffer_ptr));
+    ns_initparse(buffer_ptr, query_ptr, &msg_ptr);
+
+    ns_rr rr_ptr;
+
+    int msg_count_ptr = ns_msg_count(msg_ptr, ns_s_an);
+
+
+    for (int i = 0; i < msg_count_ptr; i++)
+    {
+        ns_parserr(&msg_ptr,ns_s_an,i,&rr_ptr);
+        if (ns_rr_type(rr_ptr) == ns_t_ptr)
+        {
+          printf("PTR info found\n");
+          char result_ptr[DNS_BUFFER_LENGTH];
+          ns_sprintrr(&msg_ptr, &rr_ptr, NULL, NULL, result_ptr, sizeof(result_ptr));
+          string result_ptr_string = result_ptr;
+          //result_ns_string = result_ns_string.substr(result_ns_string.find("NS"));
+          //result_ns_string = result_ns_string.substr(2);
+          //result_ns_string = result_ns_string.substr(0, result_ns_string.size()-1);
+          //cout << result_mx_string;
+          cout << "PTR:        " + result_ptr_string + "\n";
+          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+        }
+    }
 
   return 0;
 }
@@ -568,24 +677,15 @@ int main(int argc, char **argv)
       }
       else
       {
-        i_data.dns_hostname = dns_input;
-        dns_converted = ConvertHostname(dns_input);
-        //cout << dns_converted + "\n";
-        input_validate_dns = IpValidate(dns_converted);
-        if (input_validate_dns == "ipv6_input" )
-        {
-          i_data.dns_ipv6 = dns_converted;
-        }
-        else if ( input_validate_dns == "ipv4_input" )
-        {
-          i_data.dns_ipv4 = dns_converted;
-        }
+        std::cerr << "Error - Enter only IP adress for DNS, not hostname!\n";
+        exit(EXIT_FAILURE);
       }
   }
 
-    PrintInputData(i_data);
+    //PrintInputData(i_data);
     if (   !((i_data.skenned_ipv6).empty()) ||  !((i_data.whois_ipv6).empty())  ||  !((i_data.dns_ipv6).empty())    )
     {
+      printf("Need to convert everything to IPV6\n");
       if (!(i_data.skenned_hostname).empty())
       {
         i_data.skenned_ipv6 = ConvertHostnameIPV6(i_data.skenned_hostname);
@@ -603,18 +703,19 @@ int main(int argc, char **argv)
     }
     PrintInputData(i_data);
 
-    if (!(i_data.whois_ipv4).empty())
+    if (!(i_data.whois_ipv6).empty())
+    {
+      printf("Processing IPV6\n");
+      whois_server_response = WhoisConnectIPV6(i_data);
+      ProcessParentServerIPV6(i_data, whois_server_response);
+    }
+    else if (!(i_data.whois_ipv4).empty())
     {
       printf("Processing IPV4\n");
       whois_server_response = WhoisConnectIPV4(i_data);
       ProcessParentServer(i_data, whois_server_response);
     }
-    else if (!(i_data.whois_ipv6).empty())
-    {
-      printf("Processing IPV6dundudu\n");
-      whois_server_response = WhoisConnectIPV6(i_data);
-      ProcessParentServerIPV6(i_data, whois_server_response);
-    }
+
     DNSConnectIPV4(i_data);
 
 
