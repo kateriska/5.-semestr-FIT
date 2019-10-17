@@ -336,6 +336,7 @@ int DNSConnectIPV4(struct input_data i_data)
 
     res_init();
     _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
+    _res.nscount = 1;
   ///////////////////////////// A //////////////////////////////////////
     u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
