@@ -43,12 +43,18 @@ phi_y = np.zeros(shape_img, dtype=np.uint8)
 Orientation = np.zeros(shape_img, dtype=np.uint8)
 filtering_x = np.zeros(shape_img, dtype=np.uint8)
 filtering_y = np.zeros(shape_img, dtype=np.uint8)
+orientation_matrix = np.zeros(shape_img, dtype=np.uint8)
+magnitude_array = np.zeros(shape_img, dtype=np.uint8)
+
 
 filtering = 5
 filtering_div = 2.5
+right_angle  = 1
+
 
 
 #compute gradients for each pixel
+# gradient for uint8 image
 grad_x = cv2.Sobel(norm_image,cv2.CV_8UC1,1,0,ksize=5)
 grad_y = cv2.Sobel(norm_image,cv2.CV_8UC1,0,1,ksize=5)
 
@@ -72,35 +78,42 @@ for i in range(block_div, rows-block_div, step):
             #print(theta_calculation)
 
         theta[i][j] = theta_calculation
+        # compute the magnitude
+        magnitude = math.sqrt((Vx[i][j] * Vx[i][j]) + (Vy[i][j] * Vy[i][j]))
+        magnitude_array[i][j] = magnitude
 
-        rows_theta, cols_theta = theta.shape
-        #print(theta.shape)
+        print(magnitude)
+        phi_x = magnitude * math.cos(2*theta_calculation)
+        phi_y = magnitude * math.sin(2*theta_calculation)
+        print(phi_x)
+        orientation = 0.0
+        if (phi_x != 0):
+            orientation = 0.5 * math.atan(phi_y / phi_x)
+            print(orientation)
+        X0 = i + 8
+        Y0 = j + 8
+        r = 8
 
-        phi_x[i][j] = math.cos(2*theta[i][j])
-        phi_y[i][j] = math.sin(2*theta[i][j])
-        #print(phi_x[i][j])
+        X1 = r*math.cos(theta_calculation - right_angle)+X0
+        X1 = int (X1)
 
-        sum_filter_x = 0.0
-        sum_filter_y = 0.0
-        '''
+        Y1 = r*math.sin(theta_calculation - right_angle)+Y0
+        Y1 = int (Y1)
 
-        for u in np.arange (-filtering_div, filtering_div):
-            for v in np.arange (-filtering_div, filtering_div):
-                i_matrix = i - u*filtering
-                j_matrix = j - v*filtering
-                sum_filter_x = sum_filter_x + phi_x[i_matrix][j_matrix]
-                sum_filter_y = sum_filter_y + (phi_y[i_matrix][j_matrix])
+        #print(Y1)
+        #print(X0, Y0)
+        #print(X1, Y1)
+        #start_point = cv2.Point2f(X0, Y0)
+        #end_point = cv2.Point2f(X1, Y1)
+        norm_image = cv2.line(norm_image,(X0,Y0) , (X1,Y1), (0,255,0), 3)
+        cv2.imshow('Oriented image', norm_image)
+        #print(magnitude)
+        #orientation_matrix[i][j] = theta_calculation
 
-        filtering_x[i][j] = sum_filter_x
-        filtering_y[i][j] = sum_filter_y
 
-        #phi_x = cv2.blur(phi_x, (5,5))
-        #phi_y = cv2.blur(phi_y, (5,5))
 
-        if (phi_x[i][j] != 0):
-            Orientation[i][j] = 0.5 * math.atan(phi_y[i][j] / phi_x[i][j] )
-            #print(Orientation)
-        '''
+
+
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
