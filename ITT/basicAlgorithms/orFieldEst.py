@@ -38,8 +38,8 @@ grad_y = np.zeros(shape_img, dtype=np.uint8)
 Vx = np.zeros(shape_img, dtype=np.uint8)
 Vy = np.zeros(shape_img, dtype=np.uint8)
 theta = np.zeros(shape_img, dtype=np.uint8)
-phi_x = np.zeros(shape_img, dtype=np.uint8)
-phi_y = np.zeros(shape_img, dtype=np.uint8)
+phi_x_array = np.zeros(shape_img, dtype=np.uint8)
+phi_y_array = np.zeros(shape_img, dtype=np.uint8)
 Orientation = np.zeros(shape_img, dtype=np.uint8)
 filtering_x = np.zeros(shape_img, dtype=np.uint8)
 filtering_y = np.zeros(shape_img, dtype=np.uint8)
@@ -49,7 +49,7 @@ magnitude_array = np.zeros(shape_img, dtype=np.uint8)
 
 filtering = 5
 filtering_div = 2.5
-right_angle  = 1
+right_angle  = math.pi / 2
 
 
 
@@ -66,8 +66,12 @@ for i in range(block_div, rows-block_div, step):
             for v in range(j-block_div, j+block_div):
                 sum_Vy = sum_Vy + (2 * grad_x[u][v] * grad_y[u][v])
                 sum_Vx = sum_Vx + (grad_x[u][v]**2 * grad_y[u][v]**2)
-                #print(sum_Vx)
-                #print(sum_Vy)
+                '''
+                print("===Sum VX===")
+                print(sum_Vx)
+                print("===Sum VY===")
+                print(sum_Vy)
+                '''
 
         Vy[i][j] = sum_Vy
         Vx[i][j] = sum_Vx
@@ -75,29 +79,34 @@ for i in range(block_div, rows-block_div, step):
 
         if (sum_Vx != 0 ):
             theta_calculation = 0.5 * math.atan(sum_Vy / sum_Vx)
-            #print(theta_calculation)
+            print(theta_calculation)
 
         theta[i][j] = theta_calculation
         # compute the magnitude
         magnitude = math.sqrt((Vx[i][j] * Vx[i][j]) + (Vy[i][j] * Vy[i][j]))
         magnitude_array[i][j] = magnitude
 
-        print(magnitude)
+        #print(magnitude)
         phi_x = magnitude * math.cos(2*theta_calculation)
         phi_y = magnitude * math.sin(2*theta_calculation)
-        print(phi_x)
+        phi_x_array[i][j] = phi_x
+        phi_y_array[i][j] = phi_y
+
+        #print(phi_x)
         orientation = 0.0
         if (phi_x != 0):
             orientation = 0.5 * math.atan(phi_y / phi_x)
-            print(orientation)
+            #print(orientation)
+
+        Orientation[i][j] = orientation
         X0 = i + 8
         Y0 = j + 8
         r = 8
 
-        X1 = r*math.cos(theta_calculation - right_angle)+X0
+        X1 = r*math.cos(Orientation[i][j] - right_angle)+X0
         X1 = int (X1)
 
-        Y1 = r*math.sin(theta_calculation - right_angle)+Y0
+        Y1 = r*math.sin(Orientation[i][j] - right_angle)+Y0
         Y1 = int (Y1)
 
         #print(Y1)
