@@ -23,9 +23,9 @@ using namespace std;
 
 struct input_data
 {
-  string skenned_ipv4;
-  string skenned_ipv6;
-  string skenned_hostname;
+  string scanned_ipv4;
+  string scanned_ipv6;
+  string scanned_hostname;
   string whois_ipv4;
   string whois_ipv6;
   string whois_hostname;
@@ -116,14 +116,31 @@ string ConvertHostnameIPV6(string hostname)
   cout << converted_ip_array;
   return converted_ip_array;
 }
+// https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+string ConvertIPV4toHostname(struct input_data i_data)
+{
+  struct sockaddr_in sa;
+  sa.sin_family = AF_INET;
+  inet_pton(AF_INET, i_data.scanned_ipv4.c_str(), &sa.sin_addr);
+
+  char host[1024];
+  char service[20];
+
+  int get_name_info_return = getnameinfo((struct sockaddr*)&sa, sizeof sa, host, sizeof host, service, sizeof service, 0);
+  string host_string = host;
+  cout << host_string;
+
+
+  return host_string;
+}
 
 void PrintInputData(struct input_data i_data)
 {
   printf("--------Input data:--------\n");
 
-  cout << "Skenned IPV4: " + i_data.skenned_ipv4 + "\n";
-  cout << "Skenned IPV6: " + i_data.skenned_ipv6 + "\n";
-  cout << "Skenned hostname: " + i_data.skenned_hostname + "\n";
+  cout << "scanned IPV4: " + i_data.scanned_ipv4 + "\n";
+  cout << "scanned IPV6: " + i_data.scanned_ipv6 + "\n";
+  cout << "scanned hostname: " + i_data.scanned_hostname + "\n";
 
   cout << "Whois IPV4: " + i_data.whois_ipv4 + "\n";
   cout << "Whois IPV6: " + i_data.whois_ipv6 + "\n";
@@ -147,13 +164,28 @@ string WhoisConnectIPV4(struct input_data i_data)
     int count_respond = 0;
 
     socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , 0);
+    if (socket_whois_ipv4 < 0)
+    {
+      cerr << "Error - Creating socket for WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
     memset(buffer, 0, sizeof(sw4));
     sw4.sin_family = AF_INET;
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
-    connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
-    sprintf(message , "%s\r\n", (i_data.skenned_ipv4).c_str());
-    send(socket_whois_ipv4 , message , strlen(message) , 0);
+    int connect_whois_ipv4 = connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
+    if (connect_whois_ipv4 < 0)
+    {
+      cerr << "Error - Connection to WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
+    sprintf(message , "%s\r\n", (i_data.scanned_ipv4).c_str());
+    int send_whois_ipv4 = send(socket_whois_ipv4 , message , strlen(message) , 0);
+    if (send_whois_ipv4 < 0)
+    {
+      cerr << "Error - Sending a message to WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
 
     while (recv(socket_whois_ipv4 , buffer , sizeof(buffer),0))
     {
@@ -163,7 +195,12 @@ string WhoisConnectIPV4(struct input_data i_data)
     }
     //cout << reply_from_server+ "\n";
 
-    close(socket_whois_ipv4);
+    int close_whois_ipv4 = close(socket_whois_ipv4);
+    if (close_whois_ipv4 < 0)
+    {
+      cerr << "Error - Closing a socket after connection to WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
 
     return reply_from_server;
 
@@ -185,7 +222,7 @@ string WhoisConnectIPV6(struct input_data i_data)
     inet_pton(AF_INET6, (i_data.whois_ipv6).c_str(), &sw6.sin6_addr);
     sw6.sin6_port = htons(WHOIS_PORT);
     connect(socket_whois_ipv6, (struct sockaddr *)&sw6, sizeof(sw6));
-    sprintf(message , "%s\r\n", (i_data.skenned_ipv6).c_str());
+    sprintf(message , "%s\r\n", (i_data.scanned_ipv6).c_str());
     send(socket_whois_ipv6 , message , strlen(message) , 0);
 
     while (recv(socket_whois_ipv6 , buffer , sizeof(buffer),0))
@@ -283,7 +320,7 @@ void ProcessParentServer(struct input_data i_data, string whois_answer)
   }
 
   else
-  { // rodic - okamzite zpracovani
+  { // parent server - connect and process immediately
     ProcessResponseFromWhois(whois_answer);
   }
 }
@@ -330,17 +367,21 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
   }
 }
 
-int DNSConnectIPV4(struct input_data i_data)
+int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
 {
     printf("=== DNS ===\n");
 
     res_init();
-    _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
-    _res.nscount = 1;
+    if (entered_dns == true)
+    {
+      printf("Entered DNS server\n");
+      _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
+      _res.nscount = 1;
+    }
   ///////////////////////////// A //////////////////////////////////////
     u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
-    int query_a = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a));
+    int query_a = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a));
     ns_initparse(buffer_a, query_a, &msg_a);
 
     ns_rr rr_a;
@@ -364,7 +405,7 @@ int DNSConnectIPV4(struct input_data i_data)
 ///////////////////////////// AAAA ////////////////////////////////
     u_char buffer_aaaa[DNS_BUFFER_LENGTH];
     ns_msg msg_aaaa;
-    int query_aaaa = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_aaaa, buffer_aaaa, sizeof(buffer_aaaa));
+    int query_aaaa = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_aaaa, buffer_aaaa, sizeof(buffer_aaaa));
     ns_initparse(buffer_aaaa, query_aaaa, &msg_aaaa);
 
     ns_rr rr_aaaa;
@@ -393,7 +434,7 @@ int DNSConnectIPV4(struct input_data i_data)
     ///////////////////////////// SOA ////////////////////////////////
     u_char buffer_soa[DNS_BUFFER_LENGTH];
     ns_msg msg_soa;
-    int query_soa = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_soa, buffer_soa, sizeof(buffer_soa));
+    int query_soa = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_soa, buffer_soa, sizeof(buffer_soa));
     ns_initparse(buffer_soa, query_soa, &msg_soa);
 
     ns_rr rr_soa;
@@ -427,7 +468,7 @@ int DNSConnectIPV4(struct input_data i_data)
 
     u_char buffer_mx[DNS_BUFFER_LENGTH];
     ns_msg msg_mx;
-    int query_mx = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_mx, buffer_mx, sizeof(buffer_mx));
+    int query_mx = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_mx, buffer_mx, sizeof(buffer_mx));
     ns_initparse(buffer_mx, query_mx, &msg_mx);
 
     ns_rr rr_mx;
@@ -456,7 +497,7 @@ int DNSConnectIPV4(struct input_data i_data)
     ///////////////////////////////// CNAME ////////////////////////////////////////
     u_char buffer_cname[DNS_BUFFER_LENGTH];
     ns_msg msg_cname;
-    int query_cname = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_cname, buffer_cname, sizeof(buffer_cname));
+    int query_cname = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_cname, buffer_cname, sizeof(buffer_cname));
     ns_initparse(buffer_cname, query_cname, &msg_cname);
 
     ns_rr rr_cname;
@@ -485,7 +526,7 @@ int DNSConnectIPV4(struct input_data i_data)
     ////////////////////////////////// NS ///////////////////////////////////////
     u_char buffer_ns[DNS_BUFFER_LENGTH];
     ns_msg msg_ns;
-    int query_ns = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_ns, buffer_ns, sizeof(buffer_ns));
+    int query_ns = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_ns, buffer_ns, sizeof(buffer_ns));
     ns_initparse(buffer_ns, query_ns, &msg_ns);
 
     ns_rr rr_ns;
@@ -514,7 +555,7 @@ int DNSConnectIPV4(struct input_data i_data)
     ///////////////// PTR ////////////////////////////////////////////////
     u_char buffer_ptr[DNS_BUFFER_LENGTH];
     ns_msg msg_ptr;
-    int query_ptr = res_query(i_data.skenned_hostname.c_str(), ns_c_in, ns_t_ptr, buffer_ptr, sizeof(buffer_ptr));
+    int query_ptr = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_ptr, buffer_ptr, sizeof(buffer_ptr));
     ns_initparse(buffer_ptr, query_ptr, &msg_ptr);
 
     ns_rr rr_ptr;
@@ -608,34 +649,29 @@ int main(int argc, char **argv)
       std::cerr << "Error - Missing mandatory options!\n";
       exit(EXIT_FAILURE);
     }
-    // default dns
-    if (d == false)
-    {
-      i_data.dns_ipv4 = "1.1.1.1";
-    }
 
     input_validate_ipq = IpValidate(ipq_input);
     if (input_validate_ipq == "ipv6_input" )
     {
-      i_data.skenned_ipv6 = ipq_input;
+      i_data.scanned_ipv6 = ipq_input;
     }
     else if ( input_validate_ipq == "ipv4_input" )
     {
-      i_data.skenned_ipv4 = ipq_input;
+      i_data.scanned_ipv4 = ipq_input;
     }
     else
     {
-      i_data.skenned_hostname = ipq_input;
+      i_data.scanned_hostname = ipq_input;
       ipq_converted = ConvertHostname(ipq_input);
       //cout << ipq_converted + "\n";
       input_validate_ipq = IpValidate(ipq_converted);
       if (input_validate_ipq == "ipv6_input" )
       {
-        i_data.skenned_ipv6 = ipq_converted;
+        i_data.scanned_ipv6 = ipq_converted;
       }
       else if ( input_validate_ipq == "ipv4_input" )
       {
-        i_data.skenned_ipv4 = ipq_converted;
+        i_data.scanned_ipv4 = ipq_converted;
       }
     }
 
@@ -647,7 +683,7 @@ int main(int argc, char **argv)
     }
     else if ( input_validate_whois == "ipv4_input" )
     {
-      i_data.skenned_ipv4 = whois_input;
+      i_data.scanned_ipv4 = whois_input;
     }
     else
     {
@@ -684,12 +720,12 @@ int main(int argc, char **argv)
   }
 
     //PrintInputData(i_data);
-    if (   !((i_data.skenned_ipv6).empty()) ||  !((i_data.whois_ipv6).empty())  ||  !((i_data.dns_ipv6).empty())    )
+    if (   !((i_data.scanned_ipv6).empty()) ||  !((i_data.whois_ipv6).empty())  ||  !((i_data.dns_ipv6).empty())    )
     {
       printf("Need to convert everything to IPV6\n");
-      if (!(i_data.skenned_hostname).empty())
+      if (!(i_data.scanned_hostname).empty())
       {
-        i_data.skenned_ipv6 = ConvertHostnameIPV6(i_data.skenned_hostname);
+        i_data.scanned_ipv6 = ConvertHostnameIPV6(i_data.scanned_hostname);
       }
       if (!(i_data.whois_hostname).empty())
       {
@@ -702,7 +738,16 @@ int main(int argc, char **argv)
 
 
     }
+
+    if ((i_data.scanned_hostname).empty())
+    {
+        printf("Have to convert ipv to hostname\n");
+        i_data.scanned_hostname = ConvertIPV4toHostname(i_data);
+    }
+
     PrintInputData(i_data);
+
+    DNSConnectIPV4(i_data, d);
 
     if (!(i_data.whois_ipv6).empty())
     {
@@ -716,8 +761,6 @@ int main(int argc, char **argv)
       whois_server_response = WhoisConnectIPV4(i_data);
       ProcessParentServer(i_data, whois_server_response);
     }
-
-    DNSConnectIPV4(i_data);
 
 
 }
