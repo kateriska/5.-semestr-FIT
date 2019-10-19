@@ -311,7 +311,7 @@ void ProcessResponseFromWhois(string whois_server_response)
   }
   if (relevant_info_found == 0)
   {
-    cerr << "Error - Parent WHOIS server didn't find any relevant information about searched IP!\n";
+    cout << "Parent WHOIS server didn't find any relevant information about searched IP!\n";
   }
   return;
 }
