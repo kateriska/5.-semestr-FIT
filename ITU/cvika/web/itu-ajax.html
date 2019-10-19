@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+  <title> ITU ajax </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+  <style type="text/css">
+  div, input { margin: 10px; }
+  </style>
+</head>
+<body>
+
+<div id="chatArea" style="height: 300px; border: solid #aaa 1px; overflow:auto;"></div>
+
+<form onsubmit="return uploadData()">
+  <input type="text" id="newMessageString">
+  <input type="submit" value="send">
+</form>
+
+<div id="status" style="border: solid #aaa 1px; ">&nbsp;</div>
+
+
+<script type="text/javascript">
+  var message_id = null;
+
+/***
+  * XMLHttpRequest object constructor (for compatibility with various browsers)
+  */
+
+function createXmlHttpRequestObject() {
+  var xmlHttp;
+  try {
+    xmlHttp = new XMLHttpRequest(); //should work on all browsers except IE6 or older
+  } catch (e) {
+    try {
+      xmlHttp = new ActiveXObject("Microsoft.XMLHttp"); //browser is IE6 or older
+    } catch (e) {
+      // ignore error
+    }
+  }
+  if (!xmlHttp) {
+    alert ("Error creating the XMLHttpRequest object.");
+  } else {
+    return xmlHttp;
+  }
+}
+
+function uploadData() {
+  document.getElementById("status").innerHTML = "uploadData()";
+
+  try {
+    var xmlHttp = createXmlHttpRequestObject();//stores XMLHttpRequestObject
+
+    //// put your code here
+    xmlHttp.open("POST", "http://www.stud.fit.vutbr.cz/~xmlich02/itu-ajax/api.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+		xmlHttp.onreadystatechange = downloadData;
+		xmlHttp.send("data=" + document.getElementById("newMessageString").value);
+
+  } catch (e) {
+    alert(e.toString());
+  }
+
+  return false; // to avoid default form submit behavior
+}
+
+function downloadData() {
+  document.getElementById("status").innerHTML = "downloadData()";
+
+  //// put your code here
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "http://www.stud.fit.vutbr.cz/~xmlich02/itu-ajax/api.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200) //process is completed and http status is OK
+     {
+          const downloaded_data = JSON.parse(xmlHttp.responseText);
+
+					for (let i in downloaded_data)
+          {
+					  if (message_id !== null && downloaded_data[i].id <= message_id) // we aren't in the end of chat
+            {
+							continue;
+						}
+
+						document.getElementById("chatArea").innerHTML = document.getElementById("chatArea").innerHTML + downloaded_data[i].login + ": " + downloaded_data[i].cnt + "<hr>";
+						message_id = downloaded_data[i].id; // prepare to parse another message
+					}
+
+					//document.title = downloaded_data[data.length - 1].login;
+				}
+			};
+      
+			xmlHttp.send(null);
+
+}
+
+//// put your code here
+downloadData();
+setInterval(downloadData, 3000); // periodic repeating every 3 seconds
+
+</script>
+
+</html>
