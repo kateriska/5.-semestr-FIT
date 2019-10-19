@@ -245,6 +245,7 @@ void ProcessResponseFromWhois(string whois_server_response)
 {
   istringstream response_stream{whois_server_response};
   string line;
+  int relevant_info_found = 0;
 
   printf("=== WHOIS ===\n");
   while (getline(response_stream, line))
@@ -252,33 +253,65 @@ void ProcessResponseFromWhois(string whois_server_response)
 
     if ((line.find("inetnum:")!=std::string::npos) || (line.find("NetRange:")!=std::string::npos) || (line.find("inet6num:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string inetnum_value = line.substr(line.find(":") + 1);
+      inetnum_value = TrimWhitespaces(inetnum_value);
+      relevant_info_found++;
+      cout << "inetnum:        " + inetnum_value + "\n";
     }
     else if ((line.find("netname:")!=std::string::npos) || (line.find("NetName:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string netname_value = line.substr(line.find(":") + 1);
+      netname_value = TrimWhitespaces(netname_value);
+      relevant_info_found++;
+      cout << "netname:        " + netname_value + "\n";
     }
     else if ((line.find("descr:")!=std::string::npos) || (line.find("Organization:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string descr_value = line.substr(line.find(":") + 1);
+      descr_value = TrimWhitespaces(descr_value);
+      relevant_info_found++;
+      cout << "descr:          " + descr_value + "\n";
     }
     else if ((line.find("country:")!=std::string::npos) || (line.find("Country:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string country_value = line.substr(line.find(":") + 1);
+      country_value = TrimWhitespaces(country_value);
+      relevant_info_found++;
+      cout << "country:        " + country_value + "\n";
     }
     else if ((line.find("admin-c:")!=std::string::npos) || (line.find("OrgTechHandle:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string admin_value = line.substr(line.find(":") + 1);
+      admin_value = TrimWhitespaces(admin_value);
+      relevant_info_found++;
+      cout << "admin-c:        " + admin_value + "\n";
     }
     else if ((line.find("address:")!=std::string::npos) || (line.find("Address:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string address_value = line.substr(line.find(":") + 1);
+      address_value = TrimWhitespaces(address_value);
+      relevant_info_found++;
+      cout << "address:        " + address_value + "\n";
     }
     else if ((line.find("phone:")!=std::string::npos) || (line.find("OrgTechPhone:")!=std::string::npos))
     {
-      cout << line + "\n";
+      //cout << line + "\n";
+      string phone_value = line.substr(line.find(":") + 1);
+      phone_value = TrimWhitespaces(phone_value);
+      relevant_info_found++;
+      cout << "phone:          " + phone_value + "\n";
     }
 
+  }
+  if (relevant_info_found == 0)
+  {
+    cerr << "Error - Parent WHOIS server didn't find any relevant information about searched IP!\n";
   }
   return;
 }
