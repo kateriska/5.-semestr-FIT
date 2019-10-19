@@ -22,11 +22,9 @@
 
 <script type="text/javascript">
   var message_id = null;
-
 /***
   * XMLHttpRequest object constructor (for compatibility with various browsers)
   */
-
 function createXmlHttpRequestObject() {
   var xmlHttp;
   try {
@@ -44,29 +42,28 @@ function createXmlHttpRequestObject() {
     return xmlHttp;
   }
 }
-
 function uploadData() {
   document.getElementById("status").innerHTML = "uploadData()";
-
   try {
     var xmlHttp = createXmlHttpRequestObject();//stores XMLHttpRequestObject
 
+    if ((document.getElementById("newMessageString").value) == "")
+    {
+          alert("You are trying to send empty message!");
+          return false;
+    }
     //// put your code here
     xmlHttp.open("POST", "http://www.stud.fit.vutbr.cz/~xmlich02/itu-ajax/api.php", true);
 		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
 		xmlHttp.onreadystatechange = downloadData;
 		xmlHttp.send("data=" + document.getElementById("newMessageString").value);
-
   } catch (e) {
     alert(e.toString());
   }
-
   return false; // to avoid default form submit behavior
 }
-
 function downloadData() {
   document.getElementById("status").innerHTML = "downloadData()";
-
   //// put your code here
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "http://www.stud.fit.vutbr.cz/~xmlich02/itu-ajax/api.php", true);
@@ -75,30 +72,24 @@ function downloadData() {
 	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200) //process is completed and http status is OK
      {
           const downloaded_data = JSON.parse(xmlHttp.responseText);
-
 					for (let i in downloaded_data)
           {
 					  if (message_id !== null && downloaded_data[i].id <= message_id) // we aren't in the end of chat
             {
 							continue;
 						}
-
 						document.getElementById("chatArea").innerHTML = document.getElementById("chatArea").innerHTML + downloaded_data[i].login + ": " + downloaded_data[i].cnt + "<hr>";
 						message_id = downloaded_data[i].id; // prepare to parse another message
 					}
-
-					//document.title = downloaded_data[data.length - 1].login;
+					document.getElementById("status").innerHTML = message_id;
 				}
 			};
-      
+
 			xmlHttp.send(null);
-
 }
-
 //// put your code here
 downloadData();
 setInterval(downloadData, 3000); // periodic repeating every 3 seconds
-
 </script>
 
 </html>
