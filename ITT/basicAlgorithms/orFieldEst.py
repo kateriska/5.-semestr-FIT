@@ -106,6 +106,8 @@ for i in range(block_div, rows-block_div, step):
         if (phi_x != 0):
             orientation = 0.5 * math.atan(phi_y / phi_x)
             print(orientation)
+        else:
+            orientation = 0.0
 
         #Orientation[i][j] = orientation
 
@@ -113,10 +115,10 @@ for i in range(block_div, rows-block_div, step):
         Y0 = j + 8
         r = 8
 
-        X1 = r*math.cos(theta_calculation - right_angle)+X0
+        X1 = r*math.cos(orientation - right_angle)+X0
         X1 = int (X1)
 
-        Y1 = r*math.sin(theta_calculation - right_angle)+Y0
+        Y1 = r*math.sin(orientation - right_angle)+Y0
         Y1 = int (Y1)
 
         #print(Y1)
