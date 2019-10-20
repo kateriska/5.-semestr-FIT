@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Ctenarsky klub - Home page</title>
+    <link rel="stylesheet" href="./css/style.css">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div id="branding">
+          <h1><span class="highlight">Ctenarsky klub</h1>
+        </div>
+        <nav>
+          <ul>
+            <li class="current"><a href="home.html">Domovska stranka</a></li>
+            <li><a href="login_page.html">Prihlasit</a></li>
+            <li><a href="database_page.html">Knizni katalog</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section id="showcase">
+      <div class="container">
+        <h1>Zajimave knihy na jednom miste</h1>
+        <p>Stante se cleny naseho noveho knizniho katalogu. Po prihlaseni vam bude k dispozici unikatni obsah.</p>
+      </div>
+    </section>
+
+    <section id="newsletter">
+      <div class="container">
+        <h1>Vyhledat knihu:</h1>
+        <form>
+          <input type="email" placeholder="Zadejte knihu">
+            <input type="button" value="Vyhledat" onclick="window.location.href='login_page.html'" class="button_1"/>
+        </form>
+      </div>
+    </section>
+
+    <section id="boxes">
+      <div class="container">
+        <div class="box">
+          <img src="./img/hungergames2.jpg">
+          <h3>Hunger Games</h3>
+          <p>Suzanne Collins</p>
+        </div>
+        <div class="box">
+          <img src="./img/rur.jpg">
+          <h3>R.U.R.</h3>
+          <p>Karel Capek</p>
+        </div>
+        <div class="box">
+          <img src="./img/divergence.jpg">
+          <h3>Divergence</h3>
+          <p>Veronica Roth</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Ctenarsky klub 2019</p>
+    </footer>
+  </body>
+</html>
