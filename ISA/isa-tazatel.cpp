@@ -1,3 +1,9 @@
+/*
+  Author: Katerina Fortova (xforto00)
+  Project: ISA - Whois whisperer
+  Date: October - November 2019
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,7 +40,10 @@ struct input_data
   string dns_hostname;
 };
 
-// https://stackoverflow.com/questions/25829143/trim-whitespace-from-a-string/25829178
+/*
+Function for trimming whitespaces from input string
+Source: https://stackoverflow.com/questions/25829143/trim-whitespace-from-a-string/25829178
+*/
 string TrimWhitespaces(const string& str)
 {
     size_t first = str.find_first_not_of(' ');
@@ -46,7 +55,9 @@ string TrimWhitespaces(const string& str)
     return str.substr(first, (last - first + 1));
 }
 
-
+/*
+Function for validate whether input is IPV4, IPV6 or hostname
+*/
 string IpValidate(string input_ip)
 {
   struct sockaddr_in sa;
@@ -67,6 +78,10 @@ string IpValidate(string input_ip)
 
   return input_validate;
 }
+
+/*
+Function for converting IPV4 to hostname and decide whether hostname exists or not
+*/
 string ConvertHostname(string hostname)
 {
   string converted_ip;
@@ -78,11 +93,15 @@ string ConvertHostname(string hostname)
     cerr << "Error - Hostname doesn't exist!\n";
     exit(EXIT_FAILURE);
   }
-  // https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/
+  // Source: https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/
   converted_ip_array = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
   converted_ip = converted_ip_array;
   return converted_ip;
 }
+
+/*
+Function for converting IPV6 to hostname and decide whether hostname exists or not
+*/
 string ConvertHostnameIPV6(string hostname)
 {
   struct addrinfo hints, *infoptr;
@@ -113,10 +132,13 @@ string ConvertHostnameIPV6(string hostname)
   }
 
   freeaddrinfo(infoptr);
-  cout << converted_ip_array;
   return converted_ip_array;
 }
-// https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+
+/*
+Function for converting IPV4 to valid hostname
+Source: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+*/
 string ConvertIPV4toHostname(struct input_data i_data)
 {
   struct sockaddr_in sa;
@@ -126,14 +148,15 @@ string ConvertIPV4toHostname(struct input_data i_data)
   char host[1024];
   char service[20];
 
-  int get_name_info_return = getnameinfo((struct sockaddr*)&sa, sizeof sa, host, sizeof host, service, sizeof service, 0);
+  getnameinfo((struct sockaddr*)&sa, sizeof sa, host, sizeof host, service, sizeof service, 0);
   string host_string = host;
-  cout << host_string;
-
 
   return host_string;
 }
 
+/*
+Debugging function printing information about input structure
+*/
 void PrintInputData(struct input_data i_data)
 {
   printf("--------Input data:--------\n");
@@ -152,7 +175,10 @@ void PrintInputData(struct input_data i_data)
 
 }
 
-// https://www.geeksforgeeks.org/socket-programming-cc/
+/*
+Function for connecting to WHOIS server for IPV4 address
+Source: https://www.geeksforgeeks.org/socket-programming-cc/
+*/
 string WhoisConnectIPV4(struct input_data i_data)
 {
     struct sockaddr_in sw4;
@@ -161,7 +187,6 @@ string WhoisConnectIPV4(struct input_data i_data)
     char buffer[WHOIS_BUFFER_LENGTH];
     string reply_from_server = "";
     string sent_message_string;
-    int count_respond = 0;
 
     socket_whois_ipv4 = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_whois_ipv4 < 0)
@@ -189,11 +214,9 @@ string WhoisConnectIPV4(struct input_data i_data)
 
     while (recv(socket_whois_ipv4 , buffer , sizeof(buffer),0))
     {
-      //cout << buffer << endl;
       reply_from_server = reply_from_server + buffer;
       memset(buffer, 0, sizeof(buffer));
     }
-    //cout << reply_from_server+ "\n";
 
     int close_whois_ipv4 = close(socket_whois_ipv4);
     if (close_whois_ipv4 < 0)
@@ -204,8 +227,11 @@ string WhoisConnectIPV4(struct input_data i_data)
 
     return reply_from_server;
 
-
 }
+
+/*
+Function for connecting to WHOIS server for IPV6 address
+*/
 string WhoisConnectIPV6(struct input_data i_data)
 {
     struct sockaddr_in6 sw6;
@@ -214,33 +240,52 @@ string WhoisConnectIPV6(struct input_data i_data)
     char buffer[WHOIS_BUFFER_LENGTH];
     string reply_from_server = "";
     string sent_message_string;
-    int count_respond = 0;
 
     socket_whois_ipv6 = socket(AF_INET6 , SOCK_STREAM , 0);
+    if (socket_whois_ipv6 < 0)
+    {
+      cerr << "Error - Creating socket for WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
     memset(buffer, 0, sizeof(sw6));
     sw6.sin6_family = AF_INET6;
     inet_pton(AF_INET6, (i_data.whois_ipv6).c_str(), &sw6.sin6_addr);
     sw6.sin6_port = htons(WHOIS_PORT);
-    connect(socket_whois_ipv6, (struct sockaddr *)&sw6, sizeof(sw6));
+    int connect_whois_ipv6 = connect(socket_whois_ipv6, (struct sockaddr *)&sw6, sizeof(sw6));
+    if (connect_whois_ipv6 < 0)
+    {
+      cerr << "Error - Connection to WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
     sprintf(message , "%s\r\n", (i_data.scanned_ipv6).c_str());
-    send(socket_whois_ipv6 , message , strlen(message) , 0);
+    int send_whois_ipv6 = send(socket_whois_ipv6 , message , strlen(message) , 0);
+    if (send_whois_ipv6 < 0)
+    {
+      cerr << "Error - Sending a message to WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
 
     while (recv(socket_whois_ipv6 , buffer , sizeof(buffer),0))
     {
-      //cout << buffer << endl;
       reply_from_server = reply_from_server + buffer;
       memset(buffer, 0, sizeof(buffer));
     }
-    //cout << reply_from_server+ "\n";
 
-    close(socket_whois_ipv6);
+    int close_whois_ipv6 = close(socket_whois_ipv6);
+    if (close_whois_ipv6 < 0)
+    {
+      cerr << "Error - Closing a socket after connection to WHOIS server failed!\n";
+      exit(EXIT_FAILURE);
+    }
 
 
     return reply_from_server;
 
-
 }
 
+/*
+Function for parsing response from WHOIS, finding relevant information from response
+*/
 void ProcessResponseFromWhois(string whois_server_response)
 {
   istringstream response_stream{whois_server_response};
@@ -251,57 +296,50 @@ void ProcessResponseFromWhois(string whois_server_response)
   while (getline(response_stream, line))
   {
 
-    if ((line.find("inetnum:")!=std::string::npos) || (line.find("NetRange:")!=std::string::npos) || (line.find("inet6num:")!=std::string::npos))
+    if ((line.find("inetnum:")!=string::npos) || (line.find("NetRange:")!=string::npos) || (line.find("inet6num:")!=string::npos))
     {
-      //cout << line + "\n";
       string inetnum_value = line.substr(line.find(":") + 1);
       inetnum_value = TrimWhitespaces(inetnum_value);
       relevant_info_found++;
       cout << "inetnum:        " + inetnum_value + "\n";
     }
-    else if ((line.find("netname:")!=std::string::npos) || (line.find("NetName:")!=std::string::npos))
+    else if ((line.find("netname:")!=string::npos) || (line.find("NetName:")!=string::npos))
     {
-      //cout << line + "\n";
       string netname_value = line.substr(line.find(":") + 1);
       netname_value = TrimWhitespaces(netname_value);
       relevant_info_found++;
       cout << "netname:        " + netname_value + "\n";
     }
-    else if ((line.find("descr:")!=std::string::npos) || (line.find("Organization:")!=std::string::npos))
+    else if ((line.find("descr:")!=string::npos) || (line.find("Organization:")!=string::npos))
     {
-      //cout << line + "\n";
       string descr_value = line.substr(line.find(":") + 1);
       descr_value = TrimWhitespaces(descr_value);
       relevant_info_found++;
       cout << "descr:          " + descr_value + "\n";
     }
-    else if ((line.find("country:")!=std::string::npos) || (line.find("Country:")!=std::string::npos))
+    else if ((line.find("country:")!=string::npos) || (line.find("Country:")!=string::npos))
     {
-      //cout << line + "\n";
       string country_value = line.substr(line.find(":") + 1);
       country_value = TrimWhitespaces(country_value);
       relevant_info_found++;
       cout << "country:        " + country_value + "\n";
     }
-    else if ((line.find("admin-c:")!=std::string::npos) || (line.find("OrgTechHandle:")!=std::string::npos))
+    else if ((line.find("admin-c:")!=string::npos) || (line.find("OrgTechHandle:")!=string::npos))
     {
-      //cout << line + "\n";
       string admin_value = line.substr(line.find(":") + 1);
       admin_value = TrimWhitespaces(admin_value);
       relevant_info_found++;
       cout << "admin-c:        " + admin_value + "\n";
     }
-    else if ((line.find("address:")!=std::string::npos) || (line.find("Address:")!=std::string::npos))
+    else if ((line.find("address:")!=string::npos) || (line.find("Address:")!=string::npos))
     {
-      //cout << line + "\n";
       string address_value = line.substr(line.find(":") + 1);
       address_value = TrimWhitespaces(address_value);
       relevant_info_found++;
       cout << "address:        " + address_value + "\n";
     }
-    else if ((line.find("phone:")!=std::string::npos) || (line.find("OrgTechPhone:")!=std::string::npos))
+    else if ((line.find("phone:")!=string::npos) || (line.find("OrgTechPhone:")!=string::npos))
     {
-      //cout << line + "\n";
       string phone_value = line.substr(line.find(":") + 1);
       phone_value = TrimWhitespaces(phone_value);
       relevant_info_found++;
@@ -316,6 +354,10 @@ void ProcessResponseFromWhois(string whois_server_response)
   return;
 }
 
+/*
+Function for finding parent WHOIS server when we didn't receive relevant data or process parent server immediately when we get them
+Works for IPV4 adressess
+*/
 void ProcessParentServer(struct input_data i_data, string whois_answer)
 {
   istringstream stream{whois_answer};
@@ -324,19 +366,16 @@ void ProcessParentServer(struct input_data i_data, string whois_answer)
 
   bool parent_server_is_found = false;
 
-  while (std::getline(stream, line))
+  while (getline(stream, line))
   {
-    //cout << line+ "\n";
+    // search for key words indicating answer on another WHOIS server
     size_t found_parent_server_line = line.find("whois.");
     size_t found_refer = line.find("refer:");
-    //size_t found_resource = line.find("resource:");
     size_t found_resource_link = line.find("ResourceLink:");
-    if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos)))
+    if ((found_parent_server_line!=string::npos) && ((found_refer!=string::npos)  || (found_resource_link!=string::npos)))
     {
-      refer_hostname = line.substr(line.find("whois."));
-      //cout << refer_hostname;
+      refer_hostname = line.substr(line.find("whois.")); // cut address of WHOIS server
       refer_hostname = TrimWhitespaces(refer_hostname);
-      //cout << refer_hostname;
       refer_hostname = ConvertHostname(refer_hostname);
       i_data.whois_ipv4 = refer_hostname;
       parent_server_is_found = true;
@@ -347,17 +386,21 @@ void ProcessParentServer(struct input_data i_data, string whois_answer)
 
   if (parent_server_is_found == true)
   {
-    //printf("Zpracovavani materskeho serveru\n");
     whois_answer = WhoisConnectIPV4(i_data);
     ProcessParentServer(i_data, whois_answer);
   }
 
   else
-  { // parent server - connect and process immediately
+  {
+    // parent server - connect and process immediately
     ProcessResponseFromWhois(whois_answer);
   }
 }
 
+/*
+Function for finding parent WHOIS server when we didn't receive relevant data or process parent server immediately when we get them
+Works for IPV6 adressess
+*/
 void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 {
   istringstream stream{whois_answer};
@@ -366,21 +409,18 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 
   bool parent_server_is_found = false;
 
-  while (std::getline(stream, line))
+  while (getline(stream, line))
   {
-    //cout << line+ "\n";
     size_t found_parent_server_line = line.find("whois.");
     size_t found_refer = line.find("refer:");
-    //size_t found_whois_refer = line.find("whois:");
     size_t found_resource_link = line.find("ResourceLink:");
-    if ((found_parent_server_line!=std::string::npos) && ((found_refer!=std::string::npos)  || (found_resource_link!=std::string::npos) ))
+    size_t found_resource_whois = line.find("whois:");
+    if ((found_parent_server_line!=string::npos) && ((found_refer!=string::npos)  || (found_resource_link!=string::npos) || (found_resource_whois!=string::npos)  ))
     {
       refer_hostname = line.substr(line.find("whois."));
-      cout << refer_hostname;
       refer_hostname = TrimWhitespaces(refer_hostname);
-      //cout << refer_hostname;
       refer_hostname = ConvertHostname(refer_hostname);
-      i_data.whois_ipv6 = refer_hostname;
+      i_data.whois_ipv4 = refer_hostname;
       parent_server_is_found = true;
       break;
     }
@@ -389,53 +429,53 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 
   if (parent_server_is_found == true)
   {
-    //printf("Zpracovavani materskeho serveru\n");
-    whois_answer = WhoisConnectIPV6(i_data);
+    whois_answer = WhoisConnectIPV4(i_data);
     ProcessParentServerIPV6(i_data, whois_answer);
   }
 
   else
-  { // rodic - okamzite zpracovani
+  {
     ProcessResponseFromWhois(whois_answer);
   }
 }
 
-int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
+/*
+Function for connecting to DNS and resolving relevant data
+*/
+int DNSConnect(struct input_data i_data, bool entered_dns)
 {
     printf("=== DNS ===\n");
 
     res_init();
-    if (entered_dns == true)
+    if (entered_dns == true) // we entered DNS server, overwrite the structure
     {
-      printf("Entered DNS server\n");
       _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
       _res.nscount = 1;
     }
-  ///////////////////////////// A //////////////////////////////////////
+    ///////////////////////////// A //////////////////////////////////////
     u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
-    int query_a = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a));
-    ns_initparse(buffer_a, query_a, &msg_a);
+    int query_a = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a)); // make a query, specify our searched hostname
+    ns_initparse(buffer_a, query_a, &msg_a); // first routine, has to be called
 
     ns_rr rr_a;
 
     int msg_count_a = ns_msg_count(msg_a, ns_s_an);
-    for (int i = 0; i < msg_count_a; i++)
+    for (int i = 0; i < msg_count_a; i++) // cycle through records
     {
-        ns_parserr(&msg_a,ns_s_an,i,&rr_a);
+        ns_parserr(&msg_a,ns_s_an,i,&rr_a); // extracts information about record
 
-        if (ns_rr_type(rr_a) == ns_t_a)
+        if (ns_rr_type(rr_a) == ns_t_a) // find relevant record
         {
           struct in_addr result_a_struct;
-          memcpy(&result_a_struct.s_addr, ns_rr_rdata(rr_a), sizeof(result_a_struct.s_addr));
+          memcpy(&result_a_struct.s_addr, ns_rr_rdata(rr_a), sizeof(result_a_struct.s_addr)); // copy memory block to our destination
           char *result_a = inet_ntoa(result_a_struct);
-          string result_a_string = result_a;
+          string result_a_string = result_a; // conversion to string
           cout << "A:              " + result_a_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
         }
     }
 
-///////////////////////////// AAAA ////////////////////////////////
+    ///////////////////////////// AAAA ////////////////////////////////
     u_char buffer_aaaa[DNS_BUFFER_LENGTH];
     ns_msg msg_aaaa;
     int query_aaaa = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_aaaa, buffer_aaaa, sizeof(buffer_aaaa));
@@ -457,10 +497,8 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
           memcpy(&result_aaaa_struct.s6_addr, ns_rr_rdata(rr_aaaa), sizeof(result_aaaa_struct.s6_addr));
           memcpy(&src, result_aaaa_struct.s6_addr , sizeof(result_aaaa_struct.s6_addr));
           const char *result_aaaa = inet_ntop(AF_INET6, &src, dst, sizeof(dst));
-          //cout << dst;
           string result_aaaa_string = result_aaaa;
           cout << "AAAA:           " + result_aaaa_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
         }
     }
 
@@ -469,6 +507,7 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
     ns_msg msg_soa;
     int query_soa = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_soa, buffer_soa, sizeof(buffer_soa));
     ns_initparse(buffer_soa, query_soa, &msg_soa);
+    string soa_message;
 
     ns_rr rr_soa;
 
@@ -481,19 +520,23 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
         if (ns_rr_type(rr_soa) == ns_t_soa)
         {
           char result_soa[DNS_BUFFER_LENGTH];
-          //printf("SOA info found\n");
           ns_sprintrr(&msg_soa, &rr_soa, NULL, NULL, result_soa, sizeof(result_soa));
           string result_soa_string = result_soa;
           result_soa_string = result_soa_string.substr(result_soa_string.find("SOA"), result_soa_string.find("("));
           result_soa_string = result_soa_string.substr(4, result_soa_string.find("("));
           result_soa_string = result_soa_string.substr(0, result_soa_string.find("("));
-          //cout << result_soa_string;
 
-          //printf ("%s\n", result_soa);
-
-
-          cout << "SOA:            " + result_soa_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
+          for (unsigned int i = 0; i < result_soa_string.length(); ++i)
+          {
+            if (result_soa_string[i] == ' ')
+            result_soa_string[i] = '\n';
+          }
+          stringstream soa_stream{result_soa_string};
+          while (getline(soa_stream, soa_message))
+          {
+            soa_message = soa_message.substr(0, soa_message.size()-1);
+            cout << "SOA:            " + soa_message + "\n";
+          }
         }
     }
 
@@ -514,16 +557,13 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
         ns_parserr(&msg_mx,ns_s_an,i,&rr_mx);
         if (ns_rr_type(rr_mx) == ns_t_mx)
         {
-          //printf("MX info found\n");
           char result_mx[DNS_BUFFER_LENGTH];
           ns_sprintrr(&msg_mx, &rr_mx, NULL, NULL, result_mx, sizeof(result_mx));
           string result_mx_string = result_mx;
           result_mx_string = result_mx_string.substr(result_mx_string.find("MX"));
           result_mx_string = result_mx_string.substr(5);
           result_mx_string = result_mx_string.substr(0, result_mx_string.size()-1);
-          //cout << result_mx_string;
           cout << "MX:            " + result_mx_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
         }
     }
 
@@ -543,16 +583,13 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
         ns_parserr(&msg_cname,ns_s_an,i,&rr_cname);
         if (ns_rr_type(rr_cname) == ns_t_cname)
         {
-          //printf("CNAME info found\n");
           char result_cname[DNS_BUFFER_LENGTH];
           ns_sprintrr(&msg_cname, &rr_cname, NULL, NULL, result_cname, sizeof(result_cname));
           string result_cname_string = result_cname;
           result_cname_string = result_cname_string.substr(result_cname_string.find("CNAME"));
           result_cname_string = result_cname_string.substr(5);
           result_cname_string = result_cname_string.substr(0, result_cname_string.size()-1);
-          //cout << result_mx_string;
           cout << "CNAME:        " + result_cname_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
         }
     }
 
@@ -572,16 +609,13 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
         ns_parserr(&msg_ns,ns_s_an,i,&rr_ns);
         if (ns_rr_type(rr_ns) == ns_t_ns)
         {
-          //printf("NS info found\n");
           char result_ns[DNS_BUFFER_LENGTH];
           ns_sprintrr(&msg_ns, &rr_ns, NULL, NULL, result_ns, sizeof(result_ns));
           string result_ns_string = result_ns;
           result_ns_string = result_ns_string.substr(result_ns_string.find("NS"));
           result_ns_string = result_ns_string.substr(2);
           result_ns_string = result_ns_string.substr(0, result_ns_string.size()-1);
-          //cout << result_mx_string;
           cout << "NS:        " + result_ns_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
         }
     }
 
@@ -618,8 +652,9 @@ int DNSConnectIPV4(struct input_data i_data, bool entered_dns)
 }
 
 
-
-
+/*
+*** MAIN ***
+*/
 int main(int argc, char **argv)
 {
   int opt;
@@ -641,30 +676,26 @@ int main(int argc, char **argv)
 
   if ((argc < 5 ) || (argc > 7))
   {
-        std::cerr << "Error - Wrong count of arguments!\n";
+        cerr << "Error - Wrong count of arguments!\n";
         exit(EXIT_FAILURE);
   }
-
+  // validate parametres
   while ((opt = getopt (argc, argv, ":q:w:d:")) != -1)
   {
     switch (opt)
     {
       case 'q':
         ipq_input = optarg;
-        //std::cout << ipq_input + "\n";
         q = true;
       break;
 
       case 'w':
         whois_input = optarg;
-        //std::cout << whois_input + "\n";
         w = true;
       break;
 
       case 'd':
-        //std::cout << optarg;
         dns_input = optarg;
-        //std::cout << dns_input + "\n";
         d = true;
       break;
 
@@ -676,13 +707,15 @@ int main(int argc, char **argv)
     }
   }
 
-    // Check mandatory (povinne) parameters:
+    // check mandatory parameters
     if ((w == false) || (q == false))
     {
-      std::cerr << "Error - Missing mandatory options!\n";
+      cerr << "Error - Missing mandatory options!\n";
       exit(EXIT_FAILURE);
     }
 
+    // filled structure correctly with IPV4, IPV6 or hostname
+    // validate -q input
     input_validate_ipq = IpValidate(ipq_input);
     if (input_validate_ipq == "ipv6_input" )
     {
@@ -696,7 +729,6 @@ int main(int argc, char **argv)
     {
       i_data.scanned_hostname = ipq_input;
       ipq_converted = ConvertHostname(ipq_input);
-      //cout << ipq_converted + "\n";
       input_validate_ipq = IpValidate(ipq_converted);
       if (input_validate_ipq == "ipv6_input" )
       {
@@ -708,7 +740,7 @@ int main(int argc, char **argv)
       }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////
+    // validate -w input
     input_validate_whois = IpValidate(whois_input);
     if (input_validate_whois == "ipv6_input" )
     {
@@ -722,7 +754,6 @@ int main(int argc, char **argv)
     {
       i_data.whois_hostname = whois_input;
       whois_converted = ConvertHostname(whois_input);
-      //cout << whois_converted + "\n";
       input_validate_whois = IpValidate(whois_converted);
       if (input_validate_whois == "ipv6_input" )
       {
@@ -734,6 +765,7 @@ int main(int argc, char **argv)
       }
     }
 
+    // validate -d input
     if (d == true)
     {
       input_validate_dns = IpValidate(dns_input);
@@ -747,15 +779,14 @@ int main(int argc, char **argv)
       }
       else
       {
-        std::cerr << "Error - Enter only IP adress for DNS, not hostname!\n";
+        cerr << "Error - Enter only IP adress for DNS, not hostname!\n";
         exit(EXIT_FAILURE);
       }
   }
 
-    //PrintInputData(i_data);
-    if (   !((i_data.scanned_ipv6).empty()) ||  !((i_data.whois_ipv6).empty())  ||  !((i_data.dns_ipv6).empty())    )
+    // convert addresses to IPV6 if neccessary
+    if (!((i_data.scanned_ipv6).empty()) ||  !((i_data.whois_ipv6).empty())  ||  !((i_data.dns_ipv6).empty()))
     {
-      printf("Need to convert everything to IPV6\n");
       if (!(i_data.scanned_hostname).empty())
       {
         i_data.scanned_ipv6 = ConvertHostnameIPV6(i_data.scanned_hostname);
@@ -769,28 +800,26 @@ int main(int argc, char **argv)
         i_data.dns_ipv6 = ConvertHostnameIPV6(i_data.dns_hostname);
       }
 
-
     }
 
+    // convert hostname to IPV4 if neccessary
     if ((i_data.scanned_hostname).empty())
     {
-        printf("Have to convert ipv to hostname\n");
         i_data.scanned_hostname = ConvertIPV4toHostname(i_data);
     }
 
+    // debug - print final structure of data
     PrintInputData(i_data);
 
-    DNSConnectIPV4(i_data, d);
+    DNSConnect(i_data, d);
 
     if (!(i_data.whois_ipv6).empty())
     {
-      printf("Processing IPV6\n");
       whois_server_response = WhoisConnectIPV6(i_data);
       ProcessParentServerIPV6(i_data, whois_server_response);
     }
     else if (!(i_data.whois_ipv4).empty())
     {
-      printf("Processing IPV4\n");
       whois_server_response = WhoisConnectIPV4(i_data);
       ProcessParentServer(i_data, whois_server_response);
     }
