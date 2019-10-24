@@ -442,16 +442,64 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 /*
 Function for connecting to DNS and resolving relevant data
 */
-int DNSConnect(struct input_data i_data, bool entered_dns)
+int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
 {
     printf("=== DNS ===\n");
 
     res_init();
+
     if (entered_dns == true) // we entered DNS server, overwrite the structure
     {
       _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
       _res.nscount = 1;
     }
+
+    if (reverse_lookup == true)
+    {
+      string input_ip = i_data.scanned_ipv4;
+      string oct1 = input_ip.substr(0, input_ip.find("."));
+      string oct2 = input_ip.substr(input_ip.find(".") + 1, input_ip.find("."));
+      input_ip = input_ip.substr(input_ip.find(".") + 1);
+      input_ip = input_ip.substr(input_ip.find(".") + 1);
+      string oct3 = input_ip.substr(0, input_ip.find("."));
+      string oct4 = input_ip.substr(input_ip.find(".") + 1);
+
+      string reverse_request = oct4 + "." + oct3 + "." + oct2 + "." + oct1 + ".in-addr.arpa";
+      cout << reverse_request + "\n";
+
+      ///////////////// PTR ////////////////////////////////////////////////
+      u_char buffer_ptr[DNS_BUFFER_LENGTH];
+      ns_msg msg_ptr;
+      int query_ptr = res_query(reverse_request.c_str(), ns_c_in, ns_t_ptr, buffer_ptr, sizeof(buffer_ptr));
+      ns_initparse(buffer_ptr, query_ptr, &msg_ptr);
+
+      ns_rr rr_ptr;
+
+      int msg_count_ptr = ns_msg_count(msg_ptr, ns_s_an);
+
+
+      for (int i = 0; i < msg_count_ptr; i++)
+      {
+          ns_parserr(&msg_ptr,ns_s_an,i,&rr_ptr);
+          if (ns_rr_type(rr_ptr) == ns_t_ptr)
+          {
+            printf("PTR info found\n");
+            char result_ptr[DNS_BUFFER_LENGTH];
+            ns_sprintrr(&msg_ptr, &rr_ptr, NULL, NULL, result_ptr, sizeof(result_ptr));
+            string result_ptr_string = result_ptr;
+            result_ptr_string = result_ptr_string.substr(result_ptr_string.find("PTR") + 3);
+            //result_ns_string = result_ns_string.substr(2);
+            result_ptr_string = result_ptr_string.substr(0, result_ptr_string.size()-1);
+            result_ptr_string = TrimWhitespaces(result_ptr_string);
+            //cout << result_mx_string;
+            cout << result_ptr_string + "\n";
+            i_data.scanned_hostname = result_ptr_string;
+          }
+      }
+
+
+    }
+
     ///////////////////////////// A //////////////////////////////////////
     u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
@@ -563,7 +611,8 @@ int DNSConnect(struct input_data i_data, bool entered_dns)
           result_mx_string = result_mx_string.substr(result_mx_string.find("MX"));
           result_mx_string = result_mx_string.substr(5);
           result_mx_string = result_mx_string.substr(0, result_mx_string.size()-1);
-          cout << "MX:            " + result_mx_string + "\n";
+          result_mx_string = TrimWhitespaces(result_mx_string);
+          cout << "MX:             " + result_mx_string + "\n";
         }
     }
 
@@ -620,32 +669,9 @@ int DNSConnect(struct input_data i_data, bool entered_dns)
     }
 
     ///////////////// PTR ////////////////////////////////////////////////
-    u_char buffer_ptr[DNS_BUFFER_LENGTH];
-    ns_msg msg_ptr;
-    int query_ptr = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_ptr, buffer_ptr, sizeof(buffer_ptr));
-    ns_initparse(buffer_ptr, query_ptr, &msg_ptr);
-
-    ns_rr rr_ptr;
-
-    int msg_count_ptr = ns_msg_count(msg_ptr, ns_s_an);
-
-
-    for (int i = 0; i < msg_count_ptr; i++)
+    if ((!i_data.scanned_hostname.empty()) && (reverse_lookup == true))
     {
-        ns_parserr(&msg_ptr,ns_s_an,i,&rr_ptr);
-        if (ns_rr_type(rr_ptr) == ns_t_ptr)
-        {
-          printf("PTR info found\n");
-          char result_ptr[DNS_BUFFER_LENGTH];
-          ns_sprintrr(&msg_ptr, &rr_ptr, NULL, NULL, result_ptr, sizeof(result_ptr));
-          string result_ptr_string = result_ptr;
-          //result_ns_string = result_ns_string.substr(result_ns_string.find("NS"));
-          //result_ns_string = result_ns_string.substr(2);
-          //result_ns_string = result_ns_string.substr(0, result_ns_string.size()-1);
-          //cout << result_mx_string;
-          cout << "PTR:        " + result_ptr_string + "\n";
-          //fprintf(stderr, "%s IN A %s\n", ns_rr_name(rr_a), inet_ntoa(in));
-        }
+      cout << "PTR:            " + i_data.scanned_hostname + "\n";
     }
 
   return 0;
@@ -673,6 +699,7 @@ int main(int argc, char **argv)
   string dns_converted;
   string whois_server_response;
   string dns_server_response;
+  bool reverse_lookup = false;
 
   if ((argc < 5 ) || (argc > 7))
   {
@@ -805,13 +832,15 @@ int main(int argc, char **argv)
     // convert hostname to IPV4 if neccessary
     if ((i_data.scanned_hostname).empty())
     {
-        i_data.scanned_hostname = ConvertIPV4toHostname(i_data);
+      reverse_lookup = true;
+
+        //i_data.scanned_hostname = ConvertIPV4toHostname(i_data);
     }
 
     // debug - print final structure of data
     PrintInputData(i_data);
 
-    DNSConnect(i_data, d);
+    DNSConnect(i_data, d, reverse_lookup);
 
     if (!(i_data.whois_ipv6).empty())
     {
