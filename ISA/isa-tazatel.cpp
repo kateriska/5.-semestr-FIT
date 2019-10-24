@@ -42,8 +42,16 @@ struct input_data
 
 /*
 Function for trimming whitespaces from input string
-Source: https://stackoverflow.com/questions/25829143/trim-whitespace-from-a-string/25829178
+Source:
+***************************************************************************************
+  *    Title: Trim whitespace from a String
+  *    Author: user of stackoverflow with nickname "Anthony Kong" -> https://stackoverflow.com/users/58129/anthony-kong
+  *    Date: 14.9.2014
+  *    Code version: 1
+  *    Availability: https://stackoverflow.com/questions/25829143/trim-whitespace-from-a-string/25829178
+**************************************************************************************
 */
+
 string TrimWhitespaces(const string& str)
 {
     size_t first = str.find_first_not_of(' ');
@@ -53,6 +61,26 @@ string TrimWhitespaces(const string& str)
     }
     size_t last = str.find_last_not_of(' ');
     return str.substr(first, (last - first + 1));
+}
+
+/*
+Function for making reverse string
+Source:
+***************************************************************************************
+  *    Title: C++ reversing a string
+  *    Author: user of stackoverflow with nickname "JMan Mousey" -> https://stackoverflow.com/users/3472761/jman-mousey
+  *    Date: 15.9.2017
+  *    Code version: 1
+  *    Availability: https://stackoverflow.com/questions/46248315/c-reversing-a-string
+**************************************************************************************
+*/
+void reverseStringInPlace(string &stringToReverse)
+{
+    int numCharacters = stringToReverse.length();
+    for (int i=0; i<numCharacters/2; i++)
+    {
+      swap(stringToReverse[i], stringToReverse[numCharacters-i-1]);
+    }
 }
 
 /*
@@ -81,6 +109,11 @@ string IpValidate(string input_ip)
 
 /*
 Function for converting IPV4 to hostname and decide whether hostname exists or not
+Helpful link:
+***************************************************************************************
+ *    Title: C Program to display hostname and IP address
+ *    Availability: https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/
+**************************************************************************************
 */
 string ConvertHostname(string hostname)
 {
@@ -93,7 +126,6 @@ string ConvertHostname(string hostname)
     cerr << "Error - Hostname doesn't exist!\n";
     exit(EXIT_FAILURE);
   }
-  // Source: https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/
   converted_ip_array = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
   converted_ip = converted_ip_array;
   return converted_ip;
@@ -137,7 +169,11 @@ string ConvertHostnameIPV6(string hostname)
 
 /*
 Function for converting IPV4 to valid hostname
-Source: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+Source:
+***************************************************************************************
+ *    Title: getnameinfo()
+ *    Availability: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+**************************************************************************************
 */
 string ConvertIPV4toHostname(struct input_data i_data)
 {
@@ -177,7 +213,15 @@ void PrintInputData(struct input_data i_data)
 
 /*
 Function for connecting to WHOIS server for IPV4 address
-Source: https://www.geeksforgeeks.org/socket-programming-cc/
+Sources and helpful links:
+***************************************************************************************
+ *    Title: Socket Programming in C/C++
+ *    Availability: https://www.geeksforgeeks.org/socket-programming-cc/
+**************************************************************************************
+***************************************************************************************
+ *    Title: C code to perform IP whois
+  *    Availability: https://www.binarytides.com/c-code-to-perform-ip-whois/
+***************************************************************************************
 */
 string WhoisConnectIPV4(struct input_data i_data)
 {
@@ -441,6 +485,42 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 
 /*
 Function for connecting to DNS and resolving relevant data
+Sources and helpful links:
+***************************************************************************************
+ *    Title: C Programming with the Resolver Library Routines
+ *    Availability: https://docstore.mik.ua/orelly/networking_2ndEd/dns/ch15_02.htm
+***************************************************************************************
+***************************************************************************************
+  *    Title: How to query a server and get the MX, A, NS records
+  *    Author: user of stackoverflow with nickname "Dima00782" -> https://stackoverflow.com/users/1818004/dima00782
+  *    Author: user of stackoverflow with nickname "Code Painters" -> https://stackoverflow.com/users/483173/code-painters
+  *    Date: 18.3.2013
+  *    Code version: 1
+  *    Availability: https://stackoverflow.com/questions/15476717/how-to-query-a-server-and-get-the-mx-a-ns-records
+***************************************************************************************
+***************************************************************************************
+  *    Title: res_query(3) - Linux man page
+  *    Availability: https://linux.die.net/man/3/res_query
+***************************************************************************************
+***************************************************************************************
+  *    Title: How to query a server and get the MX, A, NS records
+  *    Author: user of stackoverflow with nickname "Dima00782" -> https://stackoverflow.com/users/1818004/dima00782
+  *    Author: user of stackoverflow with nickname "Code Painters" -> https://stackoverflow.com/users/483173/code-painters
+  *    Date: 18.3.2013
+  *    Code version: 1
+  *    Availability: https://stackoverflow.com/questions/15476717/how-to-query-a-server-and-get-the-mx-a-ns-records
+***************************************************************************************
+***************************************************************************************
+  *    Title: make a reverse ipv6 for DNSBL in c++
+  *    Author: user of stackoverflow with nickname "Michael Hampton" -> https://stackoverflow.com/users/1068283/michael-hampton
+  *    Date: 14.3.2017
+  *    Code version: 1
+  *    Availability: https://stackoverflow.com/questions/42774904/make-a-reverse-ipv6-for-dnsbl-in-c
+***************************************************************************************
+***************************************************************************************
+  *    Title: Reverse DNS lookup
+  *    Availability: https://en.wikipedia.org/wiki/Reverse_DNS_lookup
+***************************************************************************************
 */
 int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
 {
@@ -454,8 +534,50 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
       _res.nscount = 1;
     }
 
-    if (reverse_lookup == true)
+    if (reverse_lookup == true) // provide reverse DNS lookup for IPV6 or IPV4
     {
+      string reverse_request = "";
+      if (!i_data.scanned_ipv6.empty())
+      {
+        struct in6_addr addr;
+        inet_pton(AF_INET6,i_data.scanned_ipv6.c_str(),&addr);
+        char str2[48];
+        string ipv6_hexa_i;
+
+        sprintf(str2,"%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x.%02x",
+        addr.s6_addr[15], addr.s6_addr[14],
+        addr.s6_addr[13], addr.s6_addr[12],
+        addr.s6_addr[11], addr.s6_addr[10],
+        addr.s6_addr[9], addr.s6_addr[8],
+        addr.s6_addr[7], addr.s6_addr[6],
+        addr.s6_addr[5], addr.s6_addr[4],
+        addr.s6_addr[3], addr.s6_addr[2],
+        addr.s6_addr[1], addr.s6_addr[0]);
+        string retorno = str2;
+        for (unsigned int i = 0; i < retorno.length(); ++i)
+        {
+          if (retorno[i] == '.')
+          {
+            retorno[i] = '\n';
+          }
+        }
+        stringstream ipv6_reverse_stream{retorno};
+        string reverse_ipv6 = "";
+        while (getline(ipv6_reverse_stream, ipv6_hexa_i))
+        {
+          reverseStringInPlace(ipv6_hexa_i);
+          string hexa1 = ipv6_hexa_i.substr(0,1);
+          string hexa2 = ipv6_hexa_i.substr(1);
+          reverse_ipv6 = reverse_ipv6 + "." + hexa1 + "." + hexa2;
+
+        }
+
+        reverse_ipv6 = reverse_ipv6.substr(1);
+        reverse_request = reverse_ipv6 + ".ip6.arpa";
+      }
+
+      else if (!i_data.scanned_ipv4.empty())
+      {
       string input_ip = i_data.scanned_ipv4;
       string oct1 = input_ip.substr(0, input_ip.find("."));
       string oct2 = input_ip.substr(input_ip.find(".") + 1, input_ip.find("."));
@@ -464,8 +586,9 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
       string oct3 = input_ip.substr(0, input_ip.find("."));
       string oct4 = input_ip.substr(input_ip.find(".") + 1);
 
-      string reverse_request = oct4 + "." + oct3 + "." + oct2 + "." + oct1 + ".in-addr.arpa";
+      reverse_request = oct4 + "." + oct3 + "." + oct2 + "." + oct1 + ".in-addr.arpa";
       cout << reverse_request + "\n";
+      }
 
       ///////////////// PTR ////////////////////////////////////////////////
       u_char buffer_ptr[DNS_BUFFER_LENGTH];
@@ -483,20 +606,15 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           ns_parserr(&msg_ptr,ns_s_an,i,&rr_ptr);
           if (ns_rr_type(rr_ptr) == ns_t_ptr)
           {
-            printf("PTR info found\n");
             char result_ptr[DNS_BUFFER_LENGTH];
             ns_sprintrr(&msg_ptr, &rr_ptr, NULL, NULL, result_ptr, sizeof(result_ptr));
             string result_ptr_string = result_ptr;
             result_ptr_string = result_ptr_string.substr(result_ptr_string.find("PTR") + 3);
-            //result_ns_string = result_ns_string.substr(2);
             result_ptr_string = result_ptr_string.substr(0, result_ptr_string.size()-1);
             result_ptr_string = TrimWhitespaces(result_ptr_string);
-            //cout << result_mx_string;
-            cout << result_ptr_string + "\n";
             i_data.scanned_hostname = result_ptr_string;
           }
       }
-
 
     }
 
@@ -727,7 +845,7 @@ int main(int argc, char **argv)
       break;
 
       default:
-        std::cerr << "Error - Bad parametres!\n";
+        cerr << "Error - Bad parametres!\n";
         exit(EXIT_FAILURE);
       break;
 
