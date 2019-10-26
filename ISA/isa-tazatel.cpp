@@ -17,8 +17,7 @@
 #include <resolv.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 using namespace std;
 
 #define WHOIS_PORT 43
@@ -463,8 +462,8 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
     {
       refer_hostname = line.substr(line.find("whois."));
       refer_hostname = TrimWhitespaces(refer_hostname);
-      refer_hostname = ConvertHostname(refer_hostname);
-      i_data.whois_ipv4 = refer_hostname;
+      refer_hostname = ConvertHostnameIPV6(refer_hostname);
+      i_data.whois_ipv6 = refer_hostname;
       parent_server_is_found = true;
       break;
     }
@@ -473,7 +472,7 @@ void ProcessParentServerIPV6(struct input_data i_data, string whois_answer)
 
   if (parent_server_is_found == true)
   {
-    whois_answer = WhoisConnectIPV4(i_data);
+    whois_answer = WhoisConnectIPV6(i_data);
     ProcessParentServerIPV6(i_data, whois_answer);
   }
 
@@ -637,6 +636,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           memcpy(&result_a_struct.s_addr, ns_rr_rdata(rr_a), sizeof(result_a_struct.s_addr)); // copy memory block to our destination
           char *result_a = inet_ntoa(result_a_struct);
           string result_a_string = result_a; // conversion to string
+          result_a_string = TrimWhitespaces(result_a_string);
           cout << "A:              " + result_a_string + "\n";
         }
     }
@@ -664,6 +664,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           memcpy(&src, result_aaaa_struct.s6_addr , sizeof(result_aaaa_struct.s6_addr));
           const char *result_aaaa = inet_ntop(AF_INET6, &src, dst, sizeof(dst));
           string result_aaaa_string = result_aaaa;
+          result_aaaa_string = TrimWhitespaces(result_aaaa_string);
           cout << "AAAA:           " + result_aaaa_string + "\n";
         }
     }
@@ -701,6 +702,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           while (getline(soa_stream, soa_message))
           {
             soa_message = soa_message.substr(0, soa_message.size()-1);
+            soa_message = TrimWhitespaces(soa_message);
             cout << "SOA:            " + soa_message + "\n";
           }
         }
@@ -756,7 +758,8 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           result_cname_string = result_cname_string.substr(result_cname_string.find("CNAME"));
           result_cname_string = result_cname_string.substr(5);
           result_cname_string = result_cname_string.substr(0, result_cname_string.size()-1);
-          cout << "CNAME:        " + result_cname_string + "\n";
+          result_cname_string = TrimWhitespaces(result_cname_string);
+          cout << "CNAME:          " + result_cname_string + "\n";
         }
     }
 
@@ -782,7 +785,8 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           result_ns_string = result_ns_string.substr(result_ns_string.find("NS"));
           result_ns_string = result_ns_string.substr(2);
           result_ns_string = result_ns_string.substr(0, result_ns_string.size()-1);
-          cout << "NS:        " + result_ns_string + "\n";
+          result_ns_string = TrimWhitespaces(result_ns_string);
+          cout << "NS:         " + result_ns_string + "\n";
         }
     }
 
