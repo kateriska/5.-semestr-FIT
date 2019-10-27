@@ -42,31 +42,42 @@ for i in range(8, rows-8, 16):
                 sum_Vx = sum_Vx + (2*grad_x_value * grad_y_value)
                 sum_Vy = sum_Vy + ((grad_x_value * grad_x_value)- (grad_y_value * grad_y_value))
 
-        if (sum_Vx != 0):
-            tan_arg = sum_Vy / sum_Vx
+        if (sum_Vy != 0):
+            #tan_arg = sum_Vy / sum_Vx
             result = 0.5 * cv2.fastAtan2(sum_Vy, sum_Vx);
             print(result)
         #orientatin_matrix[i][j] = result
         else:
             result = 0.0
 
+        magnitude = math.sqrt((sum_Vx * sum_Vx) + (sum_Vy * sum_Vy))
+        phi_x = magnitude * math.cos(2*(math.radians(result)))
+        phi_y = magnitude * math.sin(2*(math.radians(result)))
+        if (phi_x != 0):
+            orient = 0.5 * cv2.fastAtan2(phi_y, phi_x)
+        else:
+            orient = 0.0
+
         X0 = i + 8
         Y0 = j + 8
         r = 8
 
-        result_rad = result * math.pi / 180.0
+        #result_rad = result * math.pi / 180.0
 
-        X1 = r*math.cos(result_rad - right_angle)+X0
+        X1 = r * math.cos(math.radians(orient))+ X0
         X1 = int (X1)
         print(X1)
 
-        Y1 = r*math.sin(result_rad - right_angle)+Y0
+        Y1 = r * math.sin(math.radians(orient))+ Y0
         Y1 = int (Y1)
 
         orient_img = cv2.line(orig_img,(X0,Y0) , (X1,Y1), (0,255,0), 3)
         cv2.imshow('Oriented image', orient_img)
         white_img = cv2.line(white,(X0,Y0) , (X1,Y1), (0,255,0), 3)
         cv2.imshow('Oriented skeleton', white_img)
+        rotated_img = cv2.rotate(white_img, cv2.ROTATE_90_CLOCKWISE)
+        cv2.imshow('Oriented rotated skeleton', rotated_img)
+
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
