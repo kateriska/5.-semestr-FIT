@@ -44,6 +44,8 @@ def imgThinning(img):
     return skeleton
 
 def orientFieldEstimation(orig_img):
+    white = cv2.imread("white.jpg")
+    white = cv2.resize(white,(388,374))
     img = np.float32(orig_img)
 
     rows = np.size(img, 0)
@@ -89,54 +91,55 @@ def orientFieldEstimation(orig_img):
                     grad_y_value = int (grad_y_value_str)
 
 
-                    sum_Vy = sum_Vy + (2 * grad_x_value * grad_y_value)
-                    sum_Vx = sum_Vx + ((grad_x_value**2) - (grad_y_value**2))
+                    sum_Vx = sum_Vx + (2*grad_x_value * grad_y_value)
+                    sum_Vy = sum_Vy + ((grad_x_value * grad_x_value)- (grad_y_value * grad_y_value))
 
-            if (sum_Vx != 0 ):
-                theta_calculation = 0.5 * math.atan(sum_Vy / sum_Vx)
+            if (sum_Vy != 0):
+                #tan_arg = sum_Vy / sum_Vx
+                result = 0.5 * cv2.fastAtan2(sum_Vy, sum_Vx);
+                print(result)
+            #orientatin_matrix[i][j] = result
             else:
-                theta_calculation = 0.0
+                result = 0.0
 
-            #print(theta_calculation)
             magnitude = math.sqrt((sum_Vx * sum_Vx) + (sum_Vy * sum_Vy))
-            phi_x = magnitude * math.cos(2*theta_calculation)
-            phi_y = magnitude * math.sin(2*theta_calculation)
-
-            orientation = 0.0
+            phi_x = magnitude * math.cos(2*(math.radians(result)))
+            phi_y = magnitude * math.sin(2*(math.radians(result)))
             if (phi_x != 0):
-                orientation = 0.5 * math.atan(phi_y / phi_x)
-                #print(orientation)
+                orient = 0.5 * cv2.fastAtan2(phi_y, phi_x)
             else:
-                orientation = 0.0
+                orient = 0.0
 
-            print(orientation)
-            X0 = i
-            Y0 = j
+            X0 = i + 8
+            Y0 = j + 8
             r = 8
 
-            X1 = r*math.cos(theta_calculation - right_angle)+X0
-            X1 = int (X1)
-            #print(X1)
+            #result_rad = result * math.pi / 180.0
 
-            Y1 = r*math.sin(theta_calculation - right_angle)+Y0
+            X1 = r * math.cos(math.radians(orient))+ X0
+            X1 = int (X1)
+            print(X1)
+
+            Y1 = r * math.sin(math.radians(orient))+ Y0
             Y1 = int (Y1)
 
             orient_img = cv2.line(orig_img,(X0,Y0) , (X1,Y1), (0,255,0), 3)
             cv2.imshow('Oriented image', orient_img)
+            white_img = cv2.line(white,(X0,Y0) , (X1,Y1), (0,255,0), 3)
+            cv2.imshow('Oriented skeleton', white_img)
+            rotated_img = cv2.rotate(white_img, cv2.ROTATE_90_CLOCKWISE)
+            cv2.imshow('Oriented rotated skeleton', rotated_img)
+
+    return rotated_img
 
 
-
-
-
-    return orient_img
-
-
-img = cv2.imread("101_2.tif",0) # uint8 image
+img = cv2.imread("104_1.tif",0) # uint8 image
 img = cv2.resize(img,(388,374))
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX)
 cv2.imshow('Original uint8 image', img)
 segmented_image = imgSegmentation(img)
 cv2.imshow('Final segmented image', segmented_image)
+cv2.imwrite('segmented_img.tif', segmented_image)
 thinned_image = imgThinning(segmented_image)
 cv2.imshow('Final segmented and thinned image', thinned_image)
 cv2.imwrite('thinned_img.tif', thinned_image)
