@@ -5,18 +5,18 @@ import math
 
 def imgSegmentation(img):
     ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    cv2.imshow('Tresholded image', tresh_img)
+    #cv2.imshow('Tresholded image', tresh_img)
 
     # noise removal
     kernel = np.ones((12,12), np.uint8)
     opening = cv2.morphologyEx(tresh_img, cv2.MORPH_OPEN,kernel)
-    cv2.imshow('Opening', opening)
+    #cv2.imshow('Opening', opening)
     im2, contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     #cv2.drawContours(opening, contours, -1, (0,255,0), 3)
-    cv2.imshow('Opening with contours', opening)
+    #cv2.imshow('Opening with contours', opening)
     cv2.Canny(opening, 100, 200);
     result = cv2.add(tresh_img, opening)
-    cv2.imshow('Img after noise removal', result)
+    #cv2.imshow('Img after noise removal', result)
     return result
 
 def imgThinning(img):
@@ -40,7 +40,7 @@ def imgThinning(img):
             done = True
 
     skeleton = cv2.bitwise_not(skeleton)
-    cv2.imshow("Thinned image", skeleton)
+    #cv2.imshow("Thinned image", skeleton)
     return skeleton
 
 def orientFieldEstimation(orig_img):
@@ -116,26 +116,163 @@ def orientFieldEstimation(orig_img):
 
             #result_rad = result * math.pi / 180.0
 
-            X1 = r * math.cos(math.radians(orient))+ X0
+            X1 = r * math.cos(math.radians(orient) - right_angle)+ X0
             X1 = int (X1)
             print(X1)
 
-            Y1 = r * math.sin(math.radians(orient))+ Y0
+            Y1 = r * math.sin(math.radians(orient) - right_angle)+ Y0
             Y1 = int (Y1)
 
             orient_img = cv2.line(orig_img,(X0,Y0) , (X1,Y1), (0,255,0), 3)
-            cv2.imshow('Oriented image', orient_img)
+            #cv2.imshow('Oriented image', orient_img)
             white_img = cv2.line(white,(X0,Y0) , (X1,Y1), (0,255,0), 3)
-            cv2.imshow('Oriented skeleton', white_img)
+            #cv2.imshow('Oriented skeleton', white_img)
             rotated_img = cv2.rotate(white_img, cv2.ROTATE_90_CLOCKWISE)
-            cv2.imshow('Oriented rotated skeleton', rotated_img)
+            #cv2.imshow('Oriented rotated skeleton', rotated_img)
+            flip_horizontal_img = cv2.flip(rotated_img, 1)
 
-    return rotated_img
+    return flip_horizontal_img
+
+def gaborFilter(orig_img):
+    img = np.float32(orig_img)
+    shape_img = img.shape
+
+    kernel_size = (12,12)
+    sigma = 6
+    lambda_v = 10
+    gamma = 0.05
+    psi = 0
+
+    theta1 = 0
+    theta2 = 45
+    theta3 = 90
+    theta4 = 135
+
+    enhanced = np.zeros(shape_img, dtype=np.float32)
+
+    kernel1 = cv2.getGaborKernel(kernel_size, sigma, theta1, lambda_v, gamma, psi, cv2.CV_32F);
+    kernel2 = cv2.getGaborKernel(kernel_size, sigma, theta2, lambda_v, gamma, psi, cv2.CV_32F);
+    kernel3 = cv2.getGaborKernel(kernel_size, sigma, theta3, lambda_v, gamma, psi, cv2.CV_32F);
+    kernel4 = cv2.getGaborKernel(kernel_size, sigma, theta4, lambda_v, gamma, psi, cv2.CV_32F);
+    gabor1 = cv2.filter2D(img, -1, kernel1);
+    gabor2 = cv2.filter2D(img, -1, kernel2);
+    gabor3 = cv2.filter2D(img, -1, kernel3);
+    gabor4 = cv2.filter2D(img, -1, kernel4);
+    #cv2.imshow('gabor1', gabor1)
+    #cv2.imshow('gabor2', gabor2)
+    #cv2.imshow('gabor3', gabor3)
+    #cv2.imshow('gabor4', gabor4)
+    adding1 = cv2.add(gabor1, gabor2)
+    adding2 = cv2.add(adding1, gabor3)
+    adding3 = cv2.add(adding2, gabor4)
+    #cv2.imshow('sym', adding1)
+    cv2.imshow('sym2', adding2)
+    #cv2.imshow('final', adding3)
+    cv2.imwrite('gabor_img.tif', adding2)
+    return
+
+def minutiaeExtraction(img):
+    ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    rows = np.size(tresh_img, 0)
+    cols = np.size(tresh_img, 1)
+
+    ridge = 0
+    ridcheck = 0
+    bif = 0
+    bifcheck =0
+
+    for x in range(0,rows-1):
+        for y in range(0, cols-1):
+            pix1 = 0
+            pix2 = 0
+            pix3 = 0
+            pix4 = 0
+            pix5 = 0
+            pix6 = 0
+            pix7 = 0
+            pix8 = 0
+            pix9 = 0
+
+            pix1 = tresh_img[x-1][y-1]
+            pix2 = tresh_img[x][y-1]
+            pix3 = tresh_img[x+1][y-1]
+            pix4 = tresh_img[x-1][y]
+            pix5 = tresh_img[x][y]
+            pix6 = tresh_img[x+1][y]
+            pix7 = tresh_img[x-1][y+1]
+            print(pix5)
+            pix8 = tresh_img[x][y+1]
+            pix9 = tresh_img[x+1][y+1]
+
+            if(pix1 == 255 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if(pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if (pix1 == 0 and pix2 == 0 and pix3 == 255 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 255 and pix8 == 0 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 255 and pix9 == 0):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
+                ridge = ridge + 1
+                ridcheck = ridcheck + 1
+    ##################################################################################################################################
+            if (pix1 == 255 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 255 and pix8 == 0 and pix9 == 0):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1 == 255 and pix2 == 0 and pix3==255 and pix4==0 and pix5==255 and pix6==0 and pix7==0 and pix8==255 and pix9==0):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1 == 0 and pix2 == 255 and pix3==0 and pix4==0 and pix5==255 and pix6==255 and pix7==255 and pix8==0 and pix9==0):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1==0 and pix2==0 and pix3==255 and pix4==255 and pix5==255 and pix6==0 and pix7==0 and pix8==0 and pix9==255):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1==255 and pix2==0 and pix3==0 and pix4==0 and pix5==255 and pix6==255 and pix7==0 and pix8==255 and pix9==0):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1==0 and pix2==255 and pix3==0 and pix4==0 and pix5==255 and pix6==0 and pix7==255 and pix8==0 and pix9==255):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+            if (pix1==0 and pix2==0 and pix3==255 and pix4==255 and pix5==255 and pix6==0 and pix7==0 and pix8==255 and pix9==0):
+                bif = bif + 1
+                bifcheck = bifcheck + 1
+
+            #if (ridge > 0):
+                #cv2.circle(tresh_img, (x,y), 4, (255,0,0), 2)
+                #ridge = 0
+            if (bif > 0):
+                cv2.rectangle(tresh_img, (x-2,y-2), (x+2,y+2), (255,0,0),2)
+                bif = 0
 
 
-img = cv2.imread("104_1.tif",0) # uint8 image
+
+
+    print(ridcheck)
+    print(bifcheck)
+    cv2.imshow("Bifurcations", tresh_img);
+    return tresh_img
+
+img = cv2.imread("nwmPa.png",0) # uint8 image
 img = cv2.resize(img,(388,374))
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX)
+cv2.imwrite('norm_img.tif', img)
 cv2.imshow('Original uint8 image', img)
 segmented_image = imgSegmentation(img)
 cv2.imshow('Final segmented image', segmented_image)
@@ -146,5 +283,13 @@ cv2.imwrite('thinned_img.tif', thinned_image)
 orig_img = cv2.imread("thinned_img.tif")
 oriented_image = orientFieldEstimation(orig_img)
 cv2.imshow('Final segmented, thinned and orient image', oriented_image)
+
+img = cv2.imread("norm_img.tif") # uint8 image
+img = cv2.resize(img,(388,374))
+gaborFilter(img)
+gabor_image = cv2.imread("gabor_img.tif", 0) # uint8 image
+thinned_gabor = imgThinning(gabor_image)
+minutiae_image = minutiaeExtraction(thinned_gabor)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
