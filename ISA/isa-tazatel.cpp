@@ -21,7 +21,6 @@
 using namespace std;
 
 #define WHOIS_PORT 43
-#define DNS_PORT 53
 #define WHOIS_MESSAGE_LENGTH 100
 #define WHOIS_BUFFER_LENGTH 1500
 #define DNS_BUFFER_LENGTH 1500
@@ -339,12 +338,19 @@ void ProcessResponseFromWhois(string whois_server_response)
   while (getline(response_stream, line))
   {
 
-    if ((line.find("inetnum:")!=string::npos) || (line.find("NetRange:")!=string::npos) || (line.find("inet6num:")!=string::npos))
+    if ((line.find("inetnum:")!=string::npos) || (line.find("NetRange:")!=string::npos))
     {
       string inetnum_value = line.substr(line.find(":") + 1);
       inetnum_value = TrimWhitespaces(inetnum_value);
       relevant_info_found++;
       cout << "inetnum:        " + inetnum_value + "\n";
+    }
+    else if (line.find("inet6num:")!=string::npos)
+    {
+      string inet6num_value = line.substr(line.find(":") + 1);
+      inet6num_value = TrimWhitespaces(inet6num_value);
+      relevant_info_found++;
+      cout << "inet6num:       " + inet6num_value + "\n";
     }
     else if ((line.find("netname:")!=string::npos) || (line.find("NetName:")!=string::npos))
     {
@@ -538,6 +544,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
       string reverse_request = "";
       if (!i_data.scanned_ipv6.empty())
       {
+        // SOURCE: https://stackoverflow.com/questions/42774904/make-a-reverse-ipv6-for-dnsbl-in-c
         struct in6_addr addr;
         inet_pton(AF_INET6,i_data.scanned_ipv6.c_str(),&addr);
         char str2[48];
@@ -586,7 +593,6 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
       string oct4 = input_ip.substr(input_ip.find(".") + 1);
 
       reverse_request = oct4 + "." + oct3 + "." + oct2 + "." + oct1 + ".in-addr.arpa";
-      cout << reverse_request + "\n";
       }
 
       ///////////////// PTR ////////////////////////////////////////////////
@@ -955,12 +961,7 @@ int main(int argc, char **argv)
     if ((i_data.scanned_hostname).empty())
     {
       reverse_lookup = true;
-
-        //i_data.scanned_hostname = ConvertIPV4toHostname(i_data);
     }
-
-    // debug - print final structure of data
-    PrintInputData(i_data);
 
     DNSConnect(i_data, d, reverse_lookup);
 
