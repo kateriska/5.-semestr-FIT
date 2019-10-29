@@ -3,6 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 import math
 
+### IMAGE SEGMENTATION WITH MORPHOLOGY OPERATIONS
 def imgSegmentation(img):
     ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     #cv2.imshow('Tresholded image', tresh_img)
@@ -19,6 +20,7 @@ def imgSegmentation(img):
     #cv2.imshow('Img after noise removal', result)
     return result
 
+### THINNING OF IMAGE
 def imgThinning(img):
     shape_img = img.shape
     size_img = img.size
@@ -41,8 +43,10 @@ def imgThinning(img):
 
     skeleton = cv2.bitwise_not(skeleton)
     #cv2.imshow("Thinned image", skeleton)
+    cv2.imwrite('thinned_img.tif', skeleton)
     return skeleton
 
+### ORIENTED FIELD ESTIMATION
 def orientFieldEstimation(orig_img):
     white = cv2.imread("white.jpg")
     white = cv2.resize(white,(388,374))
@@ -133,6 +137,7 @@ def orientFieldEstimation(orig_img):
 
     return flip_horizontal_img
 
+### GABOR IMAGE FILTERING
 def gaborFilter(orig_img):
     img = np.float32(orig_img)
     shape_img = img.shape
@@ -166,15 +171,19 @@ def gaborFilter(orig_img):
     adding2 = cv2.add(adding1, gabor3)
     adding3 = cv2.add(adding2, gabor4)
     #cv2.imshow('sym', adding1)
-    cv2.imshow('sym2', adding2)
+    cv2.imshow('Gabor image', adding2)
     #cv2.imshow('final', adding3)
     cv2.imwrite('gabor_img.tif', adding2)
     return
 
+### MINUTIAE EXTRACTION
 def minutiaeExtraction(img):
     ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     rows = np.size(tresh_img, 0)
     cols = np.size(tresh_img, 1)
+
+    ret, tresh_ridges = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    ret, tresh_bifurcations = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
     ridge = 0
     ridcheck = 0
@@ -204,91 +213,118 @@ def minutiaeExtraction(img):
             pix8 = tresh_img[x][y+1]
             pix9 = tresh_img[x+1][y+1]
 
-            if(pix1 == 255 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+            ############ RIDGES ################################
+
+            if (pix1 == 255 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if(pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+            elif (pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if (pix1 == 0 and pix2 == 0 and pix3 == 255 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 255 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 0 and pix8 == 0 and pix9 == 0):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 0 and pix8 == 0 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 255 and pix8 == 0 and pix9 == 0):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 255 and pix8 == 0 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 255 and pix9 == 0):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 255 and pix9 == 0):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-            if (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
                 ridge = ridge + 1
                 ridcheck = ridcheck + 1
-    ##################################################################################################################################
+
+            ######### BIFURCATIONS ##################################
             if (pix1 == 255 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 255 and pix8 == 0 and pix9 == 0):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
+            elif (pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1 == 255 and pix2 == 0 and pix3==255 and pix4==0 and pix5==255 and pix6==0 and pix7==0 and pix8==255 and pix9==0):
+            elif (pix1 == 255 and pix2 == 0 and pix3 == 255 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 255 and pix9 == 0):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1 == 0 and pix2 == 255 and pix3==0 and pix4==0 and pix5==255 and pix6==255 and pix7==255 and pix8==0 and pix9==0):
+            elif (pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 255 and pix8 == 0 and pix9 == 0):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1==0 and pix2==0 and pix3==255 and pix4==255 and pix5==255 and pix6==0 and pix7==0 and pix8==0 and pix9==255):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 255 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 0 and pix9 == 255):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1==255 and pix2==0 and pix3==0 and pix4==0 and pix5==255 and pix6==255 and pix7==0 and pix8==255 and pix9==0):
+            elif (pix1 == 255 and pix2 == 0 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 255 and pix7 == 0 and pix8 == 255 and pix9 == 0):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1==0 and pix2==255 and pix3==0 and pix4==0 and pix5==255 and pix6==0 and pix7==255 and pix8==0 and pix9==255):
+            elif (pix1 == 0 and pix2 == 255 and pix3 == 0 and pix4 == 0 and pix5 == 255 and pix6 == 0 and pix7 == 255 and pix8 == 0 and pix9 == 255):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
-            if (pix1==0 and pix2==0 and pix3==255 and pix4==255 and pix5==255 and pix6==0 and pix7==0 and pix8==255 and pix9==0):
+            elif (pix1 == 0 and pix2 == 0 and pix3 == 255 and pix4 == 255 and pix5 == 255 and pix6 == 0 and pix7 == 0 and pix8 == 255 and pix9 == 0):
                 bif = bif + 1
                 bifcheck = bifcheck + 1
 
-            #if (ridge > 0):
-                #cv2.circle(tresh_img, (x,y), 4, (255,0,0), 2)
-                #ridge = 0
+            if (ridge > 0):
+                cv2.rectangle(tresh_ridges, (x-2,y-2), (x+2,y+2), (255,0,0),2)
+                ridge = 0
+
             if (bif > 0):
-                cv2.rectangle(tresh_img, (x-2,y-2), (x+2,y+2), (255,0,0),2)
+                cv2.rectangle(tresh_bifurcations, (x-2,y-2), (x+2,y+2), (255,0,0),2)
                 bif = 0
 
 
-
-
-    print(ridcheck)
-    print(bifcheck)
-    cv2.imshow("Bifurcations", tresh_img);
+    print("Count of ridges: " + repr(ridcheck))
+    print("Count of bifurcations: " + repr(bifcheck))
+    cv2.imshow("Ridges", tresh_ridges);
+    cv2.imshow("Bifurcations", tresh_bifurcations);
     return tresh_img
 
-img = cv2.imread("nwmPa.png",0) # uint8 image
-img = cv2.resize(img,(388,374))
-img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX)
+img = cv2.imread("102_1.tif",0) # uint8 image in grayscale
+img = cv2.resize(img,(388,374)) # resize of image
+img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
-cv2.imshow('Original uint8 image', img)
-segmented_image = imgSegmentation(img)
-cv2.imshow('Final segmented image', segmented_image)
+cv2.imshow('Original normalized uint8 image', img)
+segmented_image = imgSegmentation(img) # segmented image with morphological operations
+cv2.imshow('Segmented image', segmented_image)
 cv2.imwrite('segmented_img.tif', segmented_image)
-thinned_image = imgThinning(segmented_image)
-cv2.imshow('Final segmented and thinned image', thinned_image)
-cv2.imwrite('thinned_img.tif', thinned_image)
-orig_img = cv2.imread("thinned_img.tif")
+thinned_image = imgThinning(segmented_image) # image thinning
+cv2.imshow('Segmented and thinned image', thinned_image)
+cv2.imwrite('thin_seg_img.tif', thinned_image)
+orig_img = cv2.imread("thin_seg_img.tif")
+# oriented field estimation with morphological segmented and thinned image
 oriented_image = orientFieldEstimation(orig_img)
-cv2.imshow('Final segmented, thinned and orient image', oriented_image)
+cv2.imshow('Segmented, thinned and orient image', oriented_image)
 
-img = cv2.imread("norm_img.tif") # uint8 image
+img = cv2.imread("norm_img.tif")
 img = cv2.resize(img,(388,374))
-gaborFilter(img)
-gabor_image = cv2.imread("gabor_img.tif", 0) # uint8 image
-thinned_gabor = imgThinning(gabor_image)
+gaborFilter(img) # gabor filtering of normalized image
+gabor_image_for_orient = cv2.imread("gabor_img.tif")
+gabor_image_for_orient = cv2.bitwise_not(gabor_image_for_orient) # switch colors in gabor filtered image
+cv2.imshow('Gabor for orientation', gabor_image_for_orient)
+# oriented field estimation of gabor filtered image
+oriented_image_gabor = orientFieldEstimation(gabor_image_for_orient)
+cv2.imshow('Gabor oriented image', oriented_image_gabor)
+
+img = cv2.imread("norm_img.tif")
+img = cv2.resize(img,(388,374))
+gaborFilter(img) # gabor filtering of normalized image
+gabor_image_for_orient = cv2.imread("gabor_img.tif", 0)
+gabor_image_for_orient = cv2.bitwise_not(gabor_image_for_orient)
+#cv2.imshow('Gabor for orient2', gabor_image_for_orient)
+imgThinning(gabor_image_for_orient) # thinning of gabor filtered image
+gabor_thinned_image = cv2.imread("thinned_img.tif")
+# oriented field estimation of gabor filtered and thinned image
+oriented_thinned_image_gabor = orientFieldEstimation(gabor_thinned_image)
+cv2.imshow('Gabor oriented thinned image', oriented_thinned_image_gabor)
+
+img = cv2.imread("norm_img.tif")
+img = cv2.resize(img,(388,374))
+gaborFilter(img) # gabor filtering of normalized image
+gabor_image = cv2.imread("gabor_img.tif", 0)
+thinned_gabor = imgThinning(gabor_image) # thinning of gabor filtered image
+# minutiae extraction of gabor filtered and thinned image
 minutiae_image = minutiaeExtraction(thinned_gabor)
 
 cv2.waitKey(0)
