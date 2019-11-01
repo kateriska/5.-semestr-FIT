@@ -106,31 +106,53 @@ string IpValidate(string input_ip)
 }
 
 /*
-Function for converting IPv4 to hostname and decide whether hostname exists or not
-Helpful link:
+Function for converting hostname to IPv4
+Source:
 ***************************************************************************************
- *    Title: C Program to display hostname and IP address
- *    Availability: https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/
+ *    Title: Networking, Part 2: Using getaddrinfo
+ *    Availability: https://github.com/angrave/SystemProgramming/wiki/Networking,-Part-2:-Using-getaddrinfo
 **************************************************************************************
 */
 string ConvertHostname(string hostname)
 {
-  string converted_ip;
-  struct hostent *host;
-  char *converted_ip_array;
-  host = gethostbyname((char *)hostname.c_str());
-  if (host == NULL)
+  struct addrinfo hints, *infoptr;
+  char *host;
+  memset(&hints, 0, sizeof(struct addrinfo));
+
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE;
+  hints.ai_protocol = 0;
+
+  host = (char *)hostname.c_str();
+  int converted_ip = getaddrinfo(host, NULL, &hints, &infoptr);
+  if (converted_ip != 0)
   {
-    cerr << "Error - Hostname doesn't exist!\n";
+    cerr << "Error - IPv4 for hostname doesn't exist! Check name of hostname.\n";
     exit(EXIT_FAILURE);
   }
-  converted_ip_array = inet_ntoa(*((struct in_addr*) host->h_addr_list[0]));
-  converted_ip = converted_ip_array;
-  return converted_ip;
+
+  char converted_ip_array[256] = { 0 };
+  for(struct addrinfo *p = infoptr; p != NULL; p = p->ai_next)
+  {
+    if (p->ai_family == AF_INET)
+    {
+      getnameinfo(p->ai_addr, p->ai_addrlen, converted_ip_array, sizeof (converted_ip_array), NULL, 0, NI_NUMERICHOST);
+      break;
+    }
+  }
+
+  freeaddrinfo(infoptr);
+  return converted_ip_array;
 }
 
 /*
-Function for converting IPv6 to hostname and decide whether hostname exists or not
+Function for converting hostname to IPv6
+Source:
+***************************************************************************************
+ *    Title: Networking, Part 2: Using getaddrinfo
+ *    Availability: https://github.com/angrave/SystemProgramming/wiki/Networking,-Part-2:-Using-getaddrinfo
+**************************************************************************************
 */
 string ConvertHostnameIPv6(string hostname)
 {
@@ -709,6 +731,10 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           {
             soa_message = soa_message.substr(0, soa_message.size()-1);
             soa_message = TrimWhitespaces(soa_message);
+            if (soa_message == "")
+            {
+              continue;
+            }
             cout << "SOA:            " + soa_message + "\n";
           }
         }
