@@ -862,7 +862,7 @@ int main(int argc, char **argv)
     cout << "Run project with these arguments:\n";
     cout << "./isa-tazatel -q INPUT_ADDRESS [-d DNS_SERVER] -w WHOIS_SERVER\n";
     cout << "INPUT_ADDRES is IPv4, IPv6 or hostname\n";
-    cout << "DNS_SERVER is IPv4 or IPv6. Optional argument, default is DNS server configured in operation system\n";
+    cout << "DNS_SERVER is IPv4. Optional argument, default is DNS server configured in operation system\n";
     cout << "WHOIS_SERVER is IPv4, IPv6 or hostname\n";
     exit(EXIT_SUCCESS);
 
@@ -963,17 +963,13 @@ int main(int argc, char **argv)
     if (d == true)
     {
       input_validate_dns = IpValidate(dns_input);
-      if (input_validate_dns == "ipv6_input" )
-      {
-        i_data.dns_ipv6 = dns_input;
-      }
-      else if ( input_validate_dns == "ipv4_input" )
+      if ( input_validate_dns == "ipv4_input" )
       {
         i_data.dns_ipv4 = dns_input;
       }
       else
       {
-        cerr << "Error - Enter only IP adress for DNS, not hostname!\n";
+        cerr << "Error - Enter only IPv4 address for DNS!\n";
         exit(EXIT_FAILURE);
       }
   }
