@@ -187,19 +187,20 @@ string ConvertHostnameIPv6(string hostname)
   return converted_ip_array;
 }
 
+
 /*
-Function for converting IPv4 to valid hostname
+Function for converting IPv6 to valid hostname
 Source:
 ***************************************************************************************
  *    Title: getnameinfo()
  *    Availability: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
 **************************************************************************************
 */
-string ConvertIPv4toHostname(struct input_data i_data)
+string ConvertIPv6toHostname(struct input_data i_data, string ipv6_address)
 {
-  struct sockaddr_in sa;
-  sa.sin_family = AF_INET;
-  inet_pton(AF_INET, i_data.scanned_ipv4.c_str(), &sa.sin_addr);
+  struct sockaddr_in6 sa;
+  sa.sin6_family = AF_INET6;
+  inet_pton(AF_INET6, ipv6_address.c_str(), &sa.sin6_addr);
 
   char host[1024];
   char service[20];
@@ -963,13 +964,20 @@ int main(int argc, char **argv)
     if (d == true)
     {
       input_validate_dns = IpValidate(dns_input);
-      if ( input_validate_dns == "ipv4_input" )
+      if (input_validate_dns == "ipv6_input" )
+      {
+        i_data.dns_ipv6 = dns_input;
+        i_data.dns_hostname = ConvertIPv6toHostname(i_data, i_data.dns_ipv6);
+        i_data.dns_ipv4 = ConvertHostname(i_data.dns_hostname);
+
+      }
+      else if ( input_validate_dns == "ipv4_input" )
       {
         i_data.dns_ipv4 = dns_input;
       }
       else
       {
-        cerr << "Error - Enter only IPv4 address for DNS!\n";
+        cerr << "Error - Enter only IPv4 or IPv6 address for DNS!\n";
         exit(EXIT_FAILURE);
       }
   }
