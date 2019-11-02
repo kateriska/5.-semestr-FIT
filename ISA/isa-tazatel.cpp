@@ -969,7 +969,6 @@ int main(int argc, char **argv)
         i_data.dns_ipv6 = dns_input;
         i_data.dns_hostname = ConvertIPv6toHostname(i_data, i_data.dns_ipv6);
         i_data.dns_ipv4 = ConvertHostname(i_data.dns_hostname);
-
       }
       else if ( input_validate_dns == "ipv4_input" )
       {
