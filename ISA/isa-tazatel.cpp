@@ -698,49 +698,6 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
         }
     }
 
-    ///////////////////////////// SOA ////////////////////////////////
-    u_char buffer_soa[DNS_BUFFER_LENGTH];
-    ns_msg msg_soa;
-    int query_soa = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_soa, buffer_soa, sizeof(buffer_soa));
-    ns_initparse(buffer_soa, query_soa, &msg_soa);
-    string soa_message;
-
-    ns_rr rr_soa;
-
-    int msg_count_soa = ns_msg_count(msg_soa, ns_s_an);
-
-
-    for (int i = 0; i < msg_count_soa; i++)
-    {
-        ns_parserr(&msg_soa,ns_s_an,i,&rr_soa);
-        if (ns_rr_type(rr_soa) == ns_t_soa)
-        {
-          char result_soa[DNS_BUFFER_LENGTH];
-          ns_sprintrr(&msg_soa, &rr_soa, NULL, NULL, result_soa, sizeof(result_soa));
-          string result_soa_string = result_soa;
-          result_soa_string = result_soa_string.substr(result_soa_string.find("SOA"), result_soa_string.find("("));
-          result_soa_string = result_soa_string.substr(4, result_soa_string.find("("));
-          result_soa_string = result_soa_string.substr(0, result_soa_string.find("("));
-
-          for (unsigned int i = 0; i < result_soa_string.length(); ++i)
-          {
-            if (result_soa_string[i] == ' ')
-            result_soa_string[i] = '\n';
-          }
-          stringstream soa_stream{result_soa_string};
-          while (getline(soa_stream, soa_message))
-          {
-            soa_message = soa_message.substr(0, soa_message.size()-1);
-            soa_message = TrimWhitespaces(soa_message);
-            if (soa_message == "")
-            {
-              continue;
-            }
-            cout << "SOA:            " + soa_message + "\n";
-          }
-        }
-    }
-
     /////////////////////// MX ///////////////////////////////////////
 
     u_char buffer_mx[DNS_BUFFER_LENGTH];
@@ -827,6 +784,43 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
     if ((!i_data.scanned_hostname.empty()) && (reverse_lookup == true))
     {
       cout << "PTR:            " + i_data.scanned_hostname + "\n";
+    }
+
+    ///////////////////////////// SOA ////////////////////////////////
+    u_char buffer_soa[DNS_BUFFER_LENGTH];
+    ns_msg msg_soa;
+    int query_soa = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_soa, buffer_soa, sizeof(buffer_soa));
+    ns_initparse(buffer_soa, query_soa, &msg_soa);
+    string soa_message;
+
+    ns_rr rr_soa;
+
+    int msg_count_soa = ns_msg_count(msg_soa, ns_s_an);
+
+
+    for (int i = 0; i < msg_count_soa; i++)
+    {
+        ns_parserr(&msg_soa,ns_s_an,i,&rr_soa);
+        if (ns_rr_type(rr_soa) == ns_t_soa)
+        {
+          char result_soa[DNS_BUFFER_LENGTH];
+          ns_sprintrr(&msg_soa, &rr_soa, NULL, NULL, result_soa, sizeof(result_soa));
+          string result_soa_string = result_soa;
+          result_soa_string = result_soa_string.substr(result_soa_string.find("SOA"));
+          result_soa_string = result_soa_string.substr(result_soa_string.find("SOA") + 3);
+          result_soa_string = TrimWhitespaces(result_soa_string);
+          cout << "SOA:     " + result_soa_string;
+
+          // admin email from SOA record:
+          string admin_email = result_soa_string.substr(result_soa_string.find("."));
+          admin_email = admin_email.substr(admin_email.find(" "));
+          admin_email = admin_email.substr(0, admin_email.find("("));
+          string admin_name = admin_email.substr(0, admin_email.find("."));
+          string admin_domain = admin_email.substr(admin_email.find(".") + 1);
+          string result_admin_email = admin_name + "@" + admin_domain;
+          result_admin_email = result_admin_email.substr(0, result_admin_email.size()-2);
+          cout << "admin email:   " + result_admin_email + "\n";
+        }
     }
 
   return 0;
