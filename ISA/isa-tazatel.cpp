@@ -780,12 +780,6 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
         }
     }
 
-    ///////////////// PTR ////////////////////////////////////////////////
-    if ((!i_data.scanned_hostname.empty()) && (reverse_lookup == true))
-    {
-      cout << "PTR:            " + i_data.scanned_hostname + "\n";
-    }
-
     ///////////////////////////// SOA ////////////////////////////////
     u_char buffer_soa[DNS_BUFFER_LENGTH];
     ns_msg msg_soa;
@@ -809,7 +803,13 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           result_soa_string = result_soa_string.substr(result_soa_string.find("SOA"));
           result_soa_string = result_soa_string.substr(result_soa_string.find("SOA") + 3);
           result_soa_string = TrimWhitespaces(result_soa_string);
-          cout << "SOA:     " + result_soa_string;
+
+          // MNAME from SOA record:
+          string mname = result_soa_string.substr(0, result_soa_string.find("("));
+          mname = mname.substr(0, mname.find(" "));
+          mname = TrimWhitespaces(mname);
+          mname = mname.substr(0, mname.size()-1);
+          cout << "SOA:     " + mname + "\n";
 
           // admin email from SOA record:
           string admin_email = result_soa_string.substr(result_soa_string.find("."));
@@ -821,6 +821,12 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
           result_admin_email = result_admin_email.substr(0, result_admin_email.size()-2);
           cout << "admin email:   " + result_admin_email + "\n";
         }
+    }
+
+    ///////////////// PTR ////////////////////////////////////////////////
+    if ((!i_data.scanned_hostname.empty()) && (reverse_lookup == true))
+    {
+      cout << "PTR:            " + i_data.scanned_hostname + "\n";
     }
 
   return 0;
