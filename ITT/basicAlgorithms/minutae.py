@@ -46,7 +46,7 @@ for x in range(0,rows-1):
         pix5 = tresh_img[x][y]
         pix6 = tresh_img[x+1][y]
         pix7 = tresh_img[x-1][y+1]
-        print(pix5)
+        #print(pix5)
         pix8 = tresh_img[x][y+1]
         pix9 = tresh_img[x+1][y+1]
 
@@ -118,13 +118,20 @@ for x in range(0,rows-1):
         #    cv2.rectangle(tresh_img, (x-2,y-2), (x+2,y+2), (255,0,0),2)
         #    bif = 0
 
+i = 0
+#for i in range(len(ridge_point_list)-1):
+#    print(ridge_point_list[i])
+
+
 point_before = ridge_point_list[0]
 point_before_x_str = point_before.split(" ", 1)[0]
 point_before_x = int (point_before_x_str)
 point_before_y_str = point_before.split(" ", 1)[1]
 point_before_y = int (point_before_y_str)
+
 i = 1
-for i in range(len(ridge_point_list)-1):
+
+for i in range(1, len(ridge_point_list)-1):
     #print(ridge_point_list[i])
 
     point = ridge_point_list[i]
@@ -134,6 +141,20 @@ for i in range(len(ridge_point_list)-1):
     #print(point_x)
     point_y_str = point.split(" ", 1)[1]
     point_y = int (point_y_str)
+    '''
+    print("Point before:")
+    print(point_before)
+    print("X of point before:")
+    print(point_before_x)
+    print("Y of point before:")
+    print(point_before_y)
+    print("This point:")
+    print(point)
+    print("X of this point:")
+    print(point_x)
+    print("Y of this point:")
+    print(point_y)
+    '''
 
 
     '''
@@ -142,12 +163,72 @@ for i in range(len(ridge_point_list)-1):
         ridge_point_delete.append(ridge_point_list[i])
         ridge_point_delete.append(point_before)
     '''
-    if (point_before_x == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4)):
+    if (point_before_x == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
         print("DELETING")
         ridge_point_delete.append(point)
         ridge_point_delete.append(point_before)
 
-    if (point_before_y == point_y and (point_before_x == point_x -1 or point_before_x == point_x +1 or  point_before_x == point_x -2 or point_before_x == point_x +2 or point_before_x == point_x -3 or point_before_x == point_x +3 or point_before_x == point_x -4 or point_before_x == point_x +4)):
+    if (point_before_y == point_y and (point_before_x == point_x -1 or point_before_x == point_x +1 or  point_before_x == point_x -2 or point_before_x == point_x +2 or point_before_x == point_x -3 or point_before_x == point_x +3 or point_before_x == point_x -4 or point_before_x == point_x +4 or point_before_x == point_x -5 or point_before_x == point_x +5 or point_before_x == point_x -6 or point_before_x == point_x +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x -6 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x -5 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x -4 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x -3 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x -2 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x -1 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x +1 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x +2 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x +3 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x +4 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x +5 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
+        print("DELETING")
+        ridge_point_delete.append(point)
+        ridge_point_delete.append(point_before)
+
+    if (point_before_x +6 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
         print("DELETING")
         ridge_point_delete.append(point)
         ridge_point_delete.append(point_before)
@@ -163,8 +244,8 @@ for i in range(len(ridge_point_list)-1):
     i +=1
 
 
-for p in ridge_point_delete:
-    print(p)
+#for p in ridge_point_delete:
+    #print(p)
 
 
 
@@ -173,8 +254,8 @@ for p in ridge_point_list:
         #print("Yes, delete")
         ridge_point_list.remove(p)
 
-#for p in ridge_point_list:
-    #print(p)
+for p in ridge_point_list:
+    print(p)
 
 #print("Count of reduced ridges")
 #print(len(ridge_point_list))
