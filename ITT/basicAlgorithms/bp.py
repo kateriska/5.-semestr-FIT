@@ -6,19 +6,15 @@ import math
 ### IMAGE SEGMENTATION WITH MORPHOLOGY OPERATIONS
 def imgSegmentation(img):
     ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    #cv2.imshow('Tresholded image', tresh_img)
 
     # noise removal
-    kernel = np.ones((12,12), np.uint8)
+    kernel = np.ones((21,21), np.uint8)
     opening = cv2.morphologyEx(tresh_img, cv2.MORPH_OPEN,kernel)
-    #cv2.imshow('Opening', opening)
     im2, contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    #cv2.drawContours(opening, contours, -1, (0,255,0), 3)
-    #cv2.imshow('Opening with contours', opening)
     cv2.Canny(opening, 100, 200);
     result = cv2.add(tresh_img, opening)
-    #cv2.imshow('Img after noise removal', result)
     return result
+
 
 ### THINNING OF IMAGE
 def imgThinning(img):
@@ -41,7 +37,7 @@ def imgThinning(img):
         if zeros == size_img:
             done = True
 
-    skeleton = cv2.bitwise_not(skeleton)
+    #skeleton = cv2.bitwise_not(skeleton)
     #cv2.imshow("Thinned image", skeleton)
     cv2.imwrite('thinned_img.tif', skeleton)
     return skeleton
@@ -163,28 +159,22 @@ def gaborFilter(orig_img):
     gabor2 = cv2.filter2D(img, -1, kernel2);
     gabor3 = cv2.filter2D(img, -1, kernel3);
     gabor4 = cv2.filter2D(img, -1, kernel4);
-    #cv2.imshow('gabor1', gabor1)
-    #cv2.imshow('gabor2', gabor2)
-    #cv2.imshow('gabor3', gabor3)
-    #cv2.imshow('gabor4', gabor4)
     adding1 = cv2.add(gabor1, gabor2)
     adding2 = cv2.add(adding1, gabor3)
     adding3 = cv2.add(adding2, gabor4)
-    #cv2.imshow('sym', adding1)
     cv2.imshow('Gabor image', adding2)
-    #cv2.imshow('final', adding3)
     cv2.imwrite('gabor_img.tif', adding2)
     return
 
 ### MINUTIAE EXTRACTION
 def minutiaeExtraction(img):
-    ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     rows = np.size(tresh_img, 0)
     cols = np.size(tresh_img, 1)
 
-    ret, tresh_ridges = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    ret, tresh_bifurcations = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    ret, tresh_ridges_corrected = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    ret, tresh_ridges = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    ret, tresh_bifurcations = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    ret, tresh_ridges_corrected = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     ridge = 0
     ridcheck = 0
@@ -213,7 +203,7 @@ def minutiaeExtraction(img):
             pix5 = tresh_img[x][y]
             pix6 = tresh_img[x+1][y]
             pix7 = tresh_img[x-1][y+1]
-            #print(pix5)
+            print(pix5)
             pix8 = tresh_img[x][y+1]
             pix9 = tresh_img[x+1][y+1]
 
@@ -271,35 +261,39 @@ def minutiaeExtraction(img):
                 bifcheck = bifcheck + 1
 
             if (ridge > 0):
-                cv2.rectangle(tresh_ridges, (x-2,y-2), (x+2,y+2), (255,0,0),2)
+                cv2.rectangle(tresh_ridges, (x-2,y-2), (x+2,y+2), (255,0,0),1)
                 x_str = str(x)
                 y_str = str(y)
                 ridge_point_list.append(x_str + " "+ y_str)
                 ridge = 0
 
             if (bif > 0):
-                cv2.rectangle(tresh_bifurcations, (x-2,y-2), (x+2,y+2), (255,0,0),2)
+                cv2.rectangle(tresh_bifurcations, (x-2,y-2), (x+2,y+2), (255,0,0),1)
                 bif = 0
+
+    for i in range(1, len(ridge_point_list)):
+        print(ridge_point_list[i])
 
     point_before = ridge_point_list[0]
     point_before_x_str = point_before.split(" ", 1)[0]
+    point_before_x_str = point_before_x_str.strip()
     point_before_x = int (point_before_x_str)
     point_before_y_str = point_before.split(" ", 1)[1]
+    point_before_y_str = point_before_y_str.strip()
     point_before_y = int (point_before_y_str)
 
     i = 1
 
     for i in range(1, len(ridge_point_list)-1):
-        #print(ridge_point_list[i])
 
         point = ridge_point_list[i]
-        #print(point)
         point_x_str = point.split(" ", 1)[0]
+        point_x_str = point_x_str.strip()
         point_x = int (point_x_str)
-        #print(point_x)
         point_y_str = point.split(" ", 1)[1]
+        point_y_str = point_y_str.strip()
         point_y = int (point_y_str)
-        '''
+
         print("Point before:")
         print(point_before)
         print("X of point before:")
@@ -312,14 +306,7 @@ def minutiaeExtraction(img):
         print(point_x)
         print("Y of this point:")
         print(point_y)
-        '''
 
-        '''
-        if (point_before == point -1 or point_before == point +1) or (point_before == point -2 or point_before == point +2) or (point_before == point -3 or point_before == point +3):
-            print("DELETING")
-            ridge_point_delete.append(ridge_point_list[i])
-            ridge_point_delete.append(point_before)
-        '''
         if (point_before_x == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
             print("DELETING")
             ridge_point_delete.append(point)
@@ -393,33 +380,25 @@ def minutiaeExtraction(img):
 
         point_before = point
         point_before_x_str = point_before.split(" ", 1)[0]
+        point_before_x_str = point_before_x_str.strip()
         point_before_x = int (point_before_x_str)
         point_before_y_str = point_before.split(" ", 1)[1]
+        point_before_y_str = point_before_y_str.strip()
         point_before_y = int (point_before_y_str)
-
-
         i +=1
-
-
-    #for p in ridge_point_delete:
-        #print(p)
-
 
 
     for p in ridge_point_list:
         if p in ridge_point_delete:
-            #print("Yes, delete")
             ridge_point_list.remove(p)
 
     for p in ridge_point_list:
         print(p)
 
-    #print("Count of reduced ridges")
-    #print(len(ridge_point_list))
-    #print("==========================")
+    print("Count of reduced ridges")
+    print(len(ridge_point_list))
+    print("==========================")
     for i in range(len(ridge_point_list)):
-        #print(ridge_point_list[i])
-
         point = ridge_point_list[i]
         point = ridge_point_list[i]
         point_x_str = point.split(" ", 1)[0]
@@ -429,6 +408,7 @@ def minutiaeExtraction(img):
 
         cv2.circle(tresh_ridges_corrected, (point_x,point_y), 2, (255,0,0),1)
 
+
     print("Count of ridges: " + repr(ridcheck))
     print("Count of bifurcations: " + repr(bifcheck))
     cv2.imshow("Ridges", tresh_ridges);
@@ -436,7 +416,7 @@ def minutiaeExtraction(img):
     cv2.imshow("Ridges corrected", tresh_ridges_corrected);
     return tresh_img
 
-img = cv2.imread("102_1.tif",0) # uint8 image in grayscale
+img = cv2.imread("fakefig.png",0) # uint8 image in grayscale
 img = cv2.resize(img,(388,374)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -447,6 +427,7 @@ cv2.imwrite('segmented_img.tif', segmented_image)
 thinned_image = imgThinning(segmented_image) # image thinning
 cv2.imshow('Segmented and thinned image', thinned_image)
 cv2.imwrite('thin_seg_img.tif', thinned_image)
+'''
 orig_img = cv2.imread("thin_seg_img.tif")
 # oriented field estimation with morphological segmented and thinned image
 oriented_image = orientFieldEstimation(orig_img)
@@ -461,7 +442,7 @@ cv2.imshow('Gabor for orientation', gabor_image_for_orient)
 # oriented field estimation of gabor filtered image
 oriented_image_gabor = orientFieldEstimation(gabor_image_for_orient)
 cv2.imshow('Gabor oriented image', oriented_image_gabor)
-
+'''
 img = cv2.imread("norm_img.tif")
 img = cv2.resize(img,(388,374))
 gaborFilter(img) # gabor filtering of normalized image

@@ -13,11 +13,11 @@ def get_pixel(img, center, x, y):
 
 def lbp_calculated_pixel(img, x, y):
     '''
-     64 | 128 |   1
+     pix7 | pix8 | pix9
     ----------------
-     32 |   0 |   2
+     pix4 | pix5 | pix6
     ----------------
-     16 |   8 |   4
+     pix1 | pix2 | pix3
     '''
     center = img[x][y]
     val_ar = []
@@ -68,7 +68,7 @@ def show_output(output_list):
     plt.show()
 
 def main():
-    image_file = 'podzim.jpg'
+    image_file = 'segment.tif'
     img_bgr = cv2.imread(image_file)
     height, width, channel = img_bgr.shape
     img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
