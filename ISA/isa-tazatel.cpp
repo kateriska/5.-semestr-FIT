@@ -514,10 +514,14 @@ void WHOISParentServerIPv6(struct input_data i_data, string whois_answer)
 /*
 Function for connecting to DNS and resolving relevant data
 Sources and helpful links:
+
+Structure _res:
 ***************************************************************************************
  *    Title: C Programming with the Resolver Library Routines
  *    Availability: https://docstore.mik.ua/orelly/networking_2ndEd/dns/ch15_02.htm
 ***************************************************************************************
+
+Work with resolv.h, extracting DNS records:
 ***************************************************************************************
   *    Title: How to query a server and get the MX, A, NS records
   *    Author: user of stackoverflow with nickname "Dima00782" -> https://stackoverflow.com/users/1818004/dima00782
@@ -531,13 +535,21 @@ Sources and helpful links:
   *    Availability: https://linux.die.net/man/3/res_query
 ***************************************************************************************
 ***************************************************************************************
-  *    Title: How to query a server and get the MX, A, NS records
-  *    Author: user of stackoverflow with nickname "Dima00782" -> https://stackoverflow.com/users/1818004/dima00782
-  *    Author: user of stackoverflow with nickname "Code Painters" -> https://stackoverflow.com/users/483173/code-painters
-  *    Date: 18.3.2013
+  *    Title: DNS: retrieving host IP address using resolv.h
+  *    Author: user of stackoverflow with nickname "Giulio Paoli" -> https://stackoverflow.com/users/4516787/giulio-paoli
+  *    Author: user of stackoverflow with nickname "Ctx" -> https://stackoverflow.com/users/5636775/ctx
+  *    Date: 18.7.2018
   *    Code version: 1
-  *    Availability: https://stackoverflow.com/questions/15476717/how-to-query-a-server-and-get-the-mx-a-ns-records
+  *    Availability: https://stackoverflow.com/questions/51401982/dns-retrieving-host-ip-address-using-resolv-h
 ***************************************************************************************
+
+Theory about reverse DNS lookup:
+***************************************************************************************
+  *    Title: Reverse DNS lookup
+  *    Availability: https://en.wikipedia.org/wiki/Reverse_DNS_lookup
+***************************************************************************************
+
+Reverse IPv6:
 ***************************************************************************************
   *    Title: make a reverse ipv6 for DNSBL in c++
   *    Author: user of stackoverflow with nickname "Michael Hampton" -> https://stackoverflow.com/users/1068283/michael-hampton
@@ -545,10 +557,7 @@ Sources and helpful links:
   *    Code version: 1
   *    Availability: https://stackoverflow.com/questions/42774904/make-a-reverse-ipv6-for-dnsbl-in-c
 ***************************************************************************************
-***************************************************************************************
-  *    Title: Reverse DNS lookup
-  *    Availability: https://en.wikipedia.org/wiki/Reverse_DNS_lookup
-***************************************************************************************
+
 */
 int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
 {
