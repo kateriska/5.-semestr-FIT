@@ -563,7 +563,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
 {
     printf("=== DNS ===\n");
 
-    res_init();
+    res_init(); // read configuration from resolv.conf file and initialize structure _res
 
     if (entered_dns == true) // we entered DNS server, overwrite the structure
     {
@@ -659,11 +659,11 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
     u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
     int query_a = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a)); // make a query, specify our searched hostname
-    ns_initparse(buffer_a, query_a, &msg_a); // first routine, has to be called
+    ns_initparse(buffer_a, query_a, &msg_a); // initialize and create data structure ns_msg for processing response
 
     ns_rr rr_a;
 
-    int msg_count_a = ns_msg_count(msg_a, ns_s_an);
+    int msg_count_a = ns_msg_count(msg_a, ns_s_an); // return a counter from the header section of the response message
     for (int i = 0; i < msg_count_a; i++) // cycle through records
     {
         ns_parserr(&msg_a,ns_s_an,i,&rr_a); // extracts information about record
@@ -672,7 +672,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
         {
           struct in_addr result_a_struct;
           memcpy(&result_a_struct.s_addr, ns_rr_rdata(rr_a), sizeof(result_a_struct.s_addr)); // copy memory block to our destination
-          char *result_a = inet_ntoa(result_a_struct);
+          char *result_a = inet_ntoa(result_a_struct); // convert to IPv4 dotted-decimal notation
           string result_a_string = result_a; // conversion to string
           result_a_string = TrimWhitespaces(result_a_string);
           cout << "A:              " + result_a_string + "\n";
