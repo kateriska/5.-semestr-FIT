@@ -12,8 +12,10 @@ def imgSegmentation(img):
     opening = cv2.morphologyEx(tresh_img, cv2.MORPH_OPEN,kernel)
     im2, contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cv2.Canny(opening, 100, 200);
-    result = cv2.add(tresh_img, opening)
-    return result
+    result_tresh = cv2.add(tresh_img, opening)
+    result_orig = cv2.add(img, opening)
+    cv2.imwrite('segmented_img.tif', result_orig)
+    return result_tresh
 
 
 ### THINNING OF IMAGE
@@ -270,7 +272,7 @@ def minutiaeExtraction(img):
                 cv2.rectangle(tresh_bifurcations, (x-2,y-2), (x+2,y+2), (255,0,0),1)
                 bif = 0
 
-    ridge_point_list = processFalseMinutaie(ridge_point_list)
+    ridge_point_list = processFalseMinutiae(ridge_point_list)
 
     print("Count of reduced ridges")
     print(len(ridge_point_list))
@@ -293,7 +295,7 @@ def minutiaeExtraction(img):
     cv2.imshow("Ridges corrected", tresh_ridges_corrected);
     return tresh_img
 
-def processFalseMinutaie(ridge_point_list):
+def processFalseMinutiae(ridge_point_list):
     ridge_point_delete = list()
 
     for i in range(1, len(ridge_point_list)):
@@ -421,18 +423,55 @@ def processFalseMinutaie(ridge_point_list):
         print(p)
 
     if len(ridge_point_delete) > 0:
-        processFalseMinutaie(ridge_point_list)
+        processFalseMinutiae(ridge_point_list)
 
     return ridge_point_list
 
-img = cv2.imread("livefig.png",0) # uint8 image in grayscale
+def get_pixel(img, pix5, x, y):
+    new_value = 0
+    try:
+        if img[x][y] >= pix5:
+            new_value = 1
+    except:
+        pass
+    return new_value
+
+def lbp_calculated_pixel(img, x, y):
+    '''
+     pix7 | pix8 | pix9
+    ----------------
+     pix4 | pix5 | pix6
+    ----------------
+     pix1 | pix2 | pix3
+    '''
+    pix5 = img[x][y]
+    val_ar = []
+    val_ar.append(get_pixel(img, pix5, x, y+1))     #pix8
+    val_ar.append(get_pixel(img, pix5, x-1, y+1))   #pix7
+    val_ar.append(get_pixel(img, pix5, x-1, y))     #pix4
+    val_ar.append(get_pixel(img, pix5, x-1, y-1))   #pix1
+    val_ar.append(get_pixel(img, pix5, x, y-1))   #pix2
+    val_ar.append(get_pixel(img, pix5, x+1, y-1))    #pix3
+    val_ar.append(get_pixel(img, pix5, x+1, y))    #pix6
+    val_ar.append(get_pixel(img, pix5, x+1, y+1))    #pix9
+
+    power_val = [1, 2, 4, 8, 16, 32, 64, 128]
+    val = 0
+    for i in range(len(val_ar)):
+        val += val_ar[i] * power_val[i]
+    return val
+
+
+
+
+img = cv2.imread("fakefig.png",0) # uint8 image in grayscale
 img = cv2.resize(img,(388,374)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
 cv2.imshow('Original normalized uint8 image', img)
 segmented_image = imgSegmentation(img) # segmented image with morphological operations
 cv2.imshow('Segmented image', segmented_image)
-cv2.imwrite('segmented_img.tif', segmented_image)
+cv2.imwrite('segmented_img_tresh.tif', segmented_image)
 thinned_image = imgThinning(segmented_image) # image thinning
 cv2.imshow('Segmented and thinned image', thinned_image)
 cv2.imwrite('thin_seg_img.tif', thinned_image)
@@ -471,6 +510,36 @@ gabor_image = cv2.imread("gabor_img.tif", 0)
 thinned_gabor = imgThinning(gabor_image) # thinning of gabor filtered image
 # minutiae extraction of gabor filtered and thinned image
 minutiae_image = minutiaeExtraction(thinned_gabor)
+
+img = cv2.imread('segmented_img.tif')
+height, width, channel = img.shape
+img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+lbp_image = np.zeros((height, width,3), np.uint8)
+
+for i in range(0, height):
+    for j in range(0, width):
+        lbp_image[i, j] = lbp_calculated_pixel(img_gray, i, j)
+
+cv2.imshow("lbp image", lbp_image)
+hist_lbp = cv2.calcHist([lbp_image], [0], None, [256], [0, 256])
+
+
+figure = plt.figure()
+current_plot = figure.add_subplot(1, 1, 1)
+current_plot.plot(hist_lbp, color = "black")
+#current_plot.set_xlim([0,260])
+current_plot.set_xlim([0,250])
+current_plot.set_ylim([0,4000])
+current_plot.set_title("Histogram(LBP)")
+current_plot.set_xlabel("Bins")
+current_plot.set_ylabel("Number of pixels")
+ytick_list = [int(i) for i in current_plot.get_yticks()]
+current_plot.set_yticklabels(ytick_list,rotation = 90)
+plt.show()
+
+
+
+
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
