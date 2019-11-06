@@ -182,7 +182,6 @@ def minutiaeExtraction(img):
     bifcheck =0
 
     ridge_point_list = list()
-    ridge_point_delete = list()
 
     for x in range(0,rows-1):
         for y in range(0, cols-1):
@@ -270,6 +269,32 @@ def minutiaeExtraction(img):
             if (bif > 0):
                 cv2.rectangle(tresh_bifurcations, (x-2,y-2), (x+2,y+2), (255,0,0),1)
                 bif = 0
+
+    ridge_point_list = processFalseMinutaie(ridge_point_list)
+
+    print("Count of reduced ridges")
+    print(len(ridge_point_list))
+    print("==========================")
+    for i in range(len(ridge_point_list)):
+        point = ridge_point_list[i]
+        point = ridge_point_list[i]
+        point_x_str = point.split(" ", 1)[0]
+        point_x = int (point_x_str)
+        point_y_str = point.split(" ", 1)[1]
+        point_y = int (point_y_str)
+
+        cv2.circle(tresh_ridges_corrected, (point_x,point_y), 2, (255,0,0),1)
+
+
+    print("Count of ridges: " + repr(ridcheck))
+    print("Count of bifurcations: " + repr(bifcheck))
+    cv2.imshow("Ridges", tresh_ridges);
+    cv2.imshow("Bifurcations", tresh_bifurcations);
+    cv2.imshow("Ridges corrected", tresh_ridges_corrected);
+    return tresh_img
+
+def processFalseMinutaie(ridge_point_list):
+    ridge_point_delete = list()
 
     for i in range(1, len(ridge_point_list)):
         print(ridge_point_list[i])
@@ -395,28 +420,12 @@ def minutiaeExtraction(img):
     for p in ridge_point_list:
         print(p)
 
-    print("Count of reduced ridges")
-    print(len(ridge_point_list))
-    print("==========================")
-    for i in range(len(ridge_point_list)):
-        point = ridge_point_list[i]
-        point = ridge_point_list[i]
-        point_x_str = point.split(" ", 1)[0]
-        point_x = int (point_x_str)
-        point_y_str = point.split(" ", 1)[1]
-        point_y = int (point_y_str)
+    if len(ridge_point_delete) > 0:
+        processFalseMinutaie(ridge_point_list)
 
-        cv2.circle(tresh_ridges_corrected, (point_x,point_y), 2, (255,0,0),1)
+    return ridge_point_list
 
-
-    print("Count of ridges: " + repr(ridcheck))
-    print("Count of bifurcations: " + repr(bifcheck))
-    cv2.imshow("Ridges", tresh_ridges);
-    cv2.imshow("Bifurcations", tresh_bifurcations);
-    cv2.imshow("Ridges corrected", tresh_ridges_corrected);
-    return tresh_img
-
-img = cv2.imread("fakefig.png",0) # uint8 image in grayscale
+img = cv2.imread("livefig.png",0) # uint8 image in grayscale
 img = cv2.resize(img,(388,374)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
