@@ -3,7 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 
 
-img = cv2.imread("107_7.tif", 0) # uint8 image
+img = cv2.imread("fakefig.png", 0) # uint8 image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imshow('Normalized uint8 image', img)
 ret, tresh_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
