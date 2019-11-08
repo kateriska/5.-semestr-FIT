@@ -67,9 +67,9 @@ def orientFieldEstimation(orig_img):
     grad_x = cv2.Sobel(img,cv2.CV_32FC1,1, 0)
     grad_y = cv2.Sobel(img,cv2.CV_32FC1,0, 1)
 
-    block_div = 8
+    block_div = 5
     right_angle  = math.pi / 2
-    step = 16
+    step = 10
 
     for i in range(block_div, rows-block_div, step):
         for j in range(block_div, cols-block_div, step):
@@ -96,7 +96,7 @@ def orientFieldEstimation(orig_img):
                     sum_Vx = sum_Vx + (2*grad_x_value * grad_y_value)
                     sum_Vy = sum_Vy + ((grad_x_value * grad_x_value)- (grad_y_value * grad_y_value))
 
-            if (sum_Vy != 0):
+            if (sum_Vx != 0):
                 #tan_arg = sum_Vy / sum_Vx
                 result = 0.5 * cv2.fastAtan2(sum_Vy, sum_Vx);
                 print(result)
@@ -112,25 +112,27 @@ def orientFieldEstimation(orig_img):
             else:
                 orient = 0.0
 
-            X0 = i + 8
-            Y0 = j + 8
-            r = 8
+            X0 = i
+            Y0 = j
+            r = block_div
 
             #result_rad = result * math.pi / 180.0
+            orient_deg = orient + 90
+            orient_rad = math.radians(orient_deg)
 
-            X1 = r * math.cos(math.radians(orient) - right_angle)+ X0
+            X1 = r * math.cos(orient_rad)+ X0
             X1 = int (X1)
             print(X1)
 
-            Y1 = r * math.sin(math.radians(orient) - right_angle)+ Y0
+            Y1 = r * math.sin(orient_rad)+ Y0
             Y1 = int (Y1)
 
             orient_img = cv2.line(orig_img,(X0,Y0) , (X1,Y1), (0,255,0), 3)
             #cv2.imshow('Oriented image', orient_img)
             white_img = cv2.line(white,(X0,Y0) , (X1,Y1), (0,255,0), 3)
-            #cv2.imshow('Oriented skeleton', white_img)
+            cv2.imshow('Oriented skeleton', white_img)
             rotated_img = cv2.rotate(white_img, cv2.ROTATE_90_CLOCKWISE)
-            #cv2.imshow('Oriented rotated skeleton', rotated_img)
+            cv2.imshow('Oriented rotated skeleton', rotated_img)
             flip_horizontal_img = cv2.flip(rotated_img, 1)
 
     return flip_horizontal_img
@@ -464,7 +466,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("fake.png",0) # uint8 image in grayscale
+img = cv2.imread("102_1.tif",0) # uint8 image in grayscale
 img = cv2.resize(img,(388,374)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
