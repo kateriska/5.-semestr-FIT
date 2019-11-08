@@ -427,7 +427,7 @@ def processFalseMinutiae(ridge_point_list):
 
     return ridge_point_list
 
-def get_pixel(img, pix5, x, y):
+def LBPprocesspixel(img, pix5, x, y):
     new_value = 0
     try:
         if img[x][y] >= pix5:
@@ -436,7 +436,7 @@ def get_pixel(img, pix5, x, y):
         pass
     return new_value
 
-def lbp_calculated_pixel(img, x, y):
+def processLBP(img, x, y):
     '''
      pix7 | pix8 | pix9
     ----------------
@@ -445,26 +445,26 @@ def lbp_calculated_pixel(img, x, y):
      pix1 | pix2 | pix3
     '''
     pix5 = img[x][y]
-    val_ar = []
-    val_ar.append(get_pixel(img, pix5, x, y+1))     #pix8
-    val_ar.append(get_pixel(img, pix5, x-1, y+1))   #pix7
-    val_ar.append(get_pixel(img, pix5, x-1, y))     #pix4
-    val_ar.append(get_pixel(img, pix5, x-1, y-1))   #pix1
-    val_ar.append(get_pixel(img, pix5, x, y-1))   #pix2
-    val_ar.append(get_pixel(img, pix5, x+1, y-1))    #pix3
-    val_ar.append(get_pixel(img, pix5, x+1, y))    #pix6
-    val_ar.append(get_pixel(img, pix5, x+1, y+1))    #pix9
+    pixel_new_value = []
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x, y+1))     #pix8
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x-1, y+1))   #pix7
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x-1, y))     #pix4
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x-1, y-1))   #pix1
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x, y-1))     #pix2
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x+1, y-1))   #pix3
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x+1, y))     #pix6
+    pixel_new_value.append(LBPprocesspixel(img, pix5, x+1, y+1))   #pix9
 
-    power_val = [1, 2, 4, 8, 16, 32, 64, 128]
-    val = 0
-    for i in range(len(val_ar)):
-        val += val_ar[i] * power_val[i]
-    return val
-
-
+    powers_bin = [1, 2, 4, 8, 16, 32, 64, 128]
+    value_dec = 0
+    for i in range(len(pixel_new_value)):
+        value_dec += pixel_new_value[i] * powers_bin[i]
+    return value_dec
 
 
-img = cv2.imread("fakefig.png",0) # uint8 image in grayscale
+
+
+img = cv2.imread("fake.png",0) # uint8 image in grayscale
 img = cv2.resize(img,(388,374)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -518,7 +518,7 @@ lbp_image = np.zeros((height, width,3), np.uint8)
 
 for i in range(0, height):
     for j in range(0, width):
-        lbp_image[i, j] = lbp_calculated_pixel(img_gray, i, j)
+        lbp_image[i, j] = processLBP(img_gray, i, j)
 
 cv2.imshow("lbp image", lbp_image)
 hist_lbp = cv2.calcHist([lbp_image], [0], None, [256], [0, 256])
@@ -530,7 +530,7 @@ current_plot.plot(hist_lbp, color = "black")
 #current_plot.set_xlim([0,260])
 current_plot.set_xlim([0,250])
 current_plot.set_ylim([0,4000])
-current_plot.set_title("Histogram(LBP)")
+current_plot.set_title("LBP histogram")
 current_plot.set_xlabel("Bins")
 current_plot.set_ylabel("Number of pixels")
 ytick_list = [int(i) for i in current_plot.get_yticks()]
