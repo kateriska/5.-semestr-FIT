@@ -506,7 +506,7 @@ oriented_thinned_image_gabor = orientFieldEstimation(gabor_thinned_image)
 cv2.imshow('Gabor oriented thinned image', oriented_thinned_image_gabor)
 
 img = cv2.imread("norm_img.tif")
-img = cv2.resize(img,(350,350))
+img = cv2.resize(img,(360,360))
 gaborFilter(img) # gabor filtering of normalized image
 gabor_image = cv2.imread("gabor_img.tif", 0)
 thinned_gabor = imgThinning(gabor_image) # thinning of gabor filtered image
