@@ -47,7 +47,7 @@ def imgThinning(img):
 ### ORIENTED FIELD ESTIMATION
 def orientFieldEstimation(orig_img):
     white = cv2.imread("white.jpg")
-    white = cv2.resize(white,(388,374))
+    white = cv2.resize(white,(360,360))
     img = np.float32(orig_img)
 
     rows = np.size(img, 0)
@@ -67,9 +67,9 @@ def orientFieldEstimation(orig_img):
     grad_x = cv2.Sobel(img,cv2.CV_32FC1,1, 0)
     grad_y = cv2.Sobel(img,cv2.CV_32FC1,0, 1)
 
-    block_div = 5
+    block_div = 6
     right_angle  = math.pi / 2
-    step = 10
+    step = 12
 
     for i in range(block_div, rows-block_div, step):
         for j in range(block_div, cols-block_div, step):
@@ -112,8 +112,8 @@ def orientFieldEstimation(orig_img):
             else:
                 orient = 0.0
 
-            X0 = i
-            Y0 = j
+            X0 = i + block_div
+            Y0 = j + block_div
             r = block_div
 
             #result_rad = result * math.pi / 180.0
@@ -467,7 +467,7 @@ def processLBP(img, x, y):
 
 
 img = cv2.imread("102_1.tif",0) # uint8 image in grayscale
-img = cv2.resize(img,(388,374)) # resize of image
+img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
 cv2.imshow('Original normalized uint8 image', img)
@@ -494,7 +494,7 @@ oriented_image_gabor = orientFieldEstimation(gabor_image_for_orient)
 cv2.imshow('Gabor oriented image', oriented_image_gabor)
 '''
 img = cv2.imread("norm_img.tif")
-img = cv2.resize(img,(388,374))
+img = cv2.resize(img,(360,360))
 gaborFilter(img) # gabor filtering of normalized image
 gabor_image_for_orient = cv2.imread("gabor_img.tif", 0)
 gabor_image_for_orient = cv2.bitwise_not(gabor_image_for_orient)
@@ -506,7 +506,7 @@ oriented_thinned_image_gabor = orientFieldEstimation(gabor_thinned_image)
 cv2.imshow('Gabor oriented thinned image', oriented_thinned_image_gabor)
 
 img = cv2.imread("norm_img.tif")
-img = cv2.resize(img,(388,374))
+img = cv2.resize(img,(350,350))
 gaborFilter(img) # gabor filtering of normalized image
 gabor_image = cv2.imread("gabor_img.tif", 0)
 thinned_gabor = imgThinning(gabor_image) # thinning of gabor filtered image
