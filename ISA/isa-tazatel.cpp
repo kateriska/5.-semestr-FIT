@@ -1008,7 +1008,7 @@ int main(int argc, char **argv)
 
     }
 
-    // convert hostname to IPV4 if neccessary
+    // entered IPv4 or IPv6 address for -q, not hostname - provide reverse DNS lookup
     if ((i_data.scanned_hostname).empty())
     {
       reverse_lookup = true;
