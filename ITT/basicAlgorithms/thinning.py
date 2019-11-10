@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-img = cv2.imread("104_1.tif", 0) # uint8 image
+img = cv2.imread("gabor_segmented.tif", 0) # uint8 image
 shape_img = img.shape
 size_img = img.size
 
@@ -24,5 +24,8 @@ while (not done):
 
 skeleton = cv2.bitwise_not(skeleton)
 cv2.imshow("Thinned image", skeleton)
+cv2.imwrite('thinned_gabor.tif', skeleton)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+# segmentation, thinning, orientation field estimation

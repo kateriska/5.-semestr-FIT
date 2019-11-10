@@ -466,7 +466,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("102_1.tif",0) # uint8 image in grayscale
+img = cv2.imread("fakefig.png",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
