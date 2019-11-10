@@ -4,15 +4,18 @@ Program Whois tazatel zjišťuje informace o zadané IP adrese či hostname. Zji
 *** Spuštění programu ***
 Program se spouští následujícími argumenty:
 ./isa-tazatel -q DOTAZOVANA_ADRESA [-d DNS_SERVER] -w WHOIS_SERVER
-DOTAZOVANA_ADRESA může být hostname, IPV4 nebo IPV6, jedná se o adresu, na kterou se budeme dotazovat a hledat o ní potřebné informace
-DNS_SERVER může být ve formátu IPV4 nebo IPV6. Pokud je tento argument nezadaný, DNS adresou bude zvolena adresa DNS serveru nakonfigurovaná v operačního systému
-WHOIS_SERVER může být hostname, IPV4 nebo IPV6. Jedná se o adresu serveru WHOIS.
+DOTAZOVANA_ADRESA může být hostname, IPv4 nebo IPv6, jedná se o adresu, na kterou se budeme dotazovat a hledat o ní potřebné informace
+DNS_SERVER může být ve formátu IPv4 nebo IPv6. Pokud je tento argument nezadaný, DNS adresou bude zvolena adresa DNS serveru nakonfigurovaná v operačního systému
+WHOIS_SERVER může být hostname, IPv4 nebo IPv6. Jedná se o adresu serveru WHOIS.
 
 Pořadí argumentů je libovolné.
 
+Pro zobrazení nápovědy program spouštějte následovně:
+./isa-tazatel --help
+
 *** Rozšíření ***
 1. Podpora rekurzivního dotazování u WHOIS serveru na jiné WHOIS servery při nedostatku relevantních informací a v případě, že odpověď na jiný server odkazuje.
-2. Podpora zadaného parametru -d, kdy je zadána adresa jiného DNS serveru, než je adresa nakonfigurovaná v operačním systému.
+2. Podpora zadaného parametru -d, kdy je zadána adresa jiného DNS serveru, než je adresa nakonfigurovaná v operačním systému. 
 
 *** Seznam odevzdávaných souborů ***
 isa-tazatel.cpp
