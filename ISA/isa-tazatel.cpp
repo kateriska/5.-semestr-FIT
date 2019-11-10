@@ -911,10 +911,10 @@ int main(int argc, char **argv)
     }
   }
 
-    // check mandatory parameters
+    // check compulsory parameters
     if ((w == false) || (q == false))
     {
-      cerr << "Error - Missing mandatory options!\n";
+      cerr << "Error - Missing compulsory options!\n";
       exit(EXIT_FAILURE);
     }
 
