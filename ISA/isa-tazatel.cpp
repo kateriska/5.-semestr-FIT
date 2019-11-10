@@ -872,7 +872,7 @@ int main(int argc, char **argv)
     cout << "Run project with these arguments:\n";
     cout << "./isa-tazatel -q INPUT_ADDRESS [-d DNS_SERVER] -w WHOIS_SERVER\n";
     cout << "INPUT_ADDRES is IPv4, IPv6 or hostname\n";
-    cout << "DNS_SERVER is IPv4. Optional argument, default is DNS server configured in operation system\n";
+    cout << "DNS_SERVER is IPv4 or IPv6. Optional argument, default is DNS server configured in operation system\n";
     cout << "WHOIS_SERVER is IPv4, IPv6 or hostname\n";
     exit(EXIT_SUCCESS);
 
