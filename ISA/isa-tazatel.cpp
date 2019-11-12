@@ -212,6 +212,29 @@ string ConvertIPv6toHostname(struct input_data i_data, string ipv6_address)
 }
 
 /*
+Function for converting IPv4 to valid hostname
+Source:
+***************************************************************************************
+ *    Title: getnameinfo()
+ *    Availability: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+**************************************************************************************
+*/
+string ConvertIPv4toHostname(struct input_data i_data, string ipv4_address)
+{
+  struct sockaddr_in sa;
+  sa.sin_family = AF_INET;
+  inet_pton(AF_INET, ipv4_address.c_str(), &sa.sin_addr);
+
+  char host[1024];
+  char service[20];
+
+  getnameinfo((struct sockaddr*)&sa, sizeof sa, host, sizeof host, service, sizeof service, 0);
+  string host_string = host;
+
+  return host_string;
+}
+
+/*
 Debugging function printing information about input structure
 */
 void PrintInputData(struct input_data i_data)
@@ -244,7 +267,7 @@ Sources and helpful links:
   *    Availability: https://www.binarytides.com/c-code-to-perform-ip-whois/
 ***************************************************************************************
 */
-string WHOISConnectIPv4(struct input_data i_data)
+string WHOISConnectIPv4(struct input_data i_data, bool whois_hostname_message)
 {
     struct sockaddr_in sw4;
     int socket_whois_ipv4 = 0;
@@ -269,7 +292,14 @@ string WHOISConnectIPv4(struct input_data i_data)
       cerr << "Error - Connection to WHOIS server failed!\n";
       exit(EXIT_FAILURE);
     }
-    sprintf(message , "%s\r\n", (i_data.scanned_ipv4).c_str());
+    if (whois_hostname_message == true) // send message with hostname
+    {
+      sprintf(message , "%s\r\n", (i_data.scanned_hostname).c_str());
+    }
+    else // send message with IP address
+    {
+      sprintf(message , "%s\r\n", (i_data.scanned_ipv4).c_str());
+    }
     int send_whois_ipv4 = send(socket_whois_ipv4 , message , strlen(message) , 0);
     if (send_whois_ipv4 < 0)
     {
@@ -297,7 +327,7 @@ string WHOISConnectIPv4(struct input_data i_data)
 /*
 Function for connecting to WHOIS server for IPv6 address
 */
-string WHOISConnectIPv6(struct input_data i_data)
+string WHOISConnectIPv6(struct input_data i_data, bool whois_hostname_message)
 {
     struct sockaddr_in6 sw6;
     int socket_whois_ipv6 = 0;
@@ -322,7 +352,14 @@ string WHOISConnectIPv6(struct input_data i_data)
       cerr << "Error - Connection to WHOIS server failed!\n";
       exit(EXIT_FAILURE);
     }
-    sprintf(message , "%s\r\n", (i_data.scanned_ipv6).c_str());
+    if (whois_hostname_message == true)
+    {
+      sprintf(message , "%s\r\n", (i_data.scanned_hostname).c_str());
+    }
+    else
+    {
+      sprintf(message , "%s\r\n", (i_data.scanned_ipv6).c_str());
+    }
     int send_whois_ipv6 = send(socket_whois_ipv6 , message , strlen(message) , 0);
     if (send_whois_ipv6 < 0)
     {
@@ -351,13 +388,22 @@ string WHOISConnectIPv6(struct input_data i_data)
 /*
 Function for parsing response from WHOIS, finding relevant information from response
 */
-void WHOISParseResponse(string whois_server_response)
+void WHOISParseResponse(string whois_server_response, bool whois_hostname_message, struct input_data i_data)
 {
   istringstream response_stream{whois_server_response};
   string line;
   int relevant_info_found = 0;
 
-  printf("=== WHOIS ===\n");
+  if (whois_hostname_message == true)
+  {
+    cout << ("=== WHOIS query for hostname ===\n") ;
+  }
+  else
+  {
+      cout << ("=== WHOIS query for IP ===\n") ;
+
+  }
+
   while (getline(response_stream, line))
   {
 
@@ -382,7 +428,7 @@ void WHOISParseResponse(string whois_server_response)
       relevant_info_found++;
       cout << "netname:        " + netname_value + "\n";
     }
-    else if ((line.find("descr:")!=string::npos) || (line.find("Organization:")!=string::npos))
+    else if ((line.find("descr:")!=string::npos) || (line.find("Organization:")!=string::npos) || (line.find("org:")!=string::npos))
     {
       string descr_value = line.substr(line.find(":") + 1);
       descr_value = TrimWhitespaces(descr_value);
@@ -419,9 +465,13 @@ void WHOISParseResponse(string whois_server_response)
     }
 
   }
-  if (relevant_info_found == 0)
+  if (relevant_info_found == 0 && whois_hostname_message == false)
   {
     cout << "Parent WHOIS server didn't find any relevant information about searched IP!\n";
+  }
+  else if (relevant_info_found == 0 && whois_hostname_message == true)
+  {
+    cout << "Parent WHOIS server didn't find any relevant information about searched hostname!\n";
   }
   return;
 }
@@ -430,7 +480,7 @@ void WHOISParseResponse(string whois_server_response)
 Function for finding parent WHOIS server when we didn't receive relevant data or process parent server immediately when we get them
 Works for IPv4 adressess
 */
-void WHOISParentServerIPv4(struct input_data i_data, string whois_answer)
+void WHOISParentServerIPv4(struct input_data i_data, string whois_answer, bool whois_hostname_message)
 {
   istringstream stream{whois_answer};
   string line;
@@ -458,14 +508,14 @@ void WHOISParentServerIPv4(struct input_data i_data, string whois_answer)
 
   if (parent_server_is_found == true)
   {
-    whois_answer = WHOISConnectIPv4(i_data);
-    WHOISParentServerIPv4(i_data, whois_answer);
+    whois_answer = WHOISConnectIPv4(i_data, whois_hostname_message);
+    WHOISParentServerIPv4(i_data, whois_answer, whois_hostname_message);
   }
 
   else
   {
     // parent server - connect and process immediately
-    WHOISParseResponse(whois_answer);
+    WHOISParseResponse(whois_answer, whois_hostname_message, i_data);
   }
 }
 
@@ -473,7 +523,7 @@ void WHOISParentServerIPv4(struct input_data i_data, string whois_answer)
 Function for finding parent WHOIS server when we didn't receive relevant data or process parent server immediately when we get them
 Works for IPv6 adressess
 */
-void WHOISParentServerIPv6(struct input_data i_data, string whois_answer)
+void WHOISParentServerIPv6(struct input_data i_data, string whois_answer, bool whois_hostname_message)
 {
   istringstream stream{whois_answer};
   string line;
@@ -501,26 +551,24 @@ void WHOISParentServerIPv6(struct input_data i_data, string whois_answer)
 
   if (parent_server_is_found == true)
   {
-    whois_answer = WHOISConnectIPv6(i_data);
-    WHOISParentServerIPv6(i_data, whois_answer);
+    whois_answer = WHOISConnectIPv6(i_data, whois_hostname_message);
+    WHOISParentServerIPv6(i_data, whois_answer, whois_hostname_message);
   }
 
   else
   {
-    WHOISParseResponse(whois_answer);
+    WHOISParseResponse(whois_answer, whois_hostname_message, i_data);
   }
 }
 
 /*
 Function for connecting to DNS and resolving relevant data
 Sources and helpful links:
-
 Structure _res:
 ***************************************************************************************
  *    Title: C Programming with the Resolver Library Routines
  *    Availability: https://docstore.mik.ua/orelly/networking_2ndEd/dns/ch15_02.htm
 ***************************************************************************************
-
 Work with resolv.h, extracting DNS records:
 ***************************************************************************************
   *    Title: How to query a server and get the MX, A, NS records
@@ -542,13 +590,11 @@ Work with resolv.h, extracting DNS records:
   *    Code version: 1
   *    Availability: https://stackoverflow.com/questions/51401982/dns-retrieving-host-ip-address-using-resolv-h
 ***************************************************************************************
-
 Theory about reverse DNS lookup:
 ***************************************************************************************
   *    Title: Reverse DNS lookup
   *    Availability: https://en.wikipedia.org/wiki/Reverse_DNS_lookup
 ***************************************************************************************
-
 Reverse IPv6:
 ***************************************************************************************
   *    Title: make a reverse ipv6 for DNSBL in c++
@@ -557,7 +603,6 @@ Reverse IPv6:
   *    Code version: 1
   *    Availability: https://stackoverflow.com/questions/42774904/make-a-reverse-ipv6-for-dnsbl-in-c
 ***************************************************************************************
-
 */
 int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
 {
@@ -864,6 +909,7 @@ int main(int argc, char **argv)
   string whois_server_response;
   string dns_server_response;
   bool reverse_lookup = false;
+  bool whois_hostname_message = false;
 
   if ((argc == 2) && (strcmp(argv[1], "--help") == 0))
   {
@@ -921,13 +967,20 @@ int main(int argc, char **argv)
     // filled structure correctly with IPv4, IPv6 or hostname
     // validate -q input
     input_validate_ipq = IpValidate(ipq_input);
+
     if (input_validate_ipq == "ipv6_input" )
     {
       i_data.scanned_ipv6 = ipq_input;
+      // entered IPv6 address for -q, not hostname - provide reverse DNS lookup
+      reverse_lookup = true;
+      i_data.scanned_hostname = ConvertIPv6toHostname(i_data, ipq_input);
     }
     else if ( input_validate_ipq == "ipv4_input" )
     {
       i_data.scanned_ipv4 = ipq_input;
+      // entered IPv4 address for -q, not hostname - provide reverse DNS lookup
+      reverse_lookup = true;
+      i_data.scanned_hostname = ConvertIPv4toHostname(i_data, ipq_input);
     }
     else
     {
@@ -949,10 +1002,12 @@ int main(int argc, char **argv)
     if (input_validate_whois == "ipv6_input" )
     {
       i_data.whois_ipv6 = whois_input;
+      i_data.whois_hostname = ConvertIPv6toHostname(i_data, whois_input);
     }
     else if ( input_validate_whois == "ipv4_input" )
     {
-      i_data.scanned_ipv4 = whois_input;
+      i_data.whois_ipv4 = whois_input;
+      i_data.whois_hostname = ConvertIPv4toHostname(i_data, whois_input);
     }
     else
     {
@@ -1008,23 +1063,29 @@ int main(int argc, char **argv)
 
     }
 
-    // entered IPv4 or IPv6 address for -q, not hostname - provide reverse DNS lookup
-    if ((i_data.scanned_hostname).empty())
-    {
-      reverse_lookup = true;
-    }
-
     DNSConnect(i_data, d, reverse_lookup);
 
     if (!(i_data.whois_ipv6).empty())
     {
-      whois_server_response = WHOISConnectIPv6(i_data);
-      WHOISParentServerIPv6(i_data, whois_server_response);
+      cout << "\n";
+      // WHOIS query for IP address:
+      whois_server_response = WHOISConnectIPv6(i_data, whois_hostname_message);
+      WHOISParentServerIPv6(i_data, whois_server_response, whois_hostname_message);
+      // WHOIS query for hostname:
+      whois_hostname_message = true;
+      cout << "\n";
+      whois_server_response = WHOISConnectIPv6(i_data, whois_hostname_message);
+      WHOISParentServerIPv6(i_data, whois_server_response, whois_hostname_message);
     }
     else if (!(i_data.whois_ipv4).empty())
     {
-      whois_server_response = WHOISConnectIPv4(i_data);
-      WHOISParentServerIPv4(i_data, whois_server_response);
+      cout << "\n";
+      whois_server_response = WHOISConnectIPv4(i_data, whois_hostname_message);
+      WHOISParentServerIPv4(i_data, whois_server_response, whois_hostname_message);
+      whois_hostname_message = true;
+      cout << "\n";
+      whois_server_response = WHOISConnectIPv4(i_data, whois_hostname_message);
+      WHOISParentServerIPv4(i_data, whois_server_response, whois_hostname_message);
     }
 
 
