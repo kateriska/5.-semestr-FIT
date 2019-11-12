@@ -908,8 +908,8 @@ int main(int argc, char **argv)
   string dns_converted;
   string whois_server_response;
   string dns_server_response;
-  bool reverse_lookup = false;
-  bool whois_hostname_message = false;
+  bool reverse_lookup = false; // bool for processing reverse DNS lookup
+  bool whois_hostname_message = false; // bool for processing a query to WHOIS server with message with hostname, not IP
 
   if ((argc == 2) && (strcmp(argv[1], "--help") == 0))
   {
