@@ -466,7 +466,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("fakefig.png",0) # uint8 image in grayscale
+img = cv2.imread("fakef/SD_LL_10.jpg",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -524,14 +524,55 @@ for i in range(0, height):
 
 cv2.imshow("lbp image", lbp_image)
 hist_lbp = cv2.calcHist([lbp_image], [0], None, [256], [0, 256])
+print(hist_lbp)
+histogram_list = list()
+histogram_list = hist_lbp
+sum_hist1 = 0
+sum_hist2 = 0
+sum_hist3 = 0
+sum_hist4 = 0
+print("First")
+for i in range(0, 64):
+    #print(histogram_list[i])
+    hist_value = histogram_list[i]
+    hist_value_n = str(hist_value[0])
+    print(hist_value_n)
+    sum_hist1 = sum_hist1 + float(hist_value_n)
 
+print("Second")
+for i in range(64, 128):
+    #print(histogram_list[i])
+    hist_value = histogram_list[i]
+    hist_value_n = str(hist_value[0])
+    print(hist_value_n)
+    sum_hist2 = sum_hist2 + float(hist_value_n)
 
+print("Third")
+for i in range(128, 192):
+    #print(histogram_list[i])
+    hist_value = histogram_list[i]
+    hist_value_n = str(hist_value[0])
+    print(hist_value_n)
+    sum_hist3 = sum_hist3 + float(hist_value_n)
+
+print("Forth")
+for i in range(192, 256):
+    #print(histogram_list[i])
+    hist_value = histogram_list[i]
+    hist_value_n = str(hist_value[0])
+    print(hist_value_n)
+    sum_hist4 = sum_hist4 + float(hist_value_n)
+
+print("Sum of first quater: " + str(sum_hist1))
+print("Sum of second quater: " + str(sum_hist2))
+print("Sum of third quater: " + str(sum_hist3))
+print("Sum of forth quater: " + str(sum_hist4))
 figure = plt.figure()
 current_plot = figure.add_subplot(1, 1, 1)
 current_plot.plot(hist_lbp, color = "black")
 #current_plot.set_xlim([0,260])
 current_plot.set_xlim([0,250])
-current_plot.set_ylim([0,4000])
+current_plot.set_ylim([0,6000])
 current_plot.set_title("LBP histogram")
 current_plot.set_xlabel("Bins")
 current_plot.set_ylabel("Number of pixels")
