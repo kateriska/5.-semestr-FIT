@@ -268,7 +268,10 @@ Sources and helpful links:
 **************************************************************************************
 ***************************************************************************************
  *    Title: C code to perform IP whois
-  *    Availability: https://www.binarytides.com/c-code-to-perform-ip-whois/
+ *    Author: admin of binarytides with nickname "Silver Moon" -> https://www.binarytides.com/author/admin/
+ *    Date: 21.9.2012
+ *    Code version: 1
+ *    Availability: https://www.binarytides.com/c-code-to-perform-ip-whois/
 ***************************************************************************************
 */
 string WHOISConnectIPv4(struct input_data i_data, bool whois_hostname_message)
