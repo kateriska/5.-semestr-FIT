@@ -192,8 +192,10 @@ string ConvertHostnameIPv6(string hostname)
 Function for converting IPv6 to valid hostname
 Source:
 ***************************************************************************************
- *    Title: getnameinfo()
- *    Availability: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+ *    Title: Beej’s Guide to Network Programming
+ *    Section: getnameinfo()
+ *    Availability: http://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf
+ *    Page number: 94
 **************************************************************************************
 */
 string ConvertIPv6toHostname(struct input_data i_data, string ipv6_address)
@@ -215,8 +217,10 @@ string ConvertIPv6toHostname(struct input_data i_data, string ipv6_address)
 Function for converting IPv4 to valid hostname
 Source:
 ***************************************************************************************
- *    Title: getnameinfo()
- *    Availability: https://beej.us/guide/bgnet/html/multi/getnameinfoman.html
+ *    Title: Beej’s Guide to Network Programming
+ *    Section: getnameinfo()
+ *    Availability: http://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf
+ *    Page number: 94
 **************************************************************************************
 */
 string ConvertIPv4toHostname(struct input_data i_data, string ipv4_address)
