@@ -466,7 +466,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("fakef/SD_LL_10.jpg",0) # uint8 image in grayscale
+img = cv2.imread("db2/105_8.tif",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -567,6 +567,14 @@ print("Sum of first quater: " + str(sum_hist1))
 print("Sum of second quater: " + str(sum_hist2))
 print("Sum of third quater: " + str(sum_hist3))
 print("Sum of forth quater: " + str(sum_hist4))
+if (sum_hist3 < 7000 or sum_hist4 < 7000):
+
+    print("This image according to LBP is FAKE.")
+
+else:
+
+    print("This image according to LBP is REAL.")
+
 figure = plt.figure()
 current_plot = figure.add_subplot(1, 1, 1)
 current_plot.plot(hist_lbp, color = "black")
