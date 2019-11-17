@@ -94,7 +94,7 @@ def orientFieldEstimation(orig_img):
 
 
                     sum_Vx = sum_Vx + (2*grad_x_value * grad_y_value)
-                    sum_Vy = sum_Vy + ((grad_x_value * grad_x_value)- (grad_y_value * grad_y_value))
+                    sum_Vy = sum_Vy + ((grad_x_value * grad_x_value) - (grad_y_value * grad_y_value))
 
             if (sum_Vx != 0):
                 #tan_arg = sum_Vy / sum_Vx
@@ -117,7 +117,7 @@ def orientFieldEstimation(orig_img):
             r = block_div
 
             #result_rad = result * math.pi / 180.0
-            orient_deg = orient + 90
+            orient_deg = orient - 90
             orient_rad = math.radians(orient_deg)
 
             X1 = r * math.cos(orient_rad)+ X0
@@ -126,6 +126,12 @@ def orientFieldEstimation(orig_img):
 
             Y1 = r * math.sin(orient_rad)+ Y0
             Y1 = int (Y1)
+
+            X2 = X0 - r * math.cos(orient_rad)
+            X2 = int (X2)
+
+            Y2 = Y0 - r * math.sin(orient_rad)
+            Y2 = int (Y2)
 
             orient_img = cv2.line(orig_img,(X0,Y0) , (X1,Y1), (0,255,0), 3)
             #cv2.imshow('Oriented image', orient_img)
@@ -466,7 +472,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("db2/105_8.tif",0) # uint8 image in grayscale
+img = cv2.imread("104_1.tif",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -493,16 +499,16 @@ cv2.imshow('Gabor for orientation', gabor_image_for_orient)
 oriented_image_gabor = orientFieldEstimation(gabor_image_for_orient)
 cv2.imshow('Gabor oriented image', oriented_image_gabor)
 '''
-img = cv2.imread("norm_img.tif")
+img = cv2.imread("segmented_img.tif")
 img = cv2.resize(img,(360,360))
-gaborFilter(img) # gabor filtering of normalized image
-gabor_image_for_orient = cv2.imread("gabor_img.tif", 0)
-gabor_image_for_orient = cv2.bitwise_not(gabor_image_for_orient)
+#gaborFilter(img) # gabor filtering of normalized image
+#gabor_image_for_orient = cv2.imread("gabor_img.tif", 0)
+#gabor_image_for_orient = cv2.bitwise_not(gabor_image_for_orient)
 #cv2.imshow('Gabor for orient2', gabor_image_for_orient)
-imgThinning(gabor_image_for_orient) # thinning of gabor filtered image
-gabor_thinned_image = cv2.imread("thinned_img.tif")
+#imgThinning(gabor_image_for_orient) # thinning of gabor filtered image
+#gabor_thinned_image = cv2.imread("thinned_img.tif")
 # oriented field estimation of gabor filtered and thinned image
-oriented_thinned_image_gabor = orientFieldEstimation(gabor_thinned_image)
+oriented_thinned_image_gabor = orientFieldEstimation(img)
 cv2.imshow('Gabor oriented thinned image', oriented_thinned_image_gabor)
 
 img = cv2.imread("norm_img.tif")
