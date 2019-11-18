@@ -294,7 +294,7 @@ string WHOISConnectIPv4(struct input_data i_data, bool whois_hostname_message)
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
 
-    // setting timeout for 30 seconds in case you enter wrong address of WHOIS or DNS server
+    // setting timeout for 30 seconds in case you enter wrong address of WHOIS server
     struct timeval timeout;
     timeout.tv_sec = 30;
 
@@ -362,7 +362,7 @@ string WHOISConnectIPv6(struct input_data i_data, bool whois_hostname_message)
     inet_pton(AF_INET6, (i_data.whois_ipv6).c_str(), &sw6.sin6_addr);
     sw6.sin6_port = htons(WHOIS_PORT);
 
-    // setting timeout for 30 seconds in case you enter wrong address of WHOIS or DNS server
+    // setting timeout for 30 seconds in case you enter wrong address of WHOIS server
     struct timeval timeout;
     timeout.tv_sec = 30;
 
