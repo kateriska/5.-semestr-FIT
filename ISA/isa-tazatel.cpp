@@ -294,11 +294,12 @@ string WHOISConnectIPv4(struct input_data i_data, bool whois_hostname_message)
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
 
-    // setting timeout for 30 seconds in case you enter wrong address of WHOIS server
+    // setting timeout for 20 seconds in case you enter wrong address of WHOIS server
     struct timeval timeout;
-    timeout.tv_sec = 30;
+    timeout.tv_sec = 20;
+    timeout.tv_usec = 0;
 
-    setsockopt(socket_whois_ipv4, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+    setsockopt(socket_whois_ipv4, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout));
 
     int connect_whois_ipv4 = connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
     if (connect_whois_ipv4 < 0)
@@ -362,11 +363,12 @@ string WHOISConnectIPv6(struct input_data i_data, bool whois_hostname_message)
     inet_pton(AF_INET6, (i_data.whois_ipv6).c_str(), &sw6.sin6_addr);
     sw6.sin6_port = htons(WHOIS_PORT);
 
-    // setting timeout for 30 seconds in case you enter wrong address of WHOIS server
+    // setting timeout for 20 seconds in case you enter wrong address of WHOIS server
     struct timeval timeout;
-    timeout.tv_sec = 30;
+    timeout.tv_sec = 20;
+    timeout.tv_usec = 0;
 
-    setsockopt(socket_whois_ipv6, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+    setsockopt(socket_whois_ipv6, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout));
 
     int connect_whois_ipv6 = connect(socket_whois_ipv6, (struct sockaddr *)&sw6, sizeof(sw6));
     if (connect_whois_ipv6 < 0)
