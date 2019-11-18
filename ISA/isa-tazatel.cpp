@@ -293,12 +293,20 @@ string WHOISConnectIPv4(struct input_data i_data, bool whois_hostname_message)
     sw4.sin_family = AF_INET;
     sw4.sin_addr.s_addr = inet_addr((i_data.whois_ipv4).c_str());
     sw4.sin_port = htons(WHOIS_PORT);
+
+    // setting timeout for 30 seconds in case you enter wrong address of WHOIS or DNS server
+    struct timeval timeout;
+    timeout.tv_sec = 30;
+
+    setsockopt(socket_whois_ipv4, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+
     int connect_whois_ipv4 = connect(socket_whois_ipv4, (struct sockaddr *)&sw4, sizeof(sw4));
     if (connect_whois_ipv4 < 0)
     {
       cerr << "Error - Connection to WHOIS server failed!\n";
       exit(EXIT_FAILURE);
     }
+
     if (whois_hostname_message == true) // send message with hostname
     {
       sprintf(message , "%s\r\n", (i_data.scanned_hostname).c_str());
@@ -353,6 +361,13 @@ string WHOISConnectIPv6(struct input_data i_data, bool whois_hostname_message)
     sw6.sin6_family = AF_INET6;
     inet_pton(AF_INET6, (i_data.whois_ipv6).c_str(), &sw6.sin6_addr);
     sw6.sin6_port = htons(WHOIS_PORT);
+
+    // setting timeout for 30 seconds in case you enter wrong address of WHOIS or DNS server
+    struct timeval timeout;
+    timeout.tv_sec = 30;
+
+    setsockopt(socket_whois_ipv6, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+
     int connect_whois_ipv6 = connect(socket_whois_ipv6, (struct sockaddr *)&sw6, sizeof(sw6));
     if (connect_whois_ipv6 < 0)
     {
@@ -621,6 +636,7 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
     {
       _res.nsaddr_list[0].sin_addr.s_addr = inet_addr(i_data.dns_ipv4.c_str());
       _res.nscount = 1;
+      _res.retrans = 1; // set as a timeout interval in case you enter invalid DNS server
     }
 
     if (reverse_lookup == true) // provide reverse DNS lookup for IPv6 or IPv4
@@ -711,6 +727,12 @@ int DNSConnect(struct input_data i_data, bool entered_dns, bool reverse_lookup)
     u_char buffer_a[DNS_BUFFER_LENGTH];
     ns_msg msg_a;
     int query_a = res_query(i_data.scanned_hostname.c_str(), ns_c_in, ns_t_a, buffer_a, sizeof(buffer_a)); // make a query, specify our searched hostname
+
+    if (query_a < 0)
+    {
+      cout << "A record wasn't found! Check IP of your DNS server, it could be invalid!\n";
+    }
+
     ns_initparse(buffer_a, query_a, &msg_a); // initialize and create data structure ns_msg for processing response
 
     ns_rr rr_a;
