@@ -67,9 +67,9 @@ def orientFieldEstimation(orig_img):
     grad_x = cv2.Sobel(img,cv2.CV_32FC1,1, 0)
     grad_y = cv2.Sobel(img,cv2.CV_32FC1,0, 1)
 
-    block_div = 6
+    block_div = 7
     right_angle  = math.pi / 2
-    step = 12
+    step = 14
 
     for i in range(block_div, rows-block_div, step):
         for j in range(block_div, cols-block_div, step):
@@ -136,9 +136,9 @@ def orientFieldEstimation(orig_img):
             orient_img = cv2.line(orig_img,(X0,Y0) , (X1,Y1), (0,255,0), 3)
             #cv2.imshow('Oriented image', orient_img)
             white_img = cv2.line(white,(X0,Y0) , (X1,Y1), (0,255,0), 3)
-            cv2.imshow('Oriented skeleton', white_img)
+            #cv2.imshow('Oriented skeleton', white_img)
             rotated_img = cv2.rotate(white_img, cv2.ROTATE_90_CLOCKWISE)
-            cv2.imshow('Oriented rotated skeleton', rotated_img)
+            #cv2.imshow('Oriented rotated skeleton', rotated_img)
             flip_horizontal_img = cv2.flip(rotated_img, 1)
 
     return flip_horizontal_img
@@ -212,7 +212,7 @@ def minutiaeExtraction(img):
             pix5 = tresh_img[x][y]
             pix6 = tresh_img[x+1][y]
             pix7 = tresh_img[x-1][y+1]
-            print(pix5)
+            #print(pix5)
             pix8 = tresh_img[x][y+1]
             pix9 = tresh_img[x+1][y+1]
 
@@ -328,7 +328,7 @@ def processFalseMinutiae(ridge_point_list):
         point_y_str = point.split(" ", 1)[1]
         point_y_str = point_y_str.strip()
         point_y = int (point_y_str)
-
+        '''
         print("Point before:")
         print(point_before)
         print("X of point before:")
@@ -341,74 +341,74 @@ def processFalseMinutiae(ridge_point_list):
         print(point_x)
         print("Y of this point:")
         print(point_y)
-
+        '''
         if (point_before_x == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_y == point_y and (point_before_x == point_x -1 or point_before_x == point_x +1 or  point_before_x == point_x -2 or point_before_x == point_x +2 or point_before_x == point_x -3 or point_before_x == point_x +3 or point_before_x == point_x -4 or point_before_x == point_x +4 or point_before_x == point_x -5 or point_before_x == point_x +5 or point_before_x == point_x -6 or point_before_x == point_x +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x -6 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x -5 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x -4 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x -3 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x -2 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x -1 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x +1 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x +2 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x +3 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x +4 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x +5 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
         if (point_before_x +6 == point_x and (point_before_y == point_y -1 or point_before_y == point_y +1 or  point_before_y == point_y -2 or point_before_y == point_y +2 or point_before_y == point_y -3 or point_before_y == point_y +3 or point_before_y == point_y -4 or point_before_y == point_y +4 or  point_before_y == point_y -5 or point_before_y == point_y +5 or point_before_y == point_y -6 or point_before_y == point_y +6)):
-            print("DELETING")
+            #print("DELETING")
             ridge_point_delete.append(point)
             ridge_point_delete.append(point_before)
 
@@ -427,8 +427,8 @@ def processFalseMinutiae(ridge_point_list):
         if p in ridge_point_delete:
             ridge_point_list.remove(p)
 
-    for p in ridge_point_list:
-        print(p)
+    #for p in ridge_point_list:
+        #print(p)
 
     if len(ridge_point_delete) > 0:
         processFalseMinutiae(ridge_point_list)
@@ -472,7 +472,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("104_1.tif",0) # uint8 image in grayscale
+img = cv2.imread("107_7.tif",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -514,7 +514,7 @@ cv2.imshow('Gabor oriented thinned image', oriented_thinned_image_gabor)
 img = cv2.imread("norm_img.tif")
 img = cv2.resize(img,(360,360))
 gaborFilter(img) # gabor filtering of normalized image
-gabor_image = cv2.imread("gabor_img.tif", 0)
+gabor_image = cv2.imread("segmented_img.tif", 0)
 thinned_gabor = imgThinning(gabor_image) # thinning of gabor filtered image
 # minutiae extraction of gabor filtered and thinned image
 minutiae_image = minutiaeExtraction(thinned_gabor)
@@ -530,43 +530,43 @@ for i in range(0, height):
 
 cv2.imshow("lbp image", lbp_image)
 hist_lbp = cv2.calcHist([lbp_image], [0], None, [256], [0, 256])
-print(hist_lbp)
+#print(hist_lbp)
 histogram_list = list()
 histogram_list = hist_lbp
 sum_hist1 = 0
 sum_hist2 = 0
 sum_hist3 = 0
 sum_hist4 = 0
-print("First")
+#print("First")
 for i in range(0, 64):
     #print(histogram_list[i])
     hist_value = histogram_list[i]
     hist_value_n = str(hist_value[0])
-    print(hist_value_n)
+    #print(hist_value_n)
     sum_hist1 = sum_hist1 + float(hist_value_n)
 
-print("Second")
+#print("Second")
 for i in range(64, 128):
     #print(histogram_list[i])
     hist_value = histogram_list[i]
     hist_value_n = str(hist_value[0])
-    print(hist_value_n)
+    #print(hist_value_n)
     sum_hist2 = sum_hist2 + float(hist_value_n)
 
-print("Third")
+#print("Third")
 for i in range(128, 192):
     #print(histogram_list[i])
     hist_value = histogram_list[i]
     hist_value_n = str(hist_value[0])
-    print(hist_value_n)
+    #print(hist_value_n)
     sum_hist3 = sum_hist3 + float(hist_value_n)
 
-print("Forth")
+#print("Forth")
 for i in range(192, 256):
     #print(histogram_list[i])
     hist_value = histogram_list[i]
     hist_value_n = str(hist_value[0])
-    print(hist_value_n)
+    #print(hist_value_n)
     sum_hist4 = sum_hist4 + float(hist_value_n)
 
 print("Sum of first quater: " + str(sum_hist1))
