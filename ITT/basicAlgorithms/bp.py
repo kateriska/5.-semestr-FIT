@@ -63,13 +63,18 @@ def orientFieldEstimation(orig_img):
     phi_x_array = np.zeros(shape_img, dtype=np.float32)
     phi_y_array = np.zeros(shape_img, dtype=np.float32)
     magnitude_array = np.zeros(shape_img, dtype=np.float32)
+    or_array = np.zeros((22,22))
 
-    grad_x = cv2.Sobel(img,cv2.CV_32FC1,1, 0)
-    grad_y = cv2.Sobel(img,cv2.CV_32FC1,0, 1)
+    grad_x = cv2.Sobel(img,cv2.CV_32FC1,1, 0, cv2.BORDER_DEFAULT, ksize=3)
+    grad_y = cv2.Sobel(img,cv2.CV_32FC1,0, 1, cv2.BORDER_DEFAULT, ksize=3)
 
-    block_div = 7
+    block_div = 8
     right_angle  = math.pi / 2
-    step = 14
+    step = 16
+    orient_arr = list()
+
+    m = 0
+    n = 0
 
     for i in range(block_div, rows-block_div, step):
         for j in range(block_div, cols-block_div, step):
@@ -99,7 +104,7 @@ def orientFieldEstimation(orig_img):
             if (sum_Vx != 0):
                 #tan_arg = sum_Vy / sum_Vx
                 result = 0.5 * cv2.fastAtan2(sum_Vy, sum_Vx);
-                print(result)
+                #print(result)
             #orientatin_matrix[i][j] = result
             else:
                 result = 0.0
@@ -112,6 +117,24 @@ def orientFieldEstimation(orig_img):
             else:
                 orient = 0.0
 
+            #print("Orientation of block [" + str(i) + ", " + str(j) + "] in degrees:")
+            print(orient)
+            orient_arr.append(orient)
+
+
+
+            if (n == 22 ):
+                m = m + 1
+                n = 0
+
+            or_array[m][n] = orient
+
+            n = n + 1
+
+
+
+
+
             X0 = i + block_div
             Y0 = j + block_div
             r = block_div
@@ -122,7 +145,7 @@ def orientFieldEstimation(orig_img):
 
             X1 = r * math.cos(orient_rad)+ X0
             X1 = int (X1)
-            print(X1)
+            #print(X1)
 
             Y1 = r * math.sin(orient_rad)+ Y0
             Y1 = int (Y1)
@@ -141,6 +164,9 @@ def orientFieldEstimation(orig_img):
             #cv2.imshow('Oriented rotated skeleton', rotated_img)
             flip_horizontal_img = cv2.flip(rotated_img, 1)
 
+    #print(orient_arr)
+    print(or_array)
+    print(len(orient_arr))
     return flip_horizontal_img
 
 ### GABOR IMAGE FILTERING
@@ -306,8 +332,8 @@ def minutiaeExtraction(img):
 def processFalseMinutiae(ridge_point_list):
     ridge_point_delete = list()
 
-    for i in range(1, len(ridge_point_list)):
-        print(ridge_point_list[i])
+    #for i in range(1, len(ridge_point_list)):
+    #    print(ridge_point_list[i])
 
     point_before = ridge_point_list[0]
     point_before_x_str = point_before.split(" ", 1)[0]
@@ -472,7 +498,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("107_7.tif",0) # uint8 image in grayscale
+img = cv2.imread("104_1.tif",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
