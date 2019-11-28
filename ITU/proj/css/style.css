@@ -96,6 +96,18 @@ header a:hover
   font-weight:bold;
 }
 
+a:hover
+{
+  color:#e8491d;
+  text-decoration: none;
+}
+
+a
+{
+  color:#000000;
+  text-decoration: none;
+}
+
 /* Showcase */
 #showcase
 {
@@ -117,30 +129,30 @@ header a:hover
   font-size:20px;
 }
 
-/* Newsletter */
-#newsletter
+/* formstyle */
+#formstyle
 {
-  padding:10px;
-  color:#000000;
-  background:#e8491d
+  padding:5px;
+  color:#ffffff;
+  background:#e8491d;
 }
 
-#newsletter h1
+#formstyle h1
 {
   float:left;
 }
 
-#newsletter form
+#formstyle form
 {
   float:right;
   margin-top:15px;
 }
 
-#newsletter input[type="email"]
+#formstyle input[type="email"]
 {
   padding:4px;
   height:25px;
-  width:250px;
+  width:460px;
 }
 
 /* Boxes */
@@ -292,8 +304,8 @@ footer
   header #branding,
   header nav,
   header nav li,
-  #newsletter h1,
-  #newsletter form,
+  #formstyle h1,
+  #formstyle form,
   #boxes .box,
   article#main-col,
   aside#sidebar{
@@ -312,13 +324,13 @@ footer
     margin-top:40px;
   }
 
-  #newsletter button, .quote button
+  #formstyle button, .quote button
   {
     display:block;
     width:100%;
   }
 
-  #newsletter form input[type="email"], .quote input, .quote textarea
+  #formstyle form input[type="email"], .quote input, .quote textarea
   {
     width:100%;
     margin-bottom:5px;
