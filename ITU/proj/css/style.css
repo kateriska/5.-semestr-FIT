@@ -38,14 +38,18 @@ ul
   font-family: 'Lato', sans-serif;
 }
 
-.dark
+.button_2
 {
-  padding:15px;
-  background:#ffff99;
-  color:#ffffff;
-  margin-top:10px;
-  margin-bottom:10px;
+  height:38px;
+  background:#ffff80;
+  padding-left: 15px;
+  padding-right:15px;
+  color:#000000;
+  border:solid;
+  border-color: #ffff5e;
+  font-family: 'Lato', sans-serif;
 }
+
 
 /* Header **/
 header
@@ -159,6 +163,64 @@ a
   width:460px;
 }
 
+#formstyle input[type="password"]
+{
+  padding:4px;
+  height:25px;
+  width:460px;
+}
+
+
+#editprofile
+{
+  padding:5px;
+  resize: none;
+
+}
+
+#editprofile h3
+{
+  float:left;
+  resize: none;
+}
+
+#editprofile form
+{
+  float:right;
+  margin-top:15px;
+  resize: none;
+}
+
+
+#editprofile input[type=text] {
+  padding:4px;
+  height:25px;
+  width:460px;
+  resize: none;
+}
+
+#editprofile input[type=password] {
+  padding:4px;
+  height:25px;
+  width:460px;
+  resize: none;
+}
+
+#editprofile input[type=file] {
+  padding:4px;
+  height:25px;
+  width:460px;
+  resize: none;
+}
+
+#editprofile textarea {
+  resize: none;
+  width: 460px;
+  height: 100px;
+  padding: 4px;
+  font-family: 'Lato', sans-serif;
+}
+
 /* Boxes */
 #boxes
 {
@@ -250,6 +312,7 @@ textarea {
     width: 750px;
     height: 100px;
     padding: 2px;
+    font-family: 'Lato', sans-serif;
 }
 
 select
@@ -265,38 +328,6 @@ select
 }
 
 
-
-/* Sidebar */
-aside#sidebar
-{
-  float:right;
-  width:30%;
-  margin-top:10px;
-}
-
-aside#sidebar .quote input, aside#sidebar .quote textarea
-{
-  width:90%;
-  padding:5px;
-}
-
-/* Main-col */
-article#main-col
-{
-  float:left;
-  width:65%;
-}
-
-/* Services */
-ul#services li
-{
-  list-style: none;
-  padding:20px;
-  border: #cccccc solid 1px;
-  margin-bottom:5px;
-  background:#e6e6e6;
-}
-
 footer
 {
   padding:10px;
@@ -304,43 +335,4 @@ footer
   color:#ffffff;
   background-color:#e8491d;
   text-align: center;
-}
-
-/* Media Queries */
-@media(max-width: 768px)
-{
-  header #branding,
-  header nav,
-  header nav li,
-  #formstyle h1,
-  #formstyle form,
-  #boxes .box,
-  article#main-col,
-  aside#sidebar{
-    float:none;
-    text-align:center;
-    width:100%;
-  }
-
-  header
-  {
-    padding-bottom:20px;
-  }
-
-  #showcase h1
-  {
-    margin-top:40px;
-  }
-
-  #formstyle button, .quote button
-  {
-    display:block;
-    width:100%;
-  }
-
-  #formstyle form input[type="email"], .quote input, .quote textarea
-  {
-    width:100%;
-    margin-bottom:5px;
-  }
 }
