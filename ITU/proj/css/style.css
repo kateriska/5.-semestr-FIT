@@ -227,7 +227,7 @@ bookdetails#main-col
 {
     height:38px;
     background:#ffff80;
-    border:ridge;
+    border:solid;
     padding-left: 15px;
     padding-right:15px;
     color:#000000;
@@ -236,12 +236,13 @@ bookdetails#main-col
 
 #profileimage
 {
-    border-style: ridge;
+    border-style: solid;
     background: #ffff80;
     border-color: #ffff5e;
-    width:750px;
+    width:740px;
     height:170px;
     font-family: 'Lato', sans-serif;
+    padding: 5px;
 }
 
 textarea {
