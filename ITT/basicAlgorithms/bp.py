@@ -63,15 +63,15 @@ def orientFieldEstimation(orig_img):
     phi_x_array = np.zeros(shape_img, dtype=np.float32)
     phi_y_array = np.zeros(shape_img, dtype=np.float32)
     magnitude_array = np.zeros(shape_img, dtype=np.float32)
-    or_array = np.zeros((22,22))
+    #or_array = np.zeros((22,22))
 
     grad_x = cv2.Sobel(img,cv2.CV_32FC1,1, 0, cv2.BORDER_DEFAULT, ksize=3)
     grad_y = cv2.Sobel(img,cv2.CV_32FC1,0, 1, cv2.BORDER_DEFAULT, ksize=3)
 
-    block_div = 8
+    block_div = 7
     right_angle  = math.pi / 2
-    step = 16
-    orient_arr = list()
+    step = 14
+    #orient_arr = list()
 
     m = 0
     n = 0
@@ -119,10 +119,10 @@ def orientFieldEstimation(orig_img):
 
             #print("Orientation of block [" + str(i) + ", " + str(j) + "] in degrees:")
             print(orient)
-            orient_arr.append(orient)
+            #orient_arr.append(orient)
 
 
-
+            '''
             if (n == 22 ):
                 m = m + 1
                 n = 0
@@ -130,7 +130,7 @@ def orientFieldEstimation(orig_img):
             or_array[m][n] = orient
 
             n = n + 1
-
+            '''
 
 
 
@@ -165,8 +165,8 @@ def orientFieldEstimation(orig_img):
             flip_horizontal_img = cv2.flip(rotated_img, 1)
 
     #print(orient_arr)
-    print(or_array)
-    print(len(orient_arr))
+    #print(or_array)
+    #print(len(orient_arr))
     return flip_horizontal_img
 
 ### GABOR IMAGE FILTERING
@@ -319,7 +319,7 @@ def minutiaeExtraction(img):
         point_y_str = point.split(" ", 1)[1]
         point_y = int (point_y_str)
 
-        cv2.circle(tresh_ridges_corrected, (point_x,point_y), 2, (255,0,0),1)
+        cv2.circle(tresh_ridges_corrected, (point_x,point_y), 3, (255,0,0),1)
 
 
     print("Count of ridges: " + repr(ridcheck))
@@ -327,6 +327,14 @@ def minutiaeExtraction(img):
     cv2.imshow("Ridges", tresh_ridges);
     cv2.imshow("Bifurcations", tresh_bifurcations);
     cv2.imshow("Ridges corrected", tresh_ridges_corrected);
+
+    tresh_ridges_corrected_int = int (len(ridge_point_list))
+
+    if (tresh_ridges_corrected_int < 250):
+        print("This image according to ridge count is FAKE.")
+    else:
+        print("This image according to ridge count is REAL.")
+
     return tresh_img
 
 def processFalseMinutiae(ridge_point_list):
@@ -498,7 +506,7 @@ def processLBP(img, x, y):
 
 
 
-img = cv2.imread("104_1.tif",0) # uint8 image in grayscale
+img = cv2.imread("db2/104_7.tif",0) # uint8 image in grayscale
 img = cv2.resize(img,(360,360)) # resize of image
 img = cv2.normalize(img,None,0,255,cv2.NORM_MINMAX) # normalize image
 cv2.imwrite('norm_img.tif', img)
@@ -609,13 +617,13 @@ else:
 
 figure = plt.figure()
 current_plot = figure.add_subplot(1, 1, 1)
-current_plot.plot(hist_lbp, color = "black")
+current_plot.plot(hist_lbp, color = (0, 0, 0.2))
 #current_plot.set_xlim([0,260])
 current_plot.set_xlim([0,250])
 current_plot.set_ylim([0,6000])
-current_plot.set_title("LBP histogram")
-current_plot.set_xlabel("Bins")
-current_plot.set_ylabel("Number of pixels")
+current_plot.set_title("LBP Histogram")
+current_plot.set_xlabel("Intensity")
+current_plot.set_ylabel("Count of pixels")
 ytick_list = [int(i) for i in current_plot.get_yticks()]
 current_plot.set_yticklabels(ytick_list,rotation = 90)
 plt.show()
