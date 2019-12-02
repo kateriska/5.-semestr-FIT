@@ -4,216 +4,210 @@
 body
 {
   font-family: 'Lato', sans-serif;
-  padding:0;
-  margin:auto;
-  background-color:#ffff99;
+  margin: auto;
+  background-color: #ffff99;
   width: 950px;
+  border-style: none solid none solid;
+  border-color: #ff5447;
 }
 
-/* Global */
 .container
 {
-  width:80%;
-  margin:auto;
-  overflow:hidden;
+  width: 80%;
+  margin: auto;
+  overflow: hidden;
   font-family: 'Lato', sans-serif;
 }
 
-ul
-{
-  margin:0;
-  padding:0;
-}
 
 .button_1
 {
-  height:38px;
-  background:#ffff99;
-  border:0;
+  height: 38px;
+  background: #ffff99;
   padding-left: 15px;
-  padding-right:15px;
-  color:#000000;
-  border:solid;
-  border-color:#e8491d;
+  padding-right: 15px;
+  color: #000000;
+  border: solid;
+  border-color: #ff5447;
   font-family: 'Lato', sans-serif;
 }
 
 .button_2
 {
-  height:38px;
-  background:#ffff80;
+  height: 38px;
+  background: #ffff80;
   padding-left: 15px;
-  padding-right:15px;
-  color:#000000;
-  border:solid;
+  padding-right: 15px;
+  color: #000000;
+  border: solid;
   border-color: #ffff5e;
   font-family: 'Lato', sans-serif;
 }
 
-
-/* Header **/
 header
 {
-  background:#ffff99;
-  color:#ffffff;
-  padding-top:30px;
-  min-height:70px;
-  border-bottom:#e8491d 3px solid;
+  background: #ffff99;
+  color: #ffffff;
+  padding-top: 30px;
+  min-height: 70px;
+  border-bottom: #ff5447 3px solid;
+  font-family: 'Lato', sans-serif;
 }
 
 header a
 {
-  color:#000000;
-  text-decoration:none;
+  color: #000000;
   text-transform: uppercase;
-  font-size:16px;
+  font-size: 16px;
 }
 
 header li
 {
-  float:left;
-  display:inline;
+  float: left;
+  display: inline;
   padding: 0 20px 0 20px;
 }
 
 header #branding
 {
-  float:left;
+  float: left;
 }
 
 header #branding h1
 {
-  margin:0;
+  margin: 0;
 }
 
 header nav
 {
-  float:right;
-  margin-top:10px;
+  float: right;
+  margin-top: 10px;
 }
 
 header .highlight, header .current a
 {
-  color:#e8491d;
-  font-weight:bold;
+  color: #ff5447;
+  font-weight: bolder;
 }
 
 header a:hover
 {
-  color:#000000;
-  font-weight:bold;
+  color: #000000;
+  font-weight: bold;
 }
 
 a:hover
 {
-  color:#e8491d;
+  color: #ff5447;
   text-decoration: none;
 }
 
 a
 {
-  color:#000000;
+  color: #000000;
   text-decoration: none;
 }
 
-/* Showcase */
-#showcase
+#presentation
 {
-  min-height:100px;
-  background:url('../img/books.jpg') no-repeat 0 -400px;
-  text-align:center;
-  color:#000000;
+  min-height: 100px;
+  background: url('../img/books.jpg') no-repeat 0 -400px;
+  text-align: center;
+  color: #000000;
 }
 
-#showcase h1
+#presentation h1
 {
-  margin-top:250px;
-  font-size:50px;
-  margin-bottom:10px;
+  margin-top: 250px;
+  font-size: 50px;
+  margin-bottom: 10px;
 }
 
-#showcase p
+#presentation p
 {
-  font-size:20px;
+  font-size: 20px;
 }
 
-/* formstyle */
 #formstyle
 {
-  padding:5px;
-  color:#ffffff;
-  background:#e8491d;
+  padding: 5px;
+  color: #ffffff;
+  background: #ff5447;
 }
 
 #formstyle h1
 {
-  float:left;
+  float: left;
 }
 
 #formstyle form
 {
-  float:right;
-  margin-top:15px;
+  float: right;
+  margin-top: 15px;
 }
 
 #formstyle input[type="email"]
 {
-  padding:4px;
-  height:25px;
-  width:460px;
+  padding: 4px;
+  height: 25px;
+  width: 460px;
 }
 
 #formstyle input[type="password"]
 {
-  padding:4px;
-  height:25px;
-  width:460px;
+  padding: 4px;
+  height: 25px;
+  width: 460px;
 }
 
 
 #editprofile
 {
-  padding:5px;
+  padding: 5px;
   resize: none;
 
 }
 
 #editprofile h3
 {
-  float:left;
+  float: left;
   resize: none;
 }
 
 #editprofile form
 {
-  float:right;
-  margin-top:15px;
+  float: right;
+  margin-top: 15px;
   resize: none;
 }
 
 
-#editprofile input[type=text] {
-  padding:4px;
-  height:25px;
-  width:460px;
+#editprofile input[type=text]
+{
+  padding: 4px;
+  height: 25px;
+  width: 460px;
   resize: none;
 }
 
-#editprofile input[type=password] {
-  padding:4px;
-  height:25px;
-  width:460px;
+#editprofile input[type=password]
+{
+  padding: 4px;
+  height: 25px;
+  width: 460px;
   resize: none;
 }
 
-#editprofile input[type=file] {
-  padding:4px;
-  height:25px;
-  width:460px;
+#editprofile input[type=file]
+{
+  padding: 4px;
+  height: 25px;
+  width: 460px;
   resize: none;
 }
 
-#editprofile textarea {
+#editprofile textarea
+{
   resize: none;
   width: 460px;
   height: 100px;
@@ -221,79 +215,77 @@ a
   font-family: 'Lato', sans-serif;
 }
 
-/* Boxes */
 #boxes
 {
-  margin-top:20px;
+  margin-top: 20px;
 }
 
 #boxes .box
 {
-  float:left;
+  float: left;
   text-align: center;
-  width:30%;
-  padding:10px;
+  width: 30%;
+  padding: 10px;
 }
 #boxes .box img
 {
-  width:90px;
+  width: 90px;
 }
 
-
-/* List of books in page */
 #booklists
 {
-  margin-top:10px;
+  margin-top: 10px;
 }
 
 #booklists .booklist
 {
-  float:left;
+  float: left;
   text-align: center;
-  width:50%;
-  padding:5px;
+  width: 50%;
+  padding: 5px;
 }
 
 #booklists .booklist img
 {
-  width:120px;
+  width: 120px;
 }
 
-/* Book details */
+
 bookdetails#main-col
 {
-  float:right;
-  width:65%;
+  float: right;
+  width: 65%;
 }
 
 #bookimage img
 {
-  margin-right:10px;
+  margin-right: 10px;
   margin-bottom: 5px;
-  float:left;
-  width:250px;
+  float: left;
+  width: 250px;
   padding: 2px;
 }
 
 
 #profileimage img
 {
-  margin-right:10px;
+  margin-right: 10px;
   margin-bottom: 5px;
-  float:left;
-  width:150px;
+  float: left;
+  width: 150px;
   padding: 2px;
 }
 
 #sendreview button
 {
-    height:38px;
-    background:#ffff80;
-    border:solid;
+    height: 38px;
+    background: #ffff80;
+    border: solid;
     padding-left: 15px;
-    padding-right:15px;
-    color:#000000;
+    padding-right: 15px;
+    color: #000000;
     border-color: #ffff5e;
+    font-family: 'Lato', sans-serif;
 }
 
 #profileimage
@@ -301,13 +293,14 @@ bookdetails#main-col
     border-style: solid;
     background: #ffff80;
     border-color: #ffff5e;
-    width:740px;
-    height:170px;
+    width: 740px;
+    height: 170px;
     font-family: 'Lato', sans-serif;
     padding: 5px;
 }
 
-textarea {
+textarea
+{
     resize: none;
     width: 750px;
     height: 100px;
@@ -317,22 +310,21 @@ textarea {
 
 select
 {
-  height:38px;
-  background:#ffff99;
-  border:solid;
+  height: 38px;
+  background: #ffff99;
+  border: solid;
   border-color: #ffff5e;
   padding-left: 30px;
   padding-right:15px;
-  color:#000000;
+  color: #000000;
 
 }
 
-
 footer
 {
-  padding:10px;
-  margin-top:20px;
-  color:#ffffff;
-  background-color:#e8491d;
+  padding: 3px;
+  margin-top: 20px;
+  color: #ffffff;
+  background-color: #ff5447;
   text-align: center;
 }
