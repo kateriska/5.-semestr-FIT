@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="iso-8859-2">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="./css/style.css">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div id="branding">
+          <h1><span class="highlight">Čtenářský klub Loreta</h1>
+        </div>
+        <nav>
+          <ul>
+            <li class="current"><a href="index.html">Domovská stránka</a></li>
+            <li><a href="login_page.html">Přihlásit uživatele</a></li>
+            <li><a href="book_list.html">Katalog knih</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section id="showcase">
+      <div class="container">
+        <h1>Zajímavé knihy na jednom místě</h1>
+        <p>Staňte se členy našeho nového knižního katalogu. Po přihlášení vám bude k dispozici unikátní obsah.</p>
+      </div>
+    </section>
+
+    <section id="formstyle">
+      <div class="container">
+        <h1>Vyhledat knihu:</h1>
+        <form>
+          <input type="email" placeholder="Zadejte knihu">
+            <input type="button" value="Vyhledat" onclick="window.location.href='book_list.html'" class="button_1"/>
+        </form>
+      </div>
+    </section>
+
+    <section id="boxes">
+      <div class="container">
+        <div class="box">
+          <img src="./img/hungergames2.jpg">
+          <p><h3> <a href="hunger_games.html">Hunger Games</a></h3></p>
+          <p>Suzanne Collins</p>
+        </div>
+        <div class="box">
+          <img src="./img/rur.jpg">
+          <p><h3> <a href="rur.html">R.U.R.</a></h3></p>
+          <p>Karel Čapek</p>
+        </div>
+        <div class="box">
+          <img src="./img/divergence.jpg">
+          <p><h3> <a href="divergence.html">Divergence</a></h3></p>
+          <p>Veronica Roth</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Čtenářský klub Loreta 2019</p>
+    </footer>
+  </body>
+</html>
