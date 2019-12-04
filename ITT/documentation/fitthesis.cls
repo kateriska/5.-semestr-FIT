@@ -585,6 +585,7 @@ Management}{\@fit@EN}%
 %===================================================
 \newpage
 
+
 }
 
 %Rozsireny abstrakt / Extended abstract

@@ -1,11 +1,11 @@
 \chapter{Úvod}
-S rozvojem moderních technologií a komunikačních zařízení se stále více aktuální stává otázka bezpečnosti a ochrany dat. Zabezpečování údajů pomocí biometrie si získalo velký úspěch, zvláště díky snadnosti přihlášení do systému a větší míře bezpečnosti jak například u hesel. Není zde totiž potřeba si pamatovat údaje, stačí pouze použít svůj vlastní biometrický identifikátor, který bývá i bezpečnějším způsobem přihlášení nebo ochrany soukromých údajů. 
+S rozvojem moderních technologií a komunikačních zařízení se stále více aktuální stává otázka bezpečnosti a ochrany dat. Zabezpečování údajů pomocí biometrie si získalo velký úspěch, zvláště díky snadnosti přihlášení do systému a větší míře bezpečnosti jak například u~hesel. Není zde totiž potřeba si pamatovat údaje, stačí pouze použít svůj vlastní biometrický identifikátor, který bývá i bezpečnějším způsobem přihlášení nebo ochrany soukromých údajů. 
 
-Mnoho systému dnes využívá zabezpečení pomocí otisku prstu. Přestože tento druh identifikace se nám může jevit jako opravdu spolehlivý, i tato metoda může být napadena. Zfalšované otisky prstů mohou být buď generované softwarovým programem nebo vyrobeny z syntetických materiálů. Je proto potřeba vytvořit algoritmus, který by mohl falšování otisků prstů nějakým způsobem rozlišovat a odhalit, zda je systém narušený útočníkem.
+Mnoho systémů dnes využívá zabezpečení pomocí otisku prstu. Přestože tento druh identifikace se nám může jevit jako opravdu spolehlivý, i tato metoda může být napadena. Zfalšované otisky prstů mohou být buď generované softwarovým programem nebo vyrobeny z syntetických materiálů. Je proto potřeba vytvořit algoritmus, který by mohl falšování otisků prstů nějakým způsobem rozlišovat a odhalit, zda je systém narušený útočníkem.
 
-Ve své práci se zaměřujiě na implementaci kombinace různých algoritmů pro detekci živosti otisku prstu. Jedná se o algoritmy, které se zaměřují na zpracování obrazu, úpravu obrazu a výzkum, jak se dané algoritmy chovají u obrázků falešných a přirozených otisků. Byla mi k dispozici databáze pravých otisků prstů, poskytovaných univerzitou v Bologni a dále databáze softwarově generovaných otisků prstů. Na těchto souborech jsem poté testovala implementované algoritmy, zkoumala jejich chování a vyhodnocovala závěry.
+Ve své práci se zaměřuji na implementaci kombinace různých algoritmů pro detekci živosti otisku prstu. Jedná se o algoritmy, které se zaměřují na zpracování obrazu, úpravu obrazu a výzkum, jak se dané algoritmy chovají u obrázků falešných a přirozených otisků. Byla mi k dispozici databáze pravých otisků prstů, poskytovaných univerzitou v Bologni a dále databáze softwarově generovaných otisků prstů. Na těchto souborech jsem poté testovala implementované algoritmy, zkoumala jejich chování a vyhodnocovala závěry.
 
-Přes zimní semestr jsem se hlavně seznamovala s hlavními používanými algoritmy a literaturou, v letním semestru plánuji do své detekce zakomponovat nejen softwarově generované otisky prstů, ale i otisky z různých syntetických materiálů získané ze senzoru.
+Přes zimní semestr jsem se hlavně seznamovala s hlavními používanými algoritmy a literaturou, v letním semestru plánuji do své práce zakomponovat nejen softwarově generované otisky prstů, ale i otisky z různých syntetických materiálů získané ze senzoru a práci s dalšími algoritmy.
 
 
 %\chapter{Abstrakt}
@@ -16,18 +16,18 @@ Přes zimní semestr jsem se hlavně seznamovala s hlavními používanými algo
 
 
 \chapter{Biometrie} 
-Biometrie je věda rozpoznávání identity člověka na základě jeho fyzických a behaviorálních vlastností jako například tvář, otisk prstů, hlas nebo oční duhovka. \cite{Jain2008} Slovo biometrie pochází z řeckých slov bios (život) a metron (měření). Biometrické identifikátory jsou v informatice používány pro přístupovou kontrolu a identifikaci. Skoro všechny identifkátory jsou kombinací anatomických a behaviorálních charakteristik. U otisku prstu je behaviorální složkou skutečnost, že každý uživatel použije skener otisku prstů v závislosti na svém chování. Záleží i například na úhlu přiložení prstu nebo znečistění povrchu prstu či senzoru. U identifikace tváře pak záleží i na změnách pramenících z chování člověka (např. změna životního stylu vedoucí ke změně tělesné váze).\cite{Maltoni2009}
+Biometrie je věda rozpoznávání identity člověka na základě jeho fyzických a behaviorálních vlastností jako například tvář, otisk prstů, hlas nebo oční duhovka. \cite{Jain2008} Slovo biometrie pochází z řeckých slov bios (život) a metron (měření). Biometrické identifikátory jsou v~informatice používány pro přístupovou kontrolu a identifikaci. Skoro všechny identifikátory jsou kombinací anatomických a behaviorálních charakteristik. U otisku prstu je behaviorální složkou skutečnost, že každý uživatel použije skener otisku prstů v závislosti na svém chování. Záleží i například na úhlu přiložení prstu nebo znečistění povrchu prstu či senzoru. U identifikace tváře pak záleží i na změnách pramenících z chování člověka (např. změna životního stylu vedoucí ke změně tělesné váze).\cite{Maltoni2009}
 \section{Identita, identifikace, verifikace, autentizace}
 Identifikace, verifikace, identita a autentizace jsou základními čtyřmi pojmy, které biometrické systémy využívají a pracuji s nimi.\cite{Drahansky}
 \begin{itemize}
-    \item Identita - Je jednoznačnou charakteristikou jedince. Rozlišujeme ji dále na:
+    \item \textbf{Identita} - Je jednoznačnou charakteristikou jedince. Rozlišujeme ji dále na:
         \begin{itemize}
-            \item Fyzická identita - Tato identita je pouze jedna jediná. Je definována naším vzhledem a chováním.
-            \item Elektronická identita - Těchto identit můžeme mít vytvořených nespočetně mnoho díky například více různým účtům na webové stránce.
+            \item \textbf{Fyzická identita} - Tato identita je pouze jedna jediná. Je definována naším vzhledem a chováním.
+            \item \textbf{Elektronická identita} - Těchto identit můžeme mít vytvořených nespočetně mnoho díky například více různým účtům na webové stránce.
         \end{itemize}
-    \item Identifikace - Složí pro zjištění identity osoby. Osoba předá systému svoji biometrickou vlastnost a ten musí na základě jejího vyhodnocení rozhodnout, zda je identita nalezená nebo nenalezená. Systém k tomuto účelu používá porovnávání s databází vzorků. Jedná se o porovnání 1:N, protože se biometrická vlastnost porovnává s celou databází.
-    \item Verifikace - Uživatel sdělí systému svoji elektronickou identitu. V systému je pak potřeba ověřit skutečná fyzická identita uživatele. Proto se hledá, zda-li jeho záznam obsahuje biometrická data. Dále se porovnává, zda sobě data odpovídají. Na základě tohoto údaje systém rozhodne o potvrzené či nepotvrzené identitě. Jedná se o porovnání 1:1, dochází k porovnání vstupních dat pouze s jedním záznamem dat v databázi.
-    \item Autentizace - Systém při tomto úkonu potvrzuje autentičnost (hodnověrnost) dané osoby. Může být využita při identifikaci a verifikaci. Porovnávání většinou funguje na základě pomyslného prahu.
+    \item \textbf{Identifikace} - Složí pro zjištění identity osoby. Osoba předá systému svoji biometrickou vlastnost a ten musí na základě jejího vyhodnocení rozhodnout, zda je identita nalezená nebo nenalezená. Systém k tomuto účelu používá porovnávání s databází vzorků. Jedná se o porovnání 1:N, protože se biometrická vlastnost porovnává s celou databází.
+    \item \textbf{Verifikace} - Uživatel sdělí systému svoji elektronickou identitu. V systému je pak potřeba ověřit skutečná fyzická identita uživatele. Proto se hledá, zda-li jeho záznam obsahuje biometrická data. Dále se porovnává, zda sobě data odpovídají. Na základě tohoto údaje systém rozhodne o potvrzené či nepotvrzené identitě. Jedná se o porovnání 1:1, dochází k porovnání vstupních dat pouze s jedním záznamem dat v databázi.
+    \item \textbf{Autentizace} - Systém při tomto úkonu potvrzuje autentičnost (hodnověrnost) dané osoby. Může být využita při identifikaci a verifikaci. Porovnávání většinou funguje na~základě pomyslného prahu.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -42,8 +42,8 @@ Identifikace, verifikace, identita a autentizace jsou základními čtyřmi pojm
 \section{Biometrické systémy}
 Biometrické systémy dělíme do dvou základních kategorií\cite{Drahansky}:
 \begin{itemize}
-    \item Registrační modul - Zde je zaregistrována biometrická informace (tzv. biometrický markant) a je uložena do databáze.
-    \item Verifikační modul - Zde je zaregistrována biometrická informace podobně jako u registračního modulu, ale výsledek není uložen do databáze, nýbrž jsou data z databáze načítána, aby se extrahovaný biometrický markant mohl porovnat s daty v databázi. 
+    \item \textbf{Registrační modul} - Zde je zaregistrována biometrická informace (tzv. biometrický markant) a je uložena do databáze.
+    \item \textbf{Verifikační modul} - Zde je zaregistrována biometrická informace podobně jako u~registračního modulu, ale výsledek není uložen do databáze, nýbrž jsou data z databáze načítána, aby se extrahovaný biometrický markant mohl porovnat s daty v~databázi. 
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -90,7 +90,7 @@ Otisky prstů dělíme na základní tři druhy:\cite{Drahansky}
 \section{Typy senzorů}
 Nejdůležitějším částí detekce je senzor, který zaznamenává výsledný otisk prstu. Řadíme je do těchto základních kategorií:
 \begin{itemize}
-\item Optické senzory - Využívají jednoduchý zdroj světla (LED), které osvětlí plochu prstu.\cite{Drahansky} Nejvíce používaným zástupcem optických senzorů je senzor FTIR. Prst se při snímání dotýká skleněného nebo plastového hranolu. Při dotyku jsou hřebeny papilárních linií v kontaktu s povrchem snímače, ale údolí jsou vzdálena. Světlo pocházející z hranolu dopadá na prst a je odraženo údolími papilárních liníí nebo náhodně pohlceno hřebeny. Ve výsledném obrazu jsou pak hřebeny tmavá místa a údolí světlá místa. FTIR snímače dokáží snímat 3D otisk prstu a tak dokáží detekovat i zfalšované otisky prstu, které například pocházejí z fotografie. \cite{Maltoni2009}
+\item \textbf{Optické senzory} - Využívají jednoduchý zdroj světla (LED), které osvětlí plochu prstu.\cite{Drahansky} Nejvíce používaným zástupcem optických senzorů je senzor FTIR. Prst se při snímání dotýká skleněného nebo plastového hranolu. Při dotyku jsou hřebeny papilárních linií v kontaktu s povrchem snímače, ale údolí jsou vzdálena. Světlo pocházející z hranolu dopadá na prst a je odraženo údolími papilárních liníí nebo náhodně pohlceno hřebeny. Ve výsledném obrazu jsou pak hřebeny tmavá místa a údolí světlá místa. FTIR snímače dokáží snímat 3D otisk prstu a tak dokáží detekovat i zfalšované otisky prstu, které například pocházejí z fotografie. \cite{Maltoni2009}
 
 \begin{figure}[htbp]
     \centering
@@ -99,7 +99,7 @@ Nejdůležitějším částí detekce je senzor, který zaznamenává výsledný
     \label{fig:ftir}
 \end{figure}
 
-\item Kapacitní senzory - Jsou složeny z matice malých vodivých plošek, na níž je napařena vrstva nevodivého oxidu křemičitého.\cite{Drahansky} Mezi povrchem prstu a každou z plošek (mikrokapacitorů) v čipu vzniká malý elektrický náboj. Při skládání výsledného otisku prstu je důležitá vzdálenost mezi povrchem otisku prstu a mikrokapacitorem. Hřebeny a údolí papilárních linií otisku prstu mají jinou vzdálenost od mikrokapacitoru, tudíž i odlišnou intenzitu ve výsledném obraze. Stejně jako u senzoru FTIR nemůže tato technologie být zneužita útočníkem při předložení fotografie. Jsou zde totiž měřeny vzdálenosti a pouze trojrozměrný povrch může být nasnímán.\cite{Maltoni2009}
+\item \textbf{Kapacitní senzory} - Jsou složeny z matice malých vodivých plošek, na níž je napařena vrstva nevodivého oxidu křemičitého.\cite{Drahansky} Mezi povrchem prstu a každou z plošek (mikrokapacitorů) v čipu vzniká malý elektrický náboj. Při skládání výsledného otisku prstu je důležitá vzdálenost mezi povrchem otisku prstu a mikrokapacitorem. Hřebeny a údolí papilárních linií otisku prstu mají jinou vzdálenost od mikrokapacitoru, tudíž i odlišnou intenzitu ve výsledném obraze. Stejně jako u senzoru FTIR nemůže tato technologie být zneužita útočníkem při předložení fotografie. Jsou zde totiž měřeny vzdálenosti a pouze trojrozměrný povrch může být nasnímán.\cite{Maltoni2009}
 
 \begin{figure}[htbp]
     \centering
@@ -107,7 +107,7 @@ Nejdůležitějším částí detekce je senzor, který zaznamenává výsledný
     \caption{Kapacitní senzor, převzato z \cite{Maltoni2009}}
     \label{fig:electro}
 \end{figure}
-\item Ultrazvukové senzory - Jsou založeny na posílání akustického signálu prstu a zachytávání odraženého signálu. Odražený signál je použit na výpočet hloubky obrazu a struktury papilárních linií. Senzor se skládá z vysílače a příjimače. Vysílač generuje krátké zvukové pulsy a příjímač detekuje odpověď po odražení těchto akustických pulsů od povrchu prstu. Senzor je schopný detekovat strukturu otisku prstu i např. přes tenké rukavice, stejně jako si dokáže poradit s nečistotami i mastnotou.\cite{Maltoni2009}
+\item \textbf{Ultrazvukové senzory} - Jsou založeny na posílání akustického signálu prstu a zachytávání odraženého signálu. Odražený signál je použit na výpočet hloubky obrazu a struktury papilárních linií. Senzor se skládá z vysílače a příjimače. Vysílač generuje krátké zvukové pulsy a příjímač detekuje odpověď po odražení těchto akustických pulsů od povrchu prstu. Senzor je schopný detekovat strukturu otisku prstu i např. přes tenké rukavice, stejně jako si dokáže poradit s nečistotami i mastnotou.\cite{Maltoni2009}
 
 \begin{figure}[htbp]
     \centering
@@ -115,7 +115,7 @@ Nejdůležitějším částí detekce je senzor, který zaznamenává výsledný
     \caption{Ultrazvukový senzor, převzato z \cite{Maltoni2009}}
     \label{fig:ultrasound}
 \end{figure}
-\item Elektrooptické senzory - Tyto snímače jsou složeny ze dvou vrstev. První dokáže emitovat světlo, pokud je polarizována správným nápětím. Druhá vrstva úzce spolupracuje s první, zpracovává emitované světlo a vytváří finální digitální obraz.\cite{Maltoni2009}
+\item \textbf{Elektrooptické senzory} - Tyto snímače jsou složeny ze dvou vrstev. První dokáže emitovat světlo, pokud je polarizována správným nápětím. Druhá vrstva úzce spolupracuje s první, zpracovává emitované světlo a vytváří finální digitální obraz.\cite{Maltoni2009}
 
 \begin{figure}[htbp]
     \centering
@@ -123,8 +123,8 @@ Nejdůležitějším částí detekce je senzor, který zaznamenává výsledný
     \caption{Elektrooptický senzor, převzato z \cite{Maltoni2009}}
     \label{fig:electro}
 \end{figure}
-\item Tlakový senzor - Je vytvořen z materiálu citlivého na mechanické namáhání, při kterém generuje elektrický signál. Velikost elektrického signálu závisí na tlaku, který vyvíjí prst na povrch senzoru. Hřebeny a údolí papilárních linií jsou v jiných vzdálenost od povrchu snímače, proto produkují jinou hodnotu elektrického signálu.\cite{Maltoni2009}
-\item Termický senzor - Senzor využívá pyroelektrický materiál, který generuje elektrický náboj na základě teplotních rozdílů. Je založen na skutečnosti, že hřebeny v kontaktu s povrchem senzoru produkují jinou teplotu jak údolí, které jsou vzdálenější od povrchu snímače. Senzor je obvykle předehřán na vyšší teplotu, aby se zvýšila odlišnost mezi povrchem zařízení a hřebeny linií.\cite{Maltoni2009}
+\item \textbf{Tlakový senzor} - Je vytvořen z materiálu citlivého na mechanické namáhání, při~kterém generuje elektrický signál. Velikost elektrického signálu závisí na tlaku, který vyvíjí prst na povrch senzoru. Hřebeny a údolí papilárních linií jsou v jiných vzdálenost od povrchu snímače, proto produkují jinou hodnotu elektrického signálu.\cite{Maltoni2009}
+\item \textbf{Termický senzor} - Senzor využívá pyroelektrický materiál, který generuje elektrický náboj na základě teplotních rozdílů. Je založen na skutečnosti, že hřebeny v kontaktu s~povrchem senzoru produkují jinou teplotu jak údolí, které jsou vzdálenější od povrchu snímače. Senzor je obvykle předehřán na vyšší teplotu, aby se zvýšila odlišnost mezi povrchem zařízení a hřebeny linií.\cite{Maltoni2009}
 \end{itemize}
 
 \section{Základní druhy markantů}
@@ -181,11 +181,11 @@ Falešné biometrické reprezentace jsou obecně velkým nebezpečím, protože 
 \end{itemize}
 Falešný otisk prstu reprezentuje repliku skutečného otisku prstu vyrobeného softwarově nebo z materiálů jako je želatina, silikon nebo latex. Biometrické zařízení se musí rozhodnout, zda otisk je živý nebo falešný. Tato procedura se nazývá detekce živosti.
 Pozměněné otisky prstů jsou skutečné, avšak jejich struktura je změněna. Otisky mohou být neúplné, pokřivené. Důvodem poškození otisku mohou být nemoci kůže, např. pořezání, popálenina, poleptání silnými chemikáliemi, transplantace kůže a různé kožní nemoci.\cite{Petrovici}
-\section{Známé metody pro analýzu živosti otisku prstu}
-Algoritmů pro detekci živosti otisku prstu byla objevena ve studiích celá řada. Některé z nich jsou:\cite{AbhiskekStudy}
+\section{Známé metody pro analýzu živosti otisku prstu a výpočet přesnosti analýzy}
+Algoritmů pro detekci živosti otisku prstu byla objevena ve studiích celá řada. Některé z nich zahrnují:\cite{AbhiskekStudy}
 \begin{itemize}
-    \item Pomocí použití vlastnosti elasticity lidské kůže.
-    \item Umístění senzoru na zachytávání pachu vedle senzoru pro detekci otisku prstu. Senzor pachu zaznamenával výsledný signál a byl tak schopen rozpoznat lidskou kůži od syntetických materiálů, jako např. latex, silikon nebo želatina.
+    \item Použití vlastnosti elasticity lidské kůže.
+    \item Umístění senzoru na zachytávání pachu vedle senzoru pro detekci otisku prstu. Senzor pachu zaznamenával výsledný signál a byl tak schopen rozpoznat lidskou kůži od~syntetických materiálů, jako např. latex, silikon nebo želatina.
     \item Kombinace statických vlastností při detekci živosti, bylo pracováno s histogramem, tloušťkou hřebenů papilárních linií, signálem detekovaným z hřebenů nebo hodnota výkonnového frekvenčního spektra.
     
 \end{itemize}
@@ -202,14 +202,14 @@ Po načtení obrazu bylo potřeba obraz převést na šedotonový. Poté byla pr
 \begin{figure}[htbp]
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/102_1.png}
+    \includegraphics[width=200]{obrazky-figures/102_1.png}
     \caption{Vstupní obraz}
     \label{fig:origimg}
   \end{minipage}
   \hspace{0.5cm}
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/norm_img.png}
+    \includegraphics[width=200]{obrazky-figures/norm_img.png}
     \caption{Normalizovaný obraz}
     \label{fig:normimg}
   \end{minipage}
@@ -223,14 +223,14 @@ Při prahování jsou světlé objekty odděleny od tmavých pomocí zadaných k
 \begin{figure}[htbp]
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=180]{obrazky-figures/104_7norm.png}
+    \includegraphics[width=150]{obrazky-figures/104_7norm.png}
     \caption{Normalizovaný obraz}
     \label{fig:origimg}
   \end{minipage}
   \hspace{0.5cm}
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=180]{obrazky-figures/tresh104.png}
+    \includegraphics[width=150]{obrazky-figures/tresh104.png}
     \caption{Obraz po aplikaci prahování}
     \label{fig:normimg}
   \end{minipage}
@@ -245,21 +245,21 @@ Papilární linie jsou odděleny po vyprahování úzkými místy a tento algori
 \begin{figure}[htbp]
   \begin{minipage}[b]{0.3\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/105_5norm.png}
+    \includegraphics[width=100]{obrazky-figures/105_5norm.png}
     \caption{Vstupní normalizovaný obraz}
     \label{fig:normimg105}
   \end{minipage}
   \hspace{0.3cm}
   \begin{minipage}[b]{0.3\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/105_5mask.png}
+    \includegraphics[width=100]{obrazky-figures/105_5mask.png}
     \caption{Získaná maska}
     \label{fig:mask}
   \end{minipage}
   \hspace{0.3cm}
     \begin{minipage}[b]{0.3\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/105_5segment.png}
+    \includegraphics[width=100]{obrazky-figures/105_5segment.png}
     \caption{Výsledný segmentovaný obraz}
     \label{fig:mask}
   \end{minipage}
@@ -268,42 +268,46 @@ Papilární linie jsou odděleny po vyprahování úzkými místy a tento algori
 \section{Ztenčování linií}
 Pro extrakci markantů (ukončení a vidličky) je potřeba ztenčit papilární linie otisku prstů. Pro ztenčení bylo znovu využito morfologických operací. V každé iteraci algoritmu je znovu provedena eroze obrazu.
 Známým postupem pro vytvoření morfologické kostry je Lantuéjoulova formule:\cite{WikipediaSkeleton}\\\\
-Pro diskrétní binární obraz $X$$\subset$$\mathds{Z}^2$, skeleton $S(X)$ je sjednocením podmnožin koster ${S_n(X)},$\\$ n = 0,1,..,N$, kde:
+Pro diskrétní binární obraz $X$ $\subset$ $\mathds{Z}^2$, skeleton $S(X)$ je sjednocením podmnožin koster ${S_n(X)},$\\$ n = 0,1,..,N$, kde:
 $$S_n(X) = (X \ominus nB) - (X \ominus nB) \circ B$$ Symboly $\ominus$ a $\circ$ jsou morfologická eroze a otevření. 
 
 \begin{figure}[htbp]
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/SG_LLnorm.png}
+    \includegraphics[width=130]{obrazky-figures/SG_LLnorm.png}
     \caption{Vstupní normalizovaný a segmentovaný obraz}
     \label{fig:origimg}
   \end{minipage}
   \hspace{0.5cm}
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/SG_LLthin.png}
+    \includegraphics[width=130]{obrazky-figures/SG_LLthin.png}
     \caption{Obraz se ztenčenými papilárními liniemi}
     \label{fig:normimg}
   \end{minipage}
 \end{figure}
 \section{Extrakce ukončení a vidličky}
-Extrakce těchto nejdůležitějších markantů v otisku prstu probíhá po normalizaci, segmentaci a ztenčení obrazu. Předchozí práce ukázala, že úroveň jasu v šedotónovém obrazu je náhodnou u živých otisků prstů, ale má sklon být buď uniformní nebo periodická u falešných otisků prstů. Stejná myšlenka je pak použita u místní analýzy textury otisku prstu. Z tohoto důvodu počet hřebenů ukončení papilárních linií u živých otisků prstů má tendenci dosahovat k větším číslům, jak u falešných otisků prstů. Proto je očividné, že tato metoda může být efektivní vlastností, jak odlišit živé otisky prstů od falešných.\cite{AbhiskekStudy}
+Extrakce těchto nejdůležitějších markantů v otisku prstu probíhá po normalizaci, segmentaci a ztenčení obrazu. Předchozí práce ukázala, že úroveň jasu v šedotónovém obrazu je náhodnou u živých otisků prstů, ale má sklon být buď uniformní nebo periodická u falešných otisků prstů. Stejná myšlenka je pak použita u místní analýzy textury otisku prstu. Z~tohoto důvodu počet hřebenů ukončení papilárních linií u živých otisků prstů má tendenci dosahovat k větším číslům, jak u falešných otisků prstů. Proto je očividné, že tato metoda může být efektivní vlastností, jak odlišit živé otisky prstů od falešných.\cite{AbhiskekStudy}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=400]{obrazky-figures/graylevel.png}
+    \includegraphics[width=255]{obrazky-figures/graylevel.png}
     \caption{Ukázka změn úrovně šedotónového jasu u živých otisků prstů v porovnání s falešnými otisky z syntetických materiálů, převzato z \cite{AbhiskekStudy}}
     \label{fig:graylevel}
 \end{figure}
 
 Pro extrakci ukončení i vidličky bylo použito okna o velikosti 3x3 pixely. U každého pixelu pak bylo na základě tohoto okna ve středu s procházeným pixelem zjištěno, jaké hodnoty mají jeho sousedé a tento prostřední centrální pixel. 
 
-Hledání ukončení papilárních linií probíhalo za pomocí následujícího okna:
-
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=350]{obrazky-figures/windowridge.png}
     \caption{Okno o velikosti 9 pixelů pro extrakci ukončení, převzato z \cite{BansalStudy}}
+    \label{fig:ridgewindow}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=350]{obrazky-figures/bif.png}
+    \caption{Okno o velikosti 9 pixelů pro extrakci vidličky}
     \label{fig:ridgewindow}
 \end{figure}
 
@@ -341,14 +345,14 @@ $$y_1 = r * sin(O(i,j)- \frac{\pi}{2}) + y_0$$
 \begin{figure}[htbp]
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=175]{obrazky-figures/norm_img.png}
+    \includegraphics[width=135]{obrazky-figures/norm_img.png}
     \caption{Normalizovaný a segmentovaný obraz}
     \label{fig:origimg}
   \end{minipage}
   \hspace{0.5cm}
   \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=190]{obrazky-figures/orient.png}
+    \includegraphics[width=140]{obrazky-figures/orient.png}
     \caption{Orientované pole obrazu}
     \label{fig:normimg}
   \end{minipage}
@@ -375,12 +379,12 @@ Postup algoritmu je následující:\\
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=351]{obrazky-figures/lbpprincip.png}
+    \includegraphics[width=460]{obrazky-figures/lbpprincip.png}
     \caption{Princip výpočtu lokálního binárního vzoru, upraveno s využitím \cite{GaikwadStudy}}
     \label{fig:lbpprincip}
 \end{figure}
 
- Nyní bylo potřeba vyextrahovat pro lokální binární vzor informace, na základě kterých by se dala detekovat problematika živosti otisku prstu. První informací, kterou jsem si z nového obrazu vyextrahovala byl jeho histogram. Histogramy se zvláště ve středových hodnotách podstatně liší. Svoji hypotézu jsem otestovala na základě porovnání sum hodnot histogramů v jejich druhém a třetím kvadrantu. Na základě prahu jsem pak mohla rozhodnout, zda je otisk prstu živý nebo falešný.
+ Nyní bylo potřeba vyextrahovat pro lokální binární vzor informace, na základě kterých by se dala detekovat problematika živosti otisku prstu. První informací, kterou jsem si z nového obrazu vyextrahovala byl jeho histogram. Histogramy se zvláště ve středových hodnotách podstatně liší. Svoji hypotézu jsem otestovala na základě porovnání částečných sum hodnot histogramů. Na základě prahu jsem pak mohla rozhodnout, zda je otisk prstu živý nebo falešný.
  
  Hypotéza byla otestována na třech databázích - dvou obsahující živé otisky prstu a jedné obsahující falešné otisky prstů. Celkem bylo pracováno se 140 snímky. Při výpočtu přesnosti budu využívat již zmiňovaný vzorec:\\
  $$a = \frac{C}{N}$$
@@ -390,26 +394,25 @@ Postup algoritmu je následující:\\
  Analýzou lokálního binárního vzoru pro detekci živosti a  dalšími algoritmy se budu dále zabívat v letním semestru.
  
  \begin{figure}[htbp]
-  \begin{minipage}[b]{0.3\linewidth}
+  \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/db3.png}
+    \includegraphics[width=150]{obrazky-figures/db3.png}
     \caption{Snímek z databáze DB1\_B (University at Bologna)}
     \label{fig:normimg105}
   \end{minipage}
   \hspace{0.3cm}
-  \begin{minipage}[b]{0.3\linewidth}
+  \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{obrazky-figures/db2.png}
+    \includegraphics[width=150]{obrazky-figures/db2.png}
     \caption{Snímek z databáze DB3\_B (University at Bologna)}
     \label{fig:mask}
   \end{minipage}
-  \hspace{0.3cm}
-    \begin{minipage}[b]{0.3\linewidth}
+\end{figure}
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=100]{obrazky-figures/db1.png}
+    \includegraphics[width=130]{obrazky-figures/db1.png}
     \caption{Snímek z obdržené databáze falešných otisků prstů}
-    \label{fig:mask}
-  \end{minipage}
+    \label{fig:lbpprincip}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -476,7 +479,7 @@ Postup algoritmu je následující:\\
 
 
 \chapter{Závěr}
-V průběhu zimního semestru jsem se v rámci povinného předmětu Semestrální projekt (ITT) začala seznamovat s tématem detekce živosti otisků prstů. Nastudovala jsem odborné články a literaturu, začala jsem pracovat na algoritmech pro předzpracování obrazu (normalizace, prahování, ztenčování linií, extrakce orientovaného pole, extrakce markantů). Začala jsem implementovat hlavní algoritmus pro detekci živosti - lokální binární vzor. V průběhu letního semestru budu svoji práci dále rozšiřovat a zdokonalovat, chci provést výzkum nejen softwarově generovaných otisků prstů, ale i otisků prstů z různých syntetických materiálů. Plánuji navštívit laboratoř a získat snímky syntetických otisků prstů z senzoru. Svoji detekci živosti prstu chci vedle extrakce markantů a lokálního binárního vzoru rozšířit také o práci s vlnovou délkou. Jednotlivé algoritmy poté porovnám na základě přesnosti či rychlosti zpracování. 
+V průběhu zimního semestru jsem se v rámci povinného předmětu Semestrální projekt (ITT) začala seznamovat s tématem detekce živosti otisků prstů. Nastudovala jsem odborné články a literaturu, začala jsem pracovat na algoritmech pro předzpracování obrazu (normalizace, prahování, ztenčování linií, extrakce orientovaného pole, extrakce markantů). Začala jsem implementovat hlavní algoritmus pro detekci živosti - lokální binární vzor. V průběhu letního semestru budu svoji práci dále rozšiřovat a zdokonalovat, chci provést výzkum nejen softwarově generovaných otisků prstů, ale i otisků prstů z různých syntetických materiálů. Plánuji navštívit laboratoř a získat snímky syntetických otisků prstů z senzoru, dále se pak chci pokusit z lokálního binárního vzoru vyextrahovat další užitečné informace kromě histogramu. Svoji detekci živosti prstu chci vedle extrakce markantů a lokálního binárního vzoru rozšířit také o práci s vlnovou délkou. Jednotlivé algoritmy poté porovnám na základě přesnosti či rychlosti zpracování. 
 
 \label{zaver}
 
