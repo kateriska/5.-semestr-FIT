@@ -46,6 +46,18 @@ body
   font-family: 'Roboto', sans-serif;
 }
 
+.button_3
+{
+  height: 38px;
+  background: #ffff80;
+  border: solid;
+  padding-left: 15px;
+  padding-right: 15px;
+  color: #000000;
+  border-color: #ffff5e;
+  font-family: 'Roboto', sans-serif;
+}
+
 header
 {
   background: #ffff99;
@@ -290,15 +302,28 @@ bookdetails#main-col
     font-family: 'Roboto', sans-serif;
 }
 
+#sendreview[type=submit]
+{
+    height: 38px;
+    background: #ffff80;
+    border: solid;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: #000000;
+    border-color: #ffff5e;
+    font-family: 'Roboto', sans-serif;
+}
+
 #profileimage
 {
     border-style: solid;
     background: #ffff80;
     border-color: #ffff5e;
     width: 740px;
-    height: 170px;
+    height: 500px;
     font-family: 'Roboto', sans-serif;
     padding: 5px;
+    overflow: auto;
 }
 
 textarea
