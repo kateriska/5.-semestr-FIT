@@ -2,6 +2,23 @@
 
 <!DOCTYPE html>
 <html>
+<script>
+function formValidation() {
+  var email = document.forms["submitForm"]["email"].value;
+  var pwd = document.forms["submitForm"]["pwd"].value;
+  if (email == "")
+  {
+    alert("Email není vyplněn!");
+    return false;
+  }
+  if (pwd == "")
+  {
+    alert("Heslo není vyplněno!");
+    return false;
+  }
+
+}
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -25,29 +42,15 @@
 
     <section id="formstyle">
       <div class="container">
-        <h1>E-mail:</h1>
-        <form>
-          <input type="email" placeholder="Zadejte e-mail" value="xforto00@stud.fit.vutbr.cz">
-        </form>
+        <form name="submitForm" action="book_listr.html" onsubmit="return formValidation()" method="post">
+          <h3>E-mail:</h3><input type="email" name=email placeholder="Zadejte e-mail" value="xforto00@stud.fit.vutbr.cz"><br>
+          <h3>Heslo:</h3><input type="password" name=pwd placeholder="Zadejte heslo" value="katerinafortova"><br><br>
+          <input type="submit" class="button_1" value="Přihlásit se">
+    </form>
       </div>
     </section>
 
-    <section id="formstyle">
-      <div class="container">
-        <h1>Heslo:</h1>
-        <form>
-          <input type="password" placeholder="Zadejte heslo" value="katerinafortova">
-        </form>
-      </div>
-    </section>
 
-    <section id="formstyle">
-      <div class="container">
-        <form>
-              <button onclick="location.href='book_listr.html'" type="button" class="button_1">Přihlásit se</button>
-        </form>
-      </div>
-    </section>
 
     <section id="main">
   <div class="container">

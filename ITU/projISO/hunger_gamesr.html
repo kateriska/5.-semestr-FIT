@@ -2,6 +2,36 @@
 
 <!DOCTYPE html>
 <html>
+
+<script>
+function formValidation() {
+  var review = document.forms["submitForm"]["review"].value;
+  if (review == "")
+  {
+    alert("Nesmíte zadat prázdnou recenzi!");
+    return false;
+  }
+
+}
+
+</script>
+<script>
+var dislikes = 0;
+function dislikeCounter()
+{
+    dislikes += 1;
+    document.getElementById("dislikes").innerHTML = dislikes;
+};
+</script>
+<script>
+var likes = 2;
+function likeCounter()
+{
+    likes += 1;
+    document.getElementById("likes").innerHTML = likes;
+};
+</script>
+
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -27,10 +57,10 @@
       <div class="container">
         <h1>Hunger Games</h1>
         <form>
-              <button onclick="location.href='hunger_gamesr.html'" type="button" class="button_1">Nelíbilo se</button>
+              <button onclick="dislikeCounter()" type="button" class="button_1">Nelíbilo se</button>
         </form>
         <form>
-              <button onclick="location.href='hunger_gamesr.html'" type="button" class="button_1">Líbilo se</button>
+              <button  onclick="likeCounter()" type="button" class="button_1">Líbilo se</button>
         </form>
 
 
@@ -43,7 +73,7 @@
     <p><img src="./img/hungergames2.jpg" alt="HungerGames" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>Suzanne Collins</p>
       <p><b>Žánr: </b>Dystopie</p>
-      <p><b>Hodnocení: </b>+ 2</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes">2</a>  Nelíbilo se: <a id="dislikes">0</a></p>
       <p>Dokázali byste přežít v divočině, kde se všichni snaží o to, abyste nespatřili další úsvit? V troskách země, kdysi známé jako Severní Amerika, se rozkládá Panem s nablýskaným hlavním městem Kapitolem a dvanácti okolními kraji. Kapitol jim vládne krutou a tvrdou rukou a udržuje si jejich poslušnost tím, že je nutí, aby každý rok vysílaly jednoho chlapce a jednu dívku ve věku mezi dvanácti a osmnácti lety jako účastníky Hladových her - boje na život a na smrt přenášeného televizí. Šestnáctiletá Katniss Everdeenová, která bydlí sama se svou matkou a mladší sestrou, považuje účast ve hrách za rozsudek smrti, kdyż se nabízí jako dobrovolnice, aby nahradila svou sestru, jejíž jméno bylo vylosováno pro letošní ročník. Katniss se ale už v minulosti ocitla na pokraji smrti - a je odbornicí na přežití. Aniž by chtěla, stává se soutěžící.</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/hunger-games-arena-smrti-595555"><b>Koupit knihu online</b></a></p>
@@ -95,12 +125,11 @@
 
     <section id="main">
   <div class="container">
-    <form>
-      <br><textarea name='desc' placeholder="Sem zadejte recenzi..."></textarea><br>
-    </form>
     <div id="sendreview">
-      <br>
-    <button type="button" onclick="location.href='hunger_gamesr.html'" >Odeslat</button>
+    <form name="submitForm" action="book_listr.html" onsubmit="return formValidation()" method="post">
+      <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
+      <input type="submit" class="button_3"  value="Odeslat">
+    </form>
     </div>
   </div>
 </section>
