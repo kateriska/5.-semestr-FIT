@@ -4,14 +4,19 @@
 <html>
 
 <script>
-function formValidation() {
+
+function addReview() {
+  var parent = document.getElementById('profileimage');
   var review = document.forms["submitForm"]["review"].value;
   if (review == "")
   {
     alert("Nesmíte zadat prázdnou recenzi!");
     return false;
   }
-
+  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p><br>';
+  parent.insertAdjacentHTML('beforeend', new_child);
+  var all_reviews = document.getElementById('profileimage');
+  all_reviews.scrollTop = all_reviews.scrollHeight;
 }
 </script>
 <script>
@@ -104,18 +109,19 @@ Jako strá¾ce severu lord Stark pova¾uje za prokletí, kdy¾ ho král Robert povìøí 
   <div class="container">
     <div id="profileimage">
       <p><h4> <a href="robert_potockyr.html">Robert Potocký</a></h4></p>
-    <p><img src="./img/robert.jpeg" alt="RobertPotocky" style="width:60px;margin-right:15px;">
       <p>Ano, takhle kniha má ú¾asný svìt, jaký se jen tak nevidí. Autor v¹echno krásnì propracoval a promyslel. Muselo mu dát neskuteènì práce nìco takového stvoøit. Èetla jsem pomìrnì hodnì knih ze støedovìku, ale snad ¾ádný autor nedokázal tak vìrnì popsat toto období. Je opravdu vidìt, ¾e Martin tomu, o èem pí¹e rozumí a má rozsáhle znalosti. Jak jsem øekla, svìt je obdivuhodný, ale síla tohoto pøíbìhu tkví v postavách... </p>
     </p>
+    <br>
         </div>
+      </div>
     </section>
 
     <section id="main">
   <div class="container">
     <div id="sendreview">
-    <form name="submitForm" action="book_listr.html" onsubmit="return formValidation()" method="post">
+    <form name="submitForm" >
       <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-      <input type="submit" class="button_3"  value="Odeslat">
+      <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
     </form>
     </div>
   </div>

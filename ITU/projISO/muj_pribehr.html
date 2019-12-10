@@ -3,14 +3,19 @@
 <!DOCTYPE html>
 <html>
 <script>
-function formValidation() {
+
+function addReview() {
+  var parent = document.getElementById('profileimage');
   var review = document.forms["submitForm"]["review"].value;
   if (review == "")
   {
     alert("Nesmíte zadat prázdnou recenzi!");
     return false;
   }
-
+  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p><br>';
+  parent.insertAdjacentHTML('beforeend', new_child);
+  var all_reviews = document.getElementById('profileimage');
+  all_reviews.scrollTop = all_reviews.scrollHeight;
 }
 </script>
 <script>
@@ -101,29 +106,24 @@ function likeCounter()
   <div class="container">
     <div id="profileimage">
       <p><h4> <a href="tereza_cernar.html">Tereza Èerná</a></h4></p>
-    <p><img src="./img/tereza.jpg" alt="TerezaCerna" style="width:60px;margin-right:15px;">
       <p>®ivotopis, který je hoden první dámy USA. Je psán ètivým stylem, takovým jednoduchým, obyèejným/snadno srozumitelným stylem.
 M. Obama mi byla sympatická u¾ døíve. Nicménì po pøeètení jejích memoárù musím øíct, ¾e je pro mne vzorem a inspirací.</p>
     </p>
-        </div>
-    </section>
     <br>
-    <section id="main">
-  <div class="container">
-    <div id="profileimage">
       <p><h4> <a href="barbora_podzimkovar.html">Barbora Podzimková</a></h4></p>
-    <p><img src="./img/podzim.jpg" alt="BarboraPodzimkova" style="width:60px;margin-right:15px;">
       <p>Krásnì popsaný ¾ivotní pøíbìh z lidského pohledu.</p>
     </p>
+    <br>
         </div>
+      </div>
     </section>
 
     <section id="main">
   <div class="container">
     <div id="sendreview">
-    <form name="submitForm" action="book_listr.html" onsubmit="return formValidation()" method="post">
+    <form name="submitForm" >
       <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-      <input type="submit" class="button_3"  value="Odeslat">
+      <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
     </form>
     </div>
   </div>

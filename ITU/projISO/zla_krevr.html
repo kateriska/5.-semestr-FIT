@@ -3,14 +3,19 @@
 <!DOCTYPE html>
 <html>
 <script>
-function formValidation() {
+
+function addReview() {
+  var parent = document.getElementById('profileimage');
   var review = document.forms["submitForm"]["review"].value;
   if (review == "")
   {
     alert("Nesmíte zadat prázdnou recenzi!");
     return false;
   }
-
+  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p><br>';
+  parent.insertAdjacentHTML('beforeend', new_child);
+  var all_reviews = document.getElementById('profileimage');
+  all_reviews.scrollTop = all_reviews.scrollHeight;
 }
 </script>
 <script>
@@ -101,32 +106,27 @@ function likeCounter()
   <div class="container">
     <div id="profileimage">
       <p><h4> <a href="tereza_cernar.html">Tereza Èerná</a></h4></p>
-    <p><img src="./img/tereza.jpg" alt="TerezaCerna" style="width:60px;margin-right:15px;">
       <p>Opravdu ú¾asný pøíbìh o ¾enì se snem (ale bez jakékoli pøedstavy, jak jej realizovat), která dokázala tahat za nos taková esa. Osobnì z toho mám jeden závìr: nejen ve smrti, ale i v hlouposti jsme si v¹ichni rovni.</p>
     </p>
-        </div>
-    </section>
     <br>
-    <section id="main">
-  <div class="container">
-    <div id="profileimage">
       <p><h4> <a href="barbora_podzimkovar.html">Barbora Podzimková</a></h4></p>
-    <p><img src="./img/podzim.jpg" alt="BarboraPodzimkova" style="width:60px;margin-right:15px;">
       <p>Jen tì¾ko uvìøitelný pøíbìh o obrovském podvodu. Ze zaèátku jsem se trochu ztrácela v záplavì jmen, nicménì kdy¾ jsem se ve v¹ech tìch postavách zorientovala, tak jsem knihu zhltnula skoro jedním dechem.</p>
     </p>
-        </div>
-    </section>
-
-
-    <section id="main">
-  <div class="container">
-    <div id="sendreview">
-    <form name="submitForm" action="book_listr.html" onsubmit="return formValidation()" method="post">
-      <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-      <input type="submit" class="button_3"  value="Odeslat">
-    </form>
+    <br>
+      </div>
     </div>
+  </section>
+
+
+  <section id="main">
+<div class="container">
+  <div id="sendreview">
+  <form name="submitForm" >
+    <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
+    <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
+  </form>
   </div>
+</div>
 </section>
 
 

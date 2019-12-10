@@ -2,6 +2,87 @@
 
 <!DOCTYPE html>
 <html>
+<script>
+// function for search for book name and then refer to particular page with book details
+function bookSearch() {
+  var searched_name = document.forms["submitForm"]["search_books"].value;
+
+  if (searched_name == "")
+  {
+    alert("Vyplòte název knihy!");
+    return false;
+  }
+
+  var searched_name_lowercase = searched_name.toLowerCase()
+
+  switch (searched_name_lowercase) {
+    case "divergence":
+      window.location.href = "divergencer.html";
+      return false;
+      break;
+
+    case "hra o trùny":
+      window.location.href = "hra_o_trunyr.html";
+      return false;
+      break;
+
+    case "hunger games":
+      window.location.href = "hunger_gamesr.html";
+      return false;
+      break;
+
+    case "mléko a med":
+      window.location.href = "mleko_a_medr.html";
+      return false;
+      break;
+
+    case "mùj pøíbìh":
+      window.location.href = "muj_pribehr.html";
+      return false;
+      break;
+
+    case "ne¾ jsem tì poznala":
+      window.location.href = "nez_jsem_te_poznalar.html";
+      return false;
+      break;
+
+    case "projekt kronos":
+      window.location.href = "projekt_kronosr.html";
+      return false;
+      break;
+
+    case "r.u.r.":
+      window.location.href = "rurr.html";
+      return false;
+      break;
+
+    case "¹»astná kniha":
+      window.location.href = "stastna_knihar.html";
+      return false;
+      break;
+
+    case "steve jobs":
+      window.location.href = "steve_jobsr.html";
+      return false;
+      break;
+
+    case "zlá krev":
+      window.location.href = "zla_krevr.html";
+      return false;
+      break;
+
+    case "zmizelá":
+      window.location.href = "zmizelar.html";
+      return false;
+      break;
+
+    default:
+      alert("Kniha nenalezena!");
+      return false;
+  }
+
+}
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -26,9 +107,23 @@
     <section id="formstyle">
       <div class="container">
         <h1>Vyhledat knihu:</h1>
-        <form>
-          <input type="email" placeholder="Zadejte knihu">
-            <input type="button" value="Vyhledat" onclick="window.location.href='book_listr.html'" class="button_1"/>
+        <form name="submitForm" onsubmit="return bookSearch()" >
+          <input type="text" name="search_books" list="bookname_list" idplaceholder="Zadejte knihu">
+          <datalist id="bookname_list">
+            <option value="Divergence">
+            <option value="Hra o trùny">
+            <option value="Hunger Games">
+            <option value="Mléko a med">
+            <option value="Mùj pøíbìh">
+            <option value="Ne¾ jsem tì poznala">
+            <option value="Projekt Kronos">
+            <option value="R.U.R.">
+            <option value="©»astná kniha">
+            <option value="Steve Jobs">
+            <option value="Zlá krev">
+            <option value="Zmizelá">
+          </datalist>
+            <input type="submit" value="Vyhledat" class="button_1"/>
         </form>
       </div>
     </section>

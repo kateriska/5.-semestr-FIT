@@ -4,14 +4,19 @@
 <html>
 
 <script>
-function formValidation() {
+
+function addReview() {
+  var parent = document.getElementById('profileimage');
   var review = document.forms["submitForm"]["review"].value;
   if (review == "")
   {
     alert("Nesmíte zadat prázdnou recenzi!");
     return false;
   }
-
+  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p><br>';
+  parent.insertAdjacentHTML('beforeend', new_child);
+  var all_reviews = document.getElementById('profileimage');
+  all_reviews.scrollTop = all_reviews.scrollHeight;
 }
 </script>
 <script>
@@ -108,12 +113,13 @@ Kniha je rozdìlena do ètyø kapitol a ka¾dá má jiné poselství. Jedna se sna¾í léè
 <div class="container">
 <div id="profileimage">
   <p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p>
-<p><img src="./img/profilepic.jpg" alt="KaterinaFortova" style="width:60px;margin-right:15px;">
   <p>Aè na tento typ knih nejsem (a na asijské autory), díky ètenáøské výzvì jsem se dostala k této knize a mohu opìt zase jen dìkovat této komunitì, ymslím, ¾e si ráda roz¹íøím své obzory i dále. Silný a tì¾ký pøíbìh, pøeèteno témìø na jeden nádech.
 
 Jen prosím, neoèekávejte sbírku básní, poezii, pøistupujte ke knize jako k lyrické a nev¹ední.</p>
 </p>
+<br>
     </div>
+  </div>
 </section>
 
 
@@ -122,9 +128,9 @@ Jen prosím, neoèekávejte sbírku básní, poezii, pøistupujte ke knize jako k lyric
 <section id="main">
 <div class="container">
 <div id="sendreview">
-<form name="submitForm" action="book_listr.html" onsubmit="return formValidation()" method="post">
+<form name="submitForm" >
   <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-  <input type="submit" class="button_3"  value="Odeslat">
+  <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
 </form>
 </div>
 </div>

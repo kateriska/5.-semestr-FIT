@@ -2,29 +2,11 @@
 
 <!DOCTYPE html>
 <html>
-<script>
-var review = "";
-function formValidation() {
-  var review = document.forms["submitForm"]["review"].value;
-  if (review == "")
-  {
-    alert("Nesmíte zadat prázdnou recenzi!");
-    return false;
-  }
 
 
-
-}
-</script>
-<script>
-function getRating()
-{
-  document.getElementById("rating").innerHTML = 5 + 6;
-  var rating++;
-}
-</script>
 <script>
 var dislikes = 0;
+// fuction for counting dislikes of book
 function dislikeCounter()
 {
     dislikes += 1;
@@ -33,6 +15,7 @@ function dislikeCounter()
 </script>
 <script>
 var likes = 2;
+// fuction for counting likes of book
 function likeCounter()
 {
     likes += 1;
@@ -40,9 +23,8 @@ function likeCounter()
 };
 </script>
 <script>
-var childNumber = 3;
-
-function addChild() {
+// fuction for adding a comment 
+function addReview() {
   var parent = document.getElementById('profileimage');
   var review = document.forms["submitForm"]["review"].value;
   if (review == "")
@@ -50,8 +32,10 @@ function addChild() {
     alert("Nesmíte zadat prázdnou recenzi!");
     return false;
   }
-  var newChild = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p>';
-  parent.insertAdjacentHTML('beforeend', newChild);
+  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p><br>';
+  parent.insertAdjacentHTML('beforeend', new_child);
+  var all_reviews = document.getElementById('profileimage');
+  all_reviews.scrollTop = all_reviews.scrollHeight;
 }
 </script>
   <head>
@@ -138,14 +122,12 @@ Vøele doporuèuji.</p>
       </div>
     </section>
 
-
-
     <section id="main">
   <div class="container">
     <div id="sendreview">
-    <form name="submitForm" onsubmit="return formValidation()" >
+    <form name="submitForm" >
       <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-      <input type="button" class="button_3" onclick="addChild()" value="Odeslat">
+      <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
     </form>
     </div>
   </div>
