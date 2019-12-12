@@ -182,22 +182,59 @@ a
 }
 
 
+#loginform
+{
+  padding: 5px;
+  color: #ffffff;
+  background: #ff5447;
+}
+
+#loginform h1
+{
+  float: left;
+}
+
+#loginform form
+{
+  margin-top: 15px;
+}
+
+#loginform input[type="email"]
+{
+  padding: 4px;
+  height: 25px;
+  width: 400px;
+}
+
+#loginform input[type="text"]
+{
+  padding: 4px;
+  height: 25px;
+  width: 400px;
+}
+
+#loginform input[type="password"]
+{
+  padding: 4px;
+  height: 25px;
+  width: 400px;
+}
+
+
 #editprofile
 {
   padding: 5px;
   resize: none;
-
 }
 
 #editprofile h3
 {
-  float: left;
+
   resize: none;
 }
 
 #editprofile form
 {
-  float: right;
   margin-top: 15px;
   resize: none;
 }
@@ -226,6 +263,15 @@ a
   width: 460px;
   resize: none;
 }
+
+#editprofile input[type=email]
+{
+  padding: 4px;
+  height: 25px;
+  width: 460px;
+  resize: none;
+}
+
 
 #editprofile textarea
 {
@@ -327,10 +373,11 @@ bookdetails#main-col
     background: #ffff80;
     border-color: #ffff5e;
     width: 740px;
-    height: auto;
+    height: 300px;
     font-family: 'Roboto', sans-serif;
     padding: 5px;
-    word-wrap: break-word
+    word-wrap: break-word;
+    overflow: auto;
 }
 
 textarea
