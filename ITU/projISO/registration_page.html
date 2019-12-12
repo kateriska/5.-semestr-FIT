@@ -2,6 +2,45 @@
 
 <!DOCTYPE html>
 <html>
+<script>
+function formValidation() {
+  var firstname = document.forms["submitForm"]["firstname"].value;
+  var lastname = document.forms["submitForm"]["lastname"].value;
+  var email = document.forms["submitForm"]["email"].value;
+  var new_pwd = document.forms["submitForm"]["new_pwd"].value;
+  var new_pwd_repeat = document.forms["submitForm"]["new_pwd_repeat"].value;
+
+  if (firstname == "")
+  {
+    alert("Křestní jméno není vyplněno!");
+    return false;
+  }
+
+  if (lastname == "")
+  {
+    alert("Příjmení není vyplněno!");
+    return false;
+  }
+  if (email == "")
+  {
+    alert("Email není vyplněn!");
+    return false;
+  }
+
+  if (new_pwd == "")
+  {
+    alert("Heslo není vyplněno!");
+    return false;
+  }
+  else if (new_pwd != new_pwd_repeat)
+  {
+    alert("Heslo se neshodují!");
+    return false;
+  }
+
+
+}
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -25,79 +64,16 @@
 
     <section id="editprofile">
       <div class="container">
-        <h3>Jméno:</h3>
-        <form>
-          <input type="text" placeholder="Zadejte jméno" >
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <h3>Příjmení:</h3>
-        <form>
-          <input type="text" placeholder="Zadejte příjmení" >
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <h3>E-mail:</h3>
-        <form>
-          <input type="text" placeholder="Zadejte e-mail" >
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <h3>Heslo:</h3>
-        <form>
-          <input type="password" placeholder="Zadejte heslo">
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <form>
-          <input type="password" placeholder="Zadejte heslo znovu">
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <h3>Profilová fotka:</h3>
-        <form>
-          <input type="file" >
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <h3>Zájmy:</h3>
-        <form>
-          <br><textarea name='desc' placeholder="Zadejte své zájmy..."></textarea><br>
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <h3>Oblíbené žánry:</h3>
-        <form>
-          <br><textarea name='desc' placeholder="Zadejte své oblíbené žánry..."></textarea><br>
-        </form>
-      </div>
-    </section>
-
-    <section id="editprofile">
-      <div class="container">
-        <form>
-          <input type="button" value="Zaregistrovat se" onclick="window.location.href='login_page.html'" class="button_2"/>
+        <form name="submitForm" action="katerina_fortovar.html" onsubmit="return formValidation()">
+          <h3>Jméno:*</h3><input type="text" name=firstname placeholder="Zadejte jméno" ><br>
+          <h3>Příjmení:*</h3><input type="text" name=lastname placeholder="Zadejte příjmení" ><br>
+          <h3>E-mail:*</h3><input type="email" name=email placeholder="Zadejte e-mail" ><br>
+          <h3>Heslo:*</h3><input type="password" name=new_pwd placeholder="Zadejte heslo"><br><br>
+          <input type="password" name=new_pwd_repeat placeholder="Zadejte heslo znovu"><br>
+          <h3>Profilová fotka:</h3><input type="file" ><br>
+          <h3>Zájmy:</h3><br><textarea name='desc' placeholder="Zadejte své zájmy..." ></textarea><br>
+          <h3>Oblíbené žánry:</h3><br><textarea name='desc' placeholder="Zadejte své oblíbené žánry..."></textarea><br>
+          <input type="submit" value="Zaregistrovat se" class="button_2"/>
         </form>
       </div>
     </section>
