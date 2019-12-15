@@ -20,7 +20,7 @@ Datum posledních změn v souboru:
 #include <stdint.h>
 #include <stdbool.h>
 
-#define MEASURED_VALUES_ARR_SIZE 3
+#define MEASURED_VALUES_ARR_SIZE 8
 
 
 static uint32_t clk_frequency; // frequency of clk
@@ -52,13 +52,12 @@ void PITinit()
 	PIT_GetDefaultConfig(&PIT_config);
 	PIT_Init(PIT, &PIT_config);
 
-	// set PIT0_IRQHandler as interrupt handler of PIT0
+	// set PIT0_IRQHandler as interrupt handler of PIT
 	EnableIRQ(PIT0_IRQn);
 	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 
 	const uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
 	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
-
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
 }
 
@@ -400,7 +399,7 @@ const unsigned int measureRate(const uint32_t clk_frequency)
 			if (measurement_time != 0 && began_measurement == true)
 			{
 				measured_value = (60.0 / ((float) measurement_time / 1000000.0)); // compute result in bpm
-				measured_value = measured_value - 60.0; // control because of better accuracy
+				//measured_value = measured_value - 60.0; // control because of better accuracy
 				if (measured_value <= max_human_rate)
 				{
 					// add value to array
@@ -452,8 +451,8 @@ int main()
 {
 	// init everything necessary for project
 	BOARD_InitBootPins();
-	LPTMRinit();
 	PITinit();
+	LPTMRinit();
 	ADCinit();
 
 	// display 0 in the beginning of measurement:
