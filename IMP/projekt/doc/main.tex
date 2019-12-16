@@ -57,23 +57,30 @@ Tato dokumentace popisuje výsledek implementace projektu do povinného předmě
 \section{Popis zadání projektu}
 Zadáním bylo implementovat vestavnou aplikaci v jazyce C s využitím vývojového prostředí Kinetis Design Studio nebo MCUXpresso IDE, která na základě modulu pro měření srdečního tepu po přiložení prstu změří počet tepů za minutu a výsledek zobrazí na sedmi-segmentovém displeji. Aplikace je implementována pro ARM-FITkit3.
 \section{Zapojení komponent}
-Modul pro měření srdečního tepu obsahuje fototranzistor pro detekci srdečního tepu a LED diodu. Popis jednotlivých vývodů je zaznačen na následujícím obrázku: 
+Modul pro měření srdečního tepu obsahuje fototranzistor pro detekci srdečního tepu a LED diodu. Modul byl zapojen na piny P1 na FITkitu3.
+
 \begin{figure}[htbp]
+  \begin{minipage}[b]{0.5\linewidth}
     \centering
     \includegraphics[width=220]{modulzapojeni.PNG}
-\end{figure}
-Modul byl zapojen na piny P1 na FITkitu3, konkrétně na tyto z nich:
-\begin{figure}[htbp]
+    \caption{Popis modulu pro měření srdečního tepu, převzato z \cite{ZadaniPrezentace:web}}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.5\linewidth}
     \centering
-    \includegraphics[width=280]{IMG_20191215_184411.png}
+    \includegraphics[width=200]{IMG_20191215_184411.png}
+    \caption{Zapojení modulu, převzato a upraveno na základě manuálu pro FITKit3}
+  \end{minipage}
 \end{figure}
 
-7-segmentový dispej byl pak zapojen na piny 17-28 pro P1. Displej byl pak rozdělen na jednotlivé číslice a následně jejich segmenty, kdy každá je připojena k určitému pinu. Rozdělení segmentů a číslic na maticovém displeji je pak následující:
+
+7-segmentový dispej byl pak zapojen na piny 17-28 pro P1. Displej byl pak rozdělen na jednotlivé číslice a následně jejich segmenty, kdy každá je připojena k určitému pinu. Každý segment jednotlivé číslice A - G je pak pojmenován jako \verb|DISPLAY_SEGMENT_číslo|, například tedy \verb|DISPLAY_SEGMENT_A| pro segment A.  Rozdělení segmentů a číslic na maticovém displeji je pak následující:
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=280]{disp.png}
+    \includegraphics[width=260]{disp.png}
+     \caption{7-segmentový displej použitý pro projekt, převzato z \cite{Displaydoc:web} a upraveno}
 \end{figure}
-Každý segment jednotlivé číslice A - G je pak pojmenován jako \verb|DISPLAY_SEGMENT_číslo|, například tedy \verb|DISPLAY_SEGMENT_A| pro segment A. 
+
 
 Zapojení jednotlivých pinů pro displej byla vygenerována a následně upravena na základě MCUXpresso Config Tools, na základě tohoto programu byl vygenerován obsah souboru \verb|pin_mux.c| a \verb|pin_mux.h| uložených ve složce \verb|boards|. Specifické piny pro zapojení každého segmentu a číslice na FITkitu v části P1 jsou následující, v závorce je pak uvedeno značení dle MCUXpresso Config Tools schématu):
 \begin{itemize}
@@ -102,7 +109,11 @@ Na začátku samotného běhu programu probíhá inicializace následujících k
     \item Inicializace ADC (16-bit successive Analog-to-Digital Converter) slouží pro převod analogového na digitální signál získaného z modulu srdečního tepu.
 \end{itemize}
 
-Řízení displeje probíhá na základě kontroly indexu čísla v řetězci, kdy zjistíme s jakou ze čtyř číslic na displeji se bude pracovat a následně se pak zjišťuje, které číslo je na této určité pozici (čísla 0 - 9). Na základě tohoto určení se pak rozsvítí segmenty na displeji odpovídající právě určenému číslu (např. pro číslo 0 se rozsvítí všechny segmenty kromě segmentu G nebo pro číslo 1 se rozsvítí segment B a C, atd.). 
+Řízení displeje probíhá na základě kontroly indexu čísla v řetězci, kdy zjistíme s jakou ze čtyř číslic na displeji se bude pracovat a následně se pak zjišťuje, které číslo je na této určité pozici (čísla 0 - 9). Na základě tohoto určení se pak rozsvítí segmenty na displeji odpovídající právě určenému číslu (např. pro číslo 0 se rozsvítí všechny segmenty kromě segmentu G nebo pro číslo 1 se rozsvítí segment B a C, atd.). Typická frekvence pro obnovu displeje je 60 Hz. Čas pro obnovování displeje je vypočten následovně:\\
+$$T = \frac{1}{f}$$
+$$T = \frac{1}{60} = 0,016 s = 16666,667 \mu s$$
+Displej obsahuje čtyři číslice, proto:\\
+$$\frac{16666,667}{4} = 4166,667 \mu s$$
 
 Naměřený signál z modulu srdečního tepu je konvertován pomocí ADC a následně je filtrován dolní a následně horní propustí. Dolní propust slouží pro odfiltrování signálu vyšších frekvencí, horní propust pak pro odfiltování signálů nízkých frekvencí. Tyto filtry byly implementovány podle následujících pseudokódů:\\
 Pseudokód pro dolní propust:\cite{Lowpass:web}
@@ -134,6 +145,7 @@ Signál je po přefiltrování měřen pouze v nejvyšším bodě, výsledek je 
 \section{Známé nedostatky}
 I přes veškerou snahu nejsou naměřené hodnoty z modulu srdečního tepu úplně přesné, ačkoliv je více hodnot průměrováno před tím, než je vypsán finální výsledek a dokonce jsou zahozeny hodnoty nad 220 BPM, což je maximální hodnota tepu pro člověka. Také měření ovlivňuje tlak na senzor, možný pohyb prstem nebo úhel přiložení.
 \section{Závěr}
+I přes ne úplnou přesnost zaznamenaného signálu se mi podařilo implementovat jak práci s 7-segmentovým displejem, tak filtrování pomocí horní a dolní propusti a následné spočítání a zobrazení výsledku na displej. 
 \newpage
 \bibliography{literatura}
 \end{document}
