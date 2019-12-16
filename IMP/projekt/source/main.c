@@ -7,30 +7,24 @@ originál
 Datum posledních změn v souboru:
 */
 
-#include "MK60D10.h"
-#include "pin_mux.h"
-#include "fsl_pit.h"
-#include "fsl_clock.h"
-#include "fsl_common.h"
-#include "fsl_adc16.h"
-#include "fsl_lptmr.h"
-#include "pin_mux.h"
-#include "fsl_gpio.h"
-#include <stdlib.h>
-#include <stdint.h>
+#include "MK60D10.h" // for FitKIT
+#include "fsl_gpio.h" // for General input/output
+#include "pin_mux.h" // for configuration of ports
+#include "fsl_pit.h" // for Periodic interrupt timer - refreshing display
+#include "fsl_clock.h" // for work with clk
+#include "fsl_lptmr.h" // for Low-power timer - beat measurement
+#include "fsl_adc16.h" // for work with Analog-to-digital converter, transform analog signal from module to digital
+
+// C libraries
+#include <stdio.h>
 #include <stdbool.h>
 
-#define MEASURED_VALUES_ARR_SIZE 8
+#define MEASURED_VALUES_ARR_SIZE 8 // count of measured values in array
 
-
-static uint32_t clk_frequency; // frequency of clk
-
-// refresh rate of display in microseconds
-// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
-// for 1 number - 16666,667 / 4 = 4166,667
-static const uint64_t DISPLAY_REFRESH_RATE = 4167;
+static uint32_t clk_frequency; // // frequency of clk
 
 static char measured_value_str[5]; // string for show final result on display
+
 
 /*
 Function for adding interrupt handler and show next measured value on display
@@ -46,17 +40,22 @@ Function for init PIT for refreshing display after particular refresh rate
 */
 void PITinit()
 {
+	// refresh rate of display in microseconds
+	// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
+	// for 1 number - 16666,667 / 4 = 4166,667
+	static const uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
+
 	CLOCK_EnableClock(kCLOCK_Pit0);
 
 	pit_config_t PIT_config;
 	PIT_GetDefaultConfig(&PIT_config);
 	PIT_Init(PIT, &PIT_config);
 
-	// set PIT0_IRQHandler as interrupt handler of PIT
+	// setting PIT0_IRQHandler as PIT interrupt handler
 	EnableIRQ(PIT0_IRQn);
 	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 
-	const uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
+	const uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_NUM_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
 	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
 }
@@ -67,6 +66,7 @@ Function for init LPTMR for count time intervals and time during beat measuremen
 */
 void LPTMRinit()
 {
+
 	CLOCK_SetInternalRefClkConfig(kMCG_IrclkEnable, kMCG_IrcSlow, 0);
 	clk_frequency = CLOCK_GetFreq(kCLOCK_McgInternalRefClk);
 	CLOCK_EnableClock(kCLOCK_Lptmr0);
@@ -92,8 +92,8 @@ void ADCinit()
 	ADC16_GetDefaultConfig(&ADC_config);
 	ADC_config.enableContinuousConversion = true;
 
-#if defined(FSL_FEATURE_ADC16_MAX_RESOLUTION) \
-	&& FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16
+	// setting sample resolution - 16-bit
+#if (defined(FSL_FEATURE_ADC16_MAX_RESOLUTION) && FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16)
 	ADC_config.resolution = kADC16_Resolution16Bit;
 #endif
 
@@ -101,21 +101,23 @@ void ADCinit()
 	ADC16_EnableHardwareTrigger(ADC0, false);
 	ADC16_SetHardwareAverage(ADC0, kADC16_HardwareAverageCount32);
 
-#if defined(FSL_FEATURE_ADC16_HAS_CALIBRATION) \
-	&& FSL_FEATURE_ADC16_HAS_CALIBRATION
+	// calibration of ADC
+#if (defined(FSL_FEATURE_ADC16_HAS_CALIBRATION) && FSL_FEATURE_ADC16_HAS_CALIBRATION)
 	ADC16_DoAutoCalibration(ADC0);
 #endif
 
-	adc16_channel_config_t channel_config = {
+	// setting channel of ADC
+	adc16_channel_config_t ADC_channel_config = {
 		.channelNumber = 0,
 		.enableInterruptOnConversionCompleted = false,
 	};
 
-#if defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE) && FSL_FEATURE_ADC16_HAS_DIFF_MODE
-	channel_config.enableDifferentialConversion = false;
+	// use differential sample mode
+#if (defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE) && FSL_FEATURE_ADC16_HAS_DIFF_MODE)
+	ADC_channel_config.enableDifferentialConversion = false;
 #endif
 
-	ADC16_SetChannelConfig(ADC0, 0, &channel_config);
+	ADC16_SetChannelConfig(ADC0, 0, &ADC_channel_config);
 }
 
 /*
@@ -123,9 +125,9 @@ Function for display next measured value on 7-segment display
 */
 void displayNextMeasuredValue()
 {
-	static size_t display_num_index = 3;
+	static size_t display_num_index = 3; // indexes are 0 - 3
 
-	if (++display_num_index == 4)
+	if (++display_num_index == 4) // overflow index, back to index 0
 	{
 		display_num_index = 0;
 	}
@@ -264,7 +266,7 @@ void displayNextMeasuredValue()
 
 }
 
-float signalFiltering(const float x_i_lowpass, const float dt)
+float signalFiltering(float dt, float x_i_lowpass)
 {
 	// fc = 1 / 2 * pi * tau
 	// tau = 1 / fc * 2 * pi
@@ -272,16 +274,16 @@ float signalFiltering(const float x_i_lowpass, const float dt)
 	// 1 / (2 * pi * 2) = 0.0795774155 seconds = 79577.47155 microseconds
 	float tau = 79577.47155;
 	// variables for lowpass filtering:
-	float y_i_lowpass;
+	static float y_i_lowpass;
 	static float y_i_preceding_lowpass = 0.0;
-	float alpha_lowpass;
+	static float alpha_lowpass;
 
 	// variables for highpass filtering:
-	float x_i_highpass = 0.0;
-	float y_i_highpass;
+	static float x_i_highpass = 0.0;
+	static float y_i_highpass;
 	static float x_i_preceding_highpass = 0.0;
 	static float y_i_preceding_highpass = 0.0;
-	float alpha_highpass;
+	static float alpha_highpass;
 
 	// variable for control x_0 index
 	static int actual_x_index = 0;
@@ -362,28 +364,28 @@ const unsigned int measureRate(const uint32_t clk_frequency)
 	float measured_value = 0.0; // measured value in float
 	static unsigned int measured_average_value = 0; // measured average value as unsigned int
 
-	static const float max_human_rate = 220.0; // max bpm of human
+	float max_human_rate = 220.0; // max bpm of human
 
 	bool conversion_done = false; // bool for control whether conversion of signal is done
 
 	while (conversion_done == false) // wait for finish conversion of signal
 	{
 		// get signal from module
-		const uint32_t status_flags = ADC16_GetChannelStatusFlags(ADC0, 0);
+		uint32_t status_flags = ADC16_GetChannelStatusFlags(ADC0, 0);
 		conversion_done = (status_flags & kADC16_ChannelConversionDoneFlag);
 	}
 
-	const uint32_t module_signal = ADC16_GetChannelConversionValue(ADC0, 0);
+	uint32_t module_signal = ADC16_GetChannelConversionValue(ADC0, 0);
 
 	// time interval dt between measurements in microseconds
-	const uint64_t dt = COUNT_TO_USEC((uint64_t) LPTMR_GetCurrentTimerCount(LPTMR0), clk_frequency);
+	uint64_t dt = COUNT_TO_USEC((uint64_t) LPTMR_GetCurrentTimerCount(LPTMR0), clk_frequency);
 	measurement_time = measurement_time + dt;
 
 	// reset timer of LPTMR
 	LPTMR_StopTimer(LPTMR0);
 	LPTMR_StartTimer(LPTMR0);
 
-	float filtered_signal = signalFiltering((float) module_signal, (float) dt); // filter signal with low-pass and high-pass filter
+	float filtered_signal = signalFiltering((float) dt, (float) module_signal); // filter signal with low-pass and high-pass filter
 
 	if (rising_signal == true)
 	{
