@@ -377,14 +377,15 @@ const unsigned int measureRate(const uint32_t clk_frequency)
 
 	// time interval dt between measurements in microseconds
 	uint64_t dt = COUNT_TO_USEC((uint64_t) LPTMR_GetCurrentTimerCount(LPTMR0), clk_frequency);
-	measurement_time = measurement_time + dt;
+	measurement_time = measurement_time + dt; // counting time if measure
 
-	// reset timer of LPTMR
+	// reset of LPTMR timer
 	LPTMR_StopTimer(LPTMR0);
 	LPTMR_StartTimer(LPTMR0);
 
 	float filtered_signal = signalFiltering((float) dt, (float) module_signal); // filter signal with low-pass and high-pass filter
 
+	// signal is rising
 	if (rising_signal == true)
 	{
 		// finding maximum of signal
@@ -392,30 +393,38 @@ const unsigned int measureRate(const uint32_t clk_frequency)
 		{
 			max_signal_value = filtered_signal;
 		}
-		else if (max_signal_value != 0.0)
+		else // found maximum of signal
 		{
-			rising_signal = false;
-
-			if (measurement_time != 0 && began_measurement == true)
+			if (max_signal_value != 0.0)
 			{
-				measured_value = (60.0 / ((float) measurement_time / 1000000.0)); // compute result in bpm
-				//measured_value = measured_value - 60.0; // control because of better accuracy
-				if (measured_value <= max_human_rate)
-				{
-					// add value to array
-					measured_values_arr[measured_values_arr_index] = measured_value;
-					measured_values_arr_index++;
-				}
-			}
+				rising_signal = false;
 
-			measurement_time = 0;
-			began_measurement = true;
+				if (measurement_time != 0 && began_measurement == true)
+				{
+					measured_value = (60.0 / ((float) measurement_time / 1000000.0)); // compute result in bpm
+					//measured_value = measured_value - 60.0; // control because of better accuracy
+					if (measured_value <= max_human_rate) // ignore rates larger than max human bpm
+					{
+						// add value to array
+						measured_values_arr[measured_values_arr_index] = measured_value;
+						measured_values_arr_index++;
+					}
+				}
+
+				began_measurement = true;
+				measurement_time = 0;
+
+			}
 		}
 	}
-	else if (filtered_signal <= 0.0) // control negative values
+	else
 	{
-		max_signal_value = 0.0;
-		rising_signal = true;
+		if (filtered_signal <= 0.0) // control negative values
+		{
+			rising_signal = true;
+			max_signal_value = 0.0;
+		}
+
 	}
 
 	if (measured_values_arr_index == MEASURED_VALUES_ARR_SIZE) // array of measured values is full
