@@ -273,22 +273,20 @@ float signalFiltering(float dt, float x_i_lowpass)
 	// fc = 2 Hz - average fc of heartbeat
 	// 1 / (2 * pi * 2) = 0.0795774155 seconds = 79577.47155 microseconds
 	float tau = 79577.47155;
-	// variables for lowpass filtering:
-	static float y_i_lowpass;
+	// lowpass filtering:
+	float y_i_lowpass;
 	static float y_i_preceding_lowpass = 0.0;
-	static float alpha_lowpass;
 
-	// variables for highpass filtering:
+	// highpass filtering:
 	static float x_i_highpass = 0.0;
-	static float y_i_highpass;
+	float y_i_highpass;
 	static float x_i_preceding_highpass = 0.0;
 	static float y_i_preceding_highpass = 0.0;
-	static float alpha_highpass;
 
 	// variable for control x_0 index
 	static int actual_x_index = 0;
 
-	alpha_lowpass = dt / (tau + dt);
+	float alpha_lowpass = dt / (tau + dt);
 
 	// control when index of x is 0 - no preceding index, this is first index of signal
 	if (actual_x_index == 0)
@@ -337,7 +335,7 @@ float signalFiltering(float dt, float x_i_lowpass)
    	   Source: https://en.wikipedia.org/wiki/High-pass_filter
 	 */
 
-	alpha_highpass = tau / (tau + dt);
+	float alpha_highpass = tau / (tau + dt);
 
 
 	y_i_highpass = alpha_highpass * y_i_preceding_highpass + alpha_highpass * (x_i_highpass - x_i_preceding_highpass);
