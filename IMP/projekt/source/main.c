@@ -43,7 +43,7 @@ void PITinit()
 	// refresh rate of display in microseconds
 	// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
 	// for 1 number - 16666,667 / 4 = 4166,667
-	static const uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
+	static uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
 
 	CLOCK_EnableClock(kCLOCK_Pit0);
 
@@ -55,7 +55,7 @@ void PITinit()
 	EnableIRQ(PIT0_IRQn);
 	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 
-	const uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_NUM_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
+	uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_NUM_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
 	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
 }
@@ -76,7 +76,7 @@ void LPTMRinit()
 	LPTMR_config.prescalerClockSource = kLPTMR_PrescalerClock_0;
 
 	LPTMR_Init(LPTMR0, &LPTMR_config);
-	static const uint32_t LPTMR0_period = 0xFFFF;
+	static uint32_t LPTMR0_period = 0xFFFF;
 	LPTMR_SetTimerPeriod(LPTMR0, LPTMR0_period);
 }
 
@@ -349,7 +349,7 @@ float signalFiltering(float dt, float x_i_lowpass)
 }
 
 
-const unsigned int measureRate(const uint32_t clk_frequency)
+unsigned int measureRate(uint32_t clk_frequency)
 {
 	static uint64_t measurement_time = 0; // time of measurement
 	static bool began_measurement = false; // control whether measurement began
