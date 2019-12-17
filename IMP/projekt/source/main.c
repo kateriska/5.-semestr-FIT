@@ -21,18 +21,17 @@ Datum poslednich zmen v souboru: 17. prosince 2019
 
 static uint32_t clk_frequency; // frequency of clk
 
-static char measured_value_str[5]; // string for show final result on display
+static char measured_average_value_str[5]; // string for show final result on display
+static size_t measured_average_value_str_index = 3; // indexes of numbers on display are 0 - 3
 
 /*
 Function for display next measured value on 7-segment display
 */
 void displayNextMeasuredValue()
 {
-	static size_t display_num_index = 3; // indexes are 0 - 3
-
-	if (++display_num_index == 4) // overflow index, back to index 0
+	if (++measured_average_value_str_index == 4) // overflow index, back to index 0
 	{
-		display_num_index = 0;
+		measured_average_value_str_index = 0;
 	}
 
 	// clean every segment and all digits on display
@@ -50,26 +49,26 @@ void displayNextMeasuredValue()
 	GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_G_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_G_PIN, 0);
 
 	// control each digit of display on particular index
-	if (display_num_index == 0)
+	if (measured_average_value_str_index == 0)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_FIRST_NUM_GPIO, BOARD_INITPINS_DISPLAY_FIRST_NUM_PIN, 0);
 	}
-	else if (display_num_index == 1)
+	else if (measured_average_value_str_index == 1)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SECOND_NUM_GPIO, BOARD_INITPINS_DISPLAY_SECOND_NUM_PIN, 0);
 	}
-	else if (display_num_index == 2)
+	else if (measured_average_value_str_index == 2)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_THIRD_NUM_GPIO, BOARD_INITPINS_DISPLAY_THIRD_NUM_PIN, 0);
 	}
-	else if (display_num_index == 3)
+	else if (measured_average_value_str_index == 3)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_FOURTH_NUM_GPIO, BOARD_INITPINS_DISPLAY_FOURTH_NUM_PIN, 0);
 	}
 
 	// display particular digit at index
 	// show digit 0 on particular index:
-	if (measured_value_str[display_num_index] == '0')
+	if (measured_average_value_str[measured_average_value_str_index] == '0')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
@@ -80,14 +79,14 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 1 on particular index:
-	else if (measured_value_str[display_num_index] == '1')
+	else if (measured_average_value_str[measured_average_value_str_index] == '1')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_C_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_C_PIN, 1);
 	}
 
 	// show digit 2 on particular index:
-	else if (measured_value_str[display_num_index] == '2')
+	else if (measured_average_value_str[measured_average_value_str_index] == '2')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
@@ -97,7 +96,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 3 on particular index:
-	else if (measured_value_str[display_num_index] == '3')
+	else if (measured_average_value_str[measured_average_value_str_index] == '3')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
@@ -107,7 +106,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 4 on particular index:
-	else if (measured_value_str[display_num_index] == '4')
+	else if (measured_average_value_str[measured_average_value_str_index] == '4')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_C_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_C_PIN, 1);
@@ -116,7 +115,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 5 on particular index:
-	else if (measured_value_str[display_num_index] == '5')
+	else if (measured_average_value_str[measured_average_value_str_index] == '5')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_C_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_C_PIN, 1);
@@ -126,7 +125,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 6 on particular index:
-	else if (measured_value_str[display_num_index] == '6')
+	else if (measured_average_value_str[measured_average_value_str_index] == '6')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_C_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_C_PIN, 1);
@@ -137,7 +136,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 7 on particular index:
-	else if (measured_value_str[display_num_index] == '7')
+	else if (measured_average_value_str[measured_average_value_str_index] == '7')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
@@ -145,7 +144,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 8 on particular index:
-	else if (measured_value_str[display_num_index] == '8')
+	else if (measured_average_value_str[measured_average_value_str_index] == '8')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
@@ -157,7 +156,7 @@ void displayNextMeasuredValue()
 	}
 
 	// show digit 9 on particular index:
-	else if (measured_value_str[display_num_index] == '9')
+	else if (measured_average_value_str[measured_average_value_str_index] == '9')
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_A_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_A_PIN, 1);
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_B_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_B_PIN, 1);
@@ -185,7 +184,7 @@ void PITinit()
 {
 	// refresh rate of display in microseconds
 	// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
-	// for 1 number - 16666,667 / 4 = 4166,667
+	// we have 4 numbers on display - 16666,667 / 4 = 4166,667
 	static uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
 
 	CLOCK_EnableClock(kCLOCK_Pit0);
@@ -399,7 +398,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 		{
 			if (max_signal_value != 0.0)
 			{
-				if ((measuring_time != 0 )&& (began_measuring == true))
+				if ((measuring_time != 0 ) && (began_measuring == true))
 				{
 					measured_value = (60.0 / ((float) measuring_time / 1000000.0)); // compute result in bpm
 					//measured_value = measured_value - 70.0; // control because of better accuracy
@@ -412,9 +411,9 @@ unsigned int measureRate(uint32_t clk_frequency)
 					}
 				}
 
-				ascending_signal = false;
+				ascending_signal = false; // now signal is descending
 				began_measuring = true;
-				measuring_time = 0;
+				measuring_time = 0; // measure new value
 
 			}
 		}
@@ -424,7 +423,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 		if (filtered_signal <= 0.0) // control negative values
 		{
 			ascending_signal = true;
-			max_signal_value = 0.0;
+			max_signal_value = 0.0; // maximum of signal is 0
 		}
 
 	}
@@ -448,7 +447,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 			measured_values_arr[i] = 0.0;
 		}
 
-		measured_values_arr_index = 0;
+		measured_values_arr_index = 0; // set index to first value
 	}
 
 	return measured_average_value;
@@ -477,7 +476,7 @@ int main()
 
 	while (true)
 	{
-		unsigned int measured_value = measureRate(clk_frequency); // measure rate
-		sprintf(measured_value_str, "% *u", 4, measured_value); // display rate
+		unsigned int measured_average_value = measureRate(clk_frequency); // measure rate
+		sprintf(measured_average_value_str, "% *u", 4, measured_average_value); // display rate
 	}
 }
