@@ -1,10 +1,10 @@
 /*
-Jméno a pøíjmení: Kateøina Foøtová
+Jmeno a prijmeni: Katerina Fortova
 Login: xforto00
-Projekt: ARM-FITkit3: Mìøení srdeèního tepu
-Pøedmìt: IMP
-originál
-Datum posledních zmìn v souboru:
+Projekt: ARM-FITkit3: Mereni srdecniho tepu
+Predmet: IMP
+original
+Datum poslednich zmen v souboru: 17. prosince 2019
 */
 
 /***********************************************************************************************************************
