@@ -19,106 +19,11 @@ Datum posledních změn v souboru:
 #include <stdio.h>
 #include <stdbool.h>
 
-#define MEASURED_VALUES_ARR_SIZE 8 // count of measured values in array
+#define MEASURED_VALUES_ARR_SIZE 3 // count of measured values in array
 
 static uint32_t clk_frequency; // // frequency of clk
 
 static char measured_value_str[5]; // string for show final result on display
-
-
-/*
-Function for adding interrupt handler and show next measured value on display
-*/
-void PIT0_IRQHandler()
-{
-	displayNextMeasuredValue();
-	PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
-}
-
-/*
-Function for init PIT for refreshing display after particular refresh rate
-*/
-void PITinit()
-{
-	// refresh rate of display in microseconds
-	// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
-	// for 1 number - 16666,667 / 4 = 4166,667
-	static uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
-
-	CLOCK_EnableClock(kCLOCK_Pit0);
-
-	pit_config_t PIT_config;
-	PIT_GetDefaultConfig(&PIT_config);
-	PIT_Init(PIT, &PIT_config);
-
-	// setting PIT0_IRQHandler as PIT interrupt handler
-	EnableIRQ(PIT0_IRQn);
-	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
-
-	uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_NUM_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
-	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
-	PIT_StartTimer(PIT, kPIT_Chnl_0);
-}
-
-
-/*
-Function for init LPTMR for count time intervals and time during beat measurement
-*/
-void LPTMRinit()
-{
-
-	CLOCK_SetInternalRefClkConfig(kMCG_IrclkEnable, kMCG_IrcSlow, 0);
-	clk_frequency = CLOCK_GetFreq(kCLOCK_McgInternalRefClk);
-	CLOCK_EnableClock(kCLOCK_Lptmr0);
-
-	lptmr_config_t LPTMR_config;
-	LPTMR_GetDefaultConfig(&LPTMR_config);
-	LPTMR_config.prescalerClockSource = kLPTMR_PrescalerClock_0;
-
-	LPTMR_Init(LPTMR0, &LPTMR_config);
-	static uint32_t LPTMR0_period = 0xFFFF;
-	LPTMR_SetTimerPeriod(LPTMR0, LPTMR0_period);
-}
-
-
-/*
-Function for init ADC - convert analog signal to digital from module
-*/
-void ADCinit()
-{
-	CLOCK_EnableClock(kCLOCK_Adc0);
-
-	adc16_config_t ADC_config;
-	ADC16_GetDefaultConfig(&ADC_config);
-	ADC_config.enableContinuousConversion = true;
-
-	// setting sample resolution - 16-bit
-#if (defined(FSL_FEATURE_ADC16_MAX_RESOLUTION) && FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16)
-	ADC_config.resolution = kADC16_Resolution16Bit;
-#endif
-
-	ADC16_Init(ADC0, &ADC_config);
-	ADC16_EnableHardwareTrigger(ADC0, false);
-	ADC16_SetHardwareAverage(ADC0, kADC16_HardwareAverageCount32);
-
-	// calibration of ADC
-#if (defined(FSL_FEATURE_ADC16_HAS_CALIBRATION) && FSL_FEATURE_ADC16_HAS_CALIBRATION)
-	ADC16_DoAutoCalibration(ADC0);
-#endif
-
-	// setting channel of ADC
-	adc16_channel_config_t ADC_channel_config = {
-		.channelNumber = 0,
-		.enableInterruptOnConversionCompleted = false,
-	};
-
-	// use differential sample mode
-#if (defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE) && FSL_FEATURE_ADC16_HAS_DIFF_MODE)
-	ADC_channel_config.enableDifferentialConversion = false;
-#endif
-
-	ADC16_SetChannelConfig(ADC0, 0, &ADC_channel_config);
-}
 
 /*
 Function for display next measured value on 7-segment display
@@ -266,6 +171,102 @@ void displayNextMeasuredValue()
 
 }
 
+/*
+Function for adding interrupt handler and show next measured value on display
+*/
+void PIT0_IRQHandler()
+{
+	displayNextMeasuredValue();
+	PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+}
+
+/*
+Function for init PIT for refreshing display after particular refresh rate
+*/
+void PITinit()
+{
+	// refresh rate of display in microseconds
+	// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
+	// for 1 number - 16666,667 / 4 = 4166,667
+	static uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
+
+	CLOCK_EnableClock(kCLOCK_Pit0);
+
+	pit_config_t PIT_config;
+	PIT_GetDefaultConfig(&PIT_config);
+	PIT_Init(PIT, &PIT_config);
+
+	// setting PIT0_IRQHandler as PIT interrupt handler
+	EnableIRQ(PIT0_IRQn);
+	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
+
+	uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_NUM_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
+	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
+	PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+
+
+/*
+Function for init LPTMR for count time intervals and time during beat measurement
+*/
+void LPTMRinit()
+{
+
+	CLOCK_SetInternalRefClkConfig(kMCG_IrclkEnable, kMCG_IrcSlow, 0);
+	clk_frequency = CLOCK_GetFreq(kCLOCK_McgInternalRefClk);
+	CLOCK_EnableClock(kCLOCK_Lptmr0);
+
+	lptmr_config_t LPTMR_config;
+	LPTMR_GetDefaultConfig(&LPTMR_config);
+	LPTMR_config.prescalerClockSource = kLPTMR_PrescalerClock_0;
+
+	LPTMR_Init(LPTMR0, &LPTMR_config);
+	static uint32_t LPTMR0_period = 0xFFFF;
+	LPTMR_SetTimerPeriod(LPTMR0, LPTMR0_period);
+}
+
+
+/*
+Function for init ADC - convert analog signal to digital from module
+*/
+void ADCinit()
+{
+	CLOCK_EnableClock(kCLOCK_Adc0);
+
+	adc16_config_t ADC_config;
+	ADC16_GetDefaultConfig(&ADC_config);
+	ADC_config.enableContinuousConversion = true;
+
+	// setting sample resolution - 16-bit
+#if (defined(FSL_FEATURE_ADC16_MAX_RESOLUTION) && FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16)
+	ADC_config.resolution = kADC16_Resolution16Bit;
+#endif
+
+	ADC16_Init(ADC0, &ADC_config);
+	ADC16_EnableHardwareTrigger(ADC0, false);
+	ADC16_SetHardwareAverage(ADC0, kADC16_HardwareAverageCount32);
+
+	// calibration of ADC
+#if (defined(FSL_FEATURE_ADC16_HAS_CALIBRATION) && FSL_FEATURE_ADC16_HAS_CALIBRATION)
+	ADC16_DoAutoCalibration(ADC0);
+#endif
+
+	// setting channel of ADC
+	adc16_channel_config_t ADC_channel_config = {
+		.channelNumber = 0,
+		.enableInterruptOnConversionCompleted = false,
+	};
+
+	// use differential sample mode
+#if (defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE) && FSL_FEATURE_ADC16_HAS_DIFF_MODE)
+	ADC_channel_config.enableDifferentialConversion = false;
+#endif
+
+	ADC16_SetChannelConfig(ADC0, 0, &ADC_channel_config);
+}
+
+
+
 float signalFiltering(float dt, float x_i_lowpass)
 {
 	// fc = 1 / 2 * pi * tau
@@ -358,11 +359,12 @@ unsigned int measureRate(uint32_t clk_frequency)
 	static size_t measured_values_arr_index = 0; // index to array of measured values
 
 	static float max_signal_value = 0.0; // maximum of signal
-	static bool rising_signal = false; // control whether signal is rising or not
+	static bool ascending_signal = false; // control whether signal is ascending or not
 	float measured_value = 0.0; // measured value in float
 	static unsigned int measured_average_value = 0; // measured average value as unsigned int
 
 	float max_human_rate = 220.0; // max bpm of human
+	float min_human_rate = 60.0; // min bpm of human
 
 	bool conversion_done = false; // bool for control whether conversion of signal is done
 
@@ -385,11 +387,11 @@ unsigned int measureRate(uint32_t clk_frequency)
 
 	float filtered_signal = signalFiltering((float) dt, (float) module_signal); // filter signal with low-pass and high-pass filter
 
-	// signal is rising
-	if (rising_signal == true)
+	// signal is ascending
+	if (ascending_signal == true)
 	{
 		// finding maximum of signal
-		if (filtered_signal > max_signal_value)
+		if (filtered_signal > max_signal_value && filtered_signal > 0.0)
 		{
 			max_signal_value = filtered_signal;
 		}
@@ -397,13 +399,12 @@ unsigned int measureRate(uint32_t clk_frequency)
 		{
 			if (max_signal_value != 0.0)
 			{
-				rising_signal = false;
-
 				if (measurement_time != 0 && began_measurement == true)
 				{
 					measured_value = (60.0 / ((float) measurement_time / 1000000.0)); // compute result in bpm
-					//measured_value = measured_value - 60.0; // control because of better accuracy
-					if (measured_value <= max_human_rate) // ignore rates larger than max human bpm
+					//measured_value = measured_value - 70.0; // control because of better accuracy
+					// ignore rates larger than max human bpm and below min human bpm
+					if (measured_value <= max_human_rate && measured_value >= min_human_rate)
 					{
 						// add value to array
 						measured_values_arr[measured_values_arr_index] = measured_value;
@@ -411,6 +412,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 					}
 				}
 
+				ascending_signal = false;
 				began_measurement = true;
 				measurement_time = 0;
 
@@ -421,7 +423,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 	{
 		if (filtered_signal <= 0.0) // control negative values
 		{
-			rising_signal = true;
+			ascending_signal = true;
 			max_signal_value = 0.0;
 		}
 
