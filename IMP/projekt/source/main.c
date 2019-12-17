@@ -66,7 +66,7 @@ void displayNextMeasuredValue()
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_FOURTH_NUM_GPIO, BOARD_INITPINS_DISPLAY_FOURTH_NUM_PIN, 0);
 	}
 
-	// display particular digit at index
+	// display particular digit on index
 	// show digit 0 on particular index:
 	if (measured_average_value_str[measured_average_value_str_index] == '0')
 	{
@@ -266,8 +266,8 @@ void ADCinit()
 
 float signalFiltering(float dt, float x_i_lowpass)
 {
-	// fc = 1 / 2 * pi * tau
-	// tau = 1 / fc * 2 * pi
+	// fc = 1 / (2 * pi * tau)
+	// tau = 1 / (fc * 2 * pi)
 	// fc = 2 Hz - average fc of heartbeat
 	// 1 / (2 * pi * 2) = 0.0795774155 seconds = 79577.47155 microseconds
 	float tau = 79577.47155;
@@ -438,7 +438,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 			sum = sum + measured_values_arr[i];
 		}
 
-		// compute average measured value of 3 values
+		// compute average measured value of 3 values in array
 		measured_average_value = (sum / 3);
 
 		// clean whole array
