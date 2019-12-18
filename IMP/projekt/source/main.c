@@ -4,7 +4,7 @@ Login: xforto00
 Projekt: ARM-FITkit3: Mereni srdecniho tepu
 Predmet: IMP
 original
-Datum poslednich zmen v souboru: 17. prosince 2019
+Datum poslednich zmen v souboru: 18. prosince 2019
 */
 
 #include "MK60D10.h" // for FitKIT
@@ -185,7 +185,7 @@ void PITinit()
 	// refresh rate of display in microseconds
 	// f = 60 Hz, 1 / 60 = 0,016 s = 16666,667
 	// we have 4 numbers on display - 16666,667 / 4 = 4166,667
-	static uint64_t DISPLAY_REFRESH_NUM_RATE = 4167;
+	static uint64_t display_refresh_num_rate = 4167;
 
 	CLOCK_EnableClock(kCLOCK_Pit0);
 
@@ -197,9 +197,9 @@ void PITinit()
 	EnableIRQ(PIT0_IRQn);
 	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 
-	uint64_t PIT_timer_period = USEC_TO_COUNT(DISPLAY_REFRESH_NUM_RATE, CLOCK_GetFreq(kCLOCK_BusClk));
-	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
-	PIT_StartTimer(PIT, kPIT_Chnl_0);
+	uint64_t PIT_timer_period = USEC_TO_COUNT(display_refresh_num_rate, CLOCK_GetFreq(kCLOCK_BusClk));
+	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period); // refresh every 4167 microseconds with interrupt
+	PIT_StartTimer(PIT, kPIT_Chnl_0); // starting timer
 }
 
 
@@ -215,6 +215,8 @@ void LPTMRinit()
 
 	lptmr_config_t LPTMR_config;
 	LPTMR_GetDefaultConfig(&LPTMR_config);
+
+	// config LPTMR clock source
 	LPTMR_config.prescalerClockSource = kLPTMR_PrescalerClock_0;
 
 	LPTMR_Init(LPTMR0, &LPTMR_config);
