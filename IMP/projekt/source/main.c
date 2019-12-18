@@ -237,7 +237,7 @@ void ADCinit()
 
 	// setting sample resolution - 16-bit
 	#if ((defined(FSL_FEATURE_ADC16_MAX_RESOLUTION)) && (FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16))
-	ADC_config.resolution = kADC16_Resolution16Bit;
+		ADC_config.resolution = kADC16_Resolution16Bit;
 	#endif
 
 	ADC16_Init(ADC0, &ADC_config);
@@ -246,7 +246,7 @@ void ADCinit()
 
 	// calibration of ADC
 	#if ((defined(FSL_FEATURE_ADC16_HAS_CALIBRATION)) && (FSL_FEATURE_ADC16_HAS_CALIBRATION))
-	ADC16_DoAutoCalibration(ADC0);
+		ADC16_DoAutoCalibration(ADC0);
 	#endif
 
 	// setting channel of ADC
@@ -258,14 +258,15 @@ void ADCinit()
 
 	// use differential sample mode
 	#if (defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE) && FSL_FEATURE_ADC16_HAS_DIFF_MODE)
-	ADC_channel_config.enableDifferentialConversion = false;
+		ADC_channel_config.enableDifferentialConversion = false;
 	#endif
 
 	ADC16_SetChannelConfig(ADC0, 0, &ADC_channel_config);
 }
 
-
-
+/*
+Function for filtering signal from module with low-pass filter and high-pass filter
+*/
 float signalFiltering(float dt, float x_i_lowpass)
 {
 	// fc = 1 / (2 * pi * tau)
@@ -350,7 +351,9 @@ float signalFiltering(float dt, float x_i_lowpass)
 
 }
 
-
+/*
+Function for measuring bpm from module
+*/
 unsigned int measureRate(uint32_t clk_frequency)
 {
 	static uint64_t measuring_time = 0; // time of measuring
@@ -382,7 +385,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 	uint64_t dt = COUNT_TO_USEC((uint64_t) LPTMR_GetCurrentTimerCount(LPTMR0), clk_frequency);
 	measuring_time = measuring_time + dt; // counting time of measuring
 
-	// reset of LPTMR timer
+	// restart of LPTMR timer
 	LPTMR_StopTimer(LPTMR0);
 	LPTMR_StartTimer(LPTMR0);
 
