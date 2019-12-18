@@ -49,18 +49,25 @@ void displayNextMeasuredValue()
 	GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SEGMENT_G_GPIO, BOARD_INITPINS_DISPLAY_SEGMENT_G_PIN, 0);
 
 	// control each digit of display on particular index
+	// first digit on display:
 	if (measured_average_value_str_index == 0)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_FIRST_NUM_GPIO, BOARD_INITPINS_DISPLAY_FIRST_NUM_PIN, 0);
 	}
+
+	// second digit on display:
 	else if (measured_average_value_str_index == 1)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_SECOND_NUM_GPIO, BOARD_INITPINS_DISPLAY_SECOND_NUM_PIN, 0);
 	}
+
+	// third digit on display:
 	else if (measured_average_value_str_index == 2)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_THIRD_NUM_GPIO, BOARD_INITPINS_DISPLAY_THIRD_NUM_PIN, 0);
 	}
+
+	// fourth digit on display:
 	else if (measured_average_value_str_index == 3)
 	{
 		GPIO_WritePinOutput(BOARD_INITPINS_DISPLAY_FOURTH_NUM_GPIO, BOARD_INITPINS_DISPLAY_FOURTH_NUM_PIN, 0);
@@ -383,13 +390,15 @@ unsigned int measureRate(uint32_t clk_frequency)
 
 	// time interval dt between measuring in microseconds
 	uint64_t dt = COUNT_TO_USEC((uint64_t) LPTMR_GetCurrentTimerCount(LPTMR0), clk_frequency);
+
 	measuring_time = measuring_time + dt; // counting time of measuring
 
 	// restart of LPTMR timer
 	LPTMR_StopTimer(LPTMR0);
 	LPTMR_StartTimer(LPTMR0);
 
-	float filtered_signal = signalFiltering((float) dt, (float) module_signal); // filter signal with low-pass and high-pass filter
+	// filter signal with low-pass and high-pass filter
+	float filtered_signal = signalFiltering((float) dt, (float) module_signal);
 
 	// signal is ascending
 	if (ascending_signal == true)
