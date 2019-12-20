@@ -1,10 +1,120 @@
 <!-- Autor: Katerina Fortova (xforto00) -->
-
 <!DOCTYPE html>
 <html>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+<script type="text/javascript">
+/***
+* XMLHttpRequest object constructor (for compatibility with various browsers)
+*/
+var message_id = null;
 
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest(); //should work on all browsers except IE6 or older
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp"); //browser is IE6 or older
+  } catch (e) {
+    // ignore error
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+function uploadData() {
+  try {
+    var xmlHttp = createXmlHttpRequestObject();//stores XMLHttpRequestObject
+    xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    //alert(xmlHttp.responseText);
+                    //const downloaded_data = JSON.parse(xmlHttp.responseText);
+                    //alert(downloaded_data);
+                  //document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<b>" + downloaded_data[i].title + "</b>" + ": " + downloaded_data[i].review;
+                }
+            }
+
+
+    var title = "Divergence";
+
+    //// put your code here
+    xmlHttp.open("POST", "apiReviews.php", true);// create "servant" waiting for message
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;"); // create header of request
+    xmlHttp.onreadystatechange = downloadData;
+    var message = "title=" + title + "&review_text=" + document.getElementById("review").value;
+    //alert(message);
+		xmlHttp.send(message); // sending data to server
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false; // to avoid default form submit behavior
+}
+
+
+function downloadData() {
+  //// put your code here
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true); // create "servant" waiting for message
+	xmlHttp.onreadystatechange = function() //process request when it's needed
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200) //process is completed and http status is OK
+     {
+
+          var obj = xmlHttp.responseText;
+          //alert(xmlHttp.responseText);
+          obj = obj.substring(149, obj.length - 1);
+        //  alert(obj)
+
+
+        var strLines = obj.split("\n");
+        for (var i in strLines) {
+          if (strLines[i] == "")
+          {
+            continue;
+          }
+         //alert(strLines[i]);
+         var obj = JSON.parse(strLines[i]);
+         if (message_id !== null && obj.id <= message_id) // we aren't in the end of chat
+            {
+							continue;
+						}
+         document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<b>" + obj.title + "</b>" + ": " + obj.review + "<hr>";
+        // alert(obj.title)
+        message_id = obj.id;
+        //  alert(obj);
+}
+
+          //var downloaded_data = JSON.parse(xmlHttp.responseText); // start parse JSON
+        //  alert(downloaded_data[title]);
+
+
+        //  alert(downloaded_data);
+          //alert(xmlHttp.responseText);
+/*
+          for (let i in downloaded_data) // start parse whole array of message
+          {
+            // parse JSON to well-looking string
+						document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<b>" + downloaded_data[i].title + "</b>" + ": " + downloaded_data[i].review + "<hr>";
+            //  document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + i
+					}
+*/
+
+      }
+			};
+
+			xmlHttp.send(null);
+}
+//// put your code here
+downloadData();
+//setInterval(downloadData, 7000); // periodic repeating every 2 seconds
+
+</script>
 
 <script>
+
 var dislikes = 0;
 // fuction for counting dislikes of book
 function dislikeCounter()
@@ -22,28 +132,14 @@ function likeCounter()
     document.getElementById("likes").innerHTML = likes;
 };
 </script>
-<script>
-// fuction for adding a comment 
-function addReview() {
-  var parent = document.getElementById('profileimage');
-  var review = document.forms["submitForm"]["review"].value;
-  if (review == "")
-  {
-    alert("Nesmíte zadat prázdnou recenzi!");
-    return false;
-  }
-  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateřina Fořtová</a></h4></p><p>'+ review + '</p><br>';
-  parent.insertAdjacentHTML('beforeend', new_child);
-  var all_reviews = document.getElementById('profileimage');
-  all_reviews.scrollTop = all_reviews.scrollHeight;
-}
-</script>
+
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="./css/style.css">
   </head>
   <body>
+
     <header>
       <div class="container">
         <div id="branding">
@@ -110,14 +206,7 @@ function addReview() {
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="katerina_fortovar.html">Kateřina Fořtová</a></h4></p>
-      <p>Jedna z nejlepších dystopií. Ačkoliv další díly už jsou o trochu slabší, první je zárukou kvality.</p>
-    </p>
-    <br>
-    <p><h4> <a href="tereza_cernar.html">Tereza Černá</a></h4></p>
-    <p>Svižně napsaný příběh nadupaný symboly a metaforami, které mají velkou hloubku. Pokud se vám chce přemýšlet, najdete tu spoustu témat a pokud ne, užijete si "jen" pěkné akční čtení.
-Vřele doporučuji.</p>
-  <br>
+
         </div>
       </div>
     </section>
@@ -125,9 +214,9 @@ Vřele doporučuji.</p>
     <section id="main">
   <div class="container">
     <div id="sendreview">
-    <form name="submitForm" >
-      <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-      <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
+    <form onsubmit="return uploadData()">
+      <br><textarea id="review" placeholder="Sem zadejte recenzi..."></textarea><br>
+      <input type="submit" class="button_3" value="Odeslat" >
     </form>
     </div>
   </div>
