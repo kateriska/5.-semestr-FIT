@@ -5,7 +5,7 @@ $myFile = "commentsAPI.json";
 
 function insertReview($last_index_value, $myFile)
 {
-if (array_key_exists('title', $_POST) && array_key_exists('review_text', $_POST))
+if (array_key_exists('title', $_POST) && array_key_exists('review_text', $_POST) && array_key_exists('user', $_POST))
 {
 //  $file = file_get_contents($myFile);
 //  $data = json_decode($file, true);
@@ -16,12 +16,14 @@ if (array_key_exists('title', $_POST) && array_key_exists('review_text', $_POST)
 //echo $last_item_id;
    $title = $_POST['title'];
    $review_text = $_POST['review_text'];
+   $user = $_POST['user'];
    $value = $last_index_value + 1;
 
    //echo 'Yes, it works!';
    $array = array(
      "id" => $value,
      "title" => $title,
+     "user" => $user,
      "review" => $review_text
    );
    //print_r($array);

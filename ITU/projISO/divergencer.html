@@ -39,12 +39,13 @@ function uploadData() {
 
 
     var title = "Divergence";
+    var user = "katerina_fortova";
 
     //// put your code here
     xmlHttp.open("POST", "apiReviews.php", true);// create "servant" waiting for message
 		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;"); // create header of request
     xmlHttp.onreadystatechange = downloadData;
-    var message = "title=" + title + "&review_text=" + document.getElementById("review").value;
+    var message = "title=" + title + "&user=" + user + "&review_text=" + document.getElementById("review").value;
     //alert(message);
 		xmlHttp.send(message); // sending data to server
   } catch (e) {
@@ -77,11 +78,15 @@ function downloadData() {
           }
          //alert(strLines[i]);
          var obj = JSON.parse(strLines[i]);
+         if (obj.title != "Divergence")
+         {
+           continue;
+         }
          if (message_id !== null && obj.id <= message_id) // we aren't in the end of chat
             {
 							continue;
 						}
-         document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<b>" + obj.title + "</b>" + ": " + obj.review + "<hr>";
+         document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + "r.html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
         // alert(obj.title)
         message_id = obj.id;
         //  alert(obj);
@@ -101,7 +106,7 @@ function downloadData() {
             //  document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + i
 					}
 */
-
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight; // show new messages, dont have to scroll
       }
 			};
 
