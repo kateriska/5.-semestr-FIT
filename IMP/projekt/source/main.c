@@ -282,7 +282,7 @@ void ADCinit()
 	};
 
 	// use differential sample mode
-	#if (defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE) && FSL_FEATURE_ADC16_HAS_DIFF_MODE)
+	#if ((defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE)) && (FSL_FEATURE_ADC16_HAS_DIFF_MODE))
 		ADC_channel_config.enableDifferentialConversion = false;
 	#endif
 
@@ -345,8 +345,6 @@ float signalFiltering(float dt, float x_i_lowpass)
 
 	y_i_lowpass = (alpha_lowpass * x_i_lowpass) + ((1.0 - alpha_lowpass) * y_i_preceding_lowpass);
 
-	y_i_preceding_lowpass = y_i_lowpass;
-
 	x_i_highpass = y_i_lowpass;
 
 	/*
@@ -368,7 +366,8 @@ float signalFiltering(float dt, float x_i_lowpass)
 
 	y_i_highpass = (alpha_highpass * y_i_preceding_highpass) + (alpha_highpass * (x_i_highpass - x_i_preceding_highpass));
 
-
+	// store values as preceding values for next iteration
+	y_i_preceding_lowpass = y_i_lowpass;
 	x_i_preceding_highpass = x_i_highpass;
 	y_i_preceding_highpass = y_i_highpass;
 
@@ -401,7 +400,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 	{
 		// get signal from module
 		uint32_t ADC_status_flags = ADC16_GetChannelStatusFlags(ADC0, 0);
-		conversion_undone = !((ADC_status_flags) & (kADC16_ChannelConversionDoneFlag));
+		conversion_undone = !((kADC16_ChannelConversionDoneFlag) & (ADC_status_flags));
 	}
 
 	uint32_t module_signal = ADC16_GetChannelConversionValue(ADC0, 0);
