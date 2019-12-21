@@ -505,6 +505,6 @@ int main()
 	while (true)
 	{
 		unsigned int measured_average_value = measureRate(clk_frequency); // measure average rate
-		sprintf(measured_average_value_str, "% *u", 4, measured_average_value); // display average rate
+		sprintf(measured_average_value_str, "%*u", 4, measured_average_value); // display average rate
 	}
 }
