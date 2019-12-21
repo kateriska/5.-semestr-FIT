@@ -4,7 +4,7 @@ Login: xforto00
 Projekt: ARM-FITkit3: Mereni srdecniho tepu
 Predmet: IMP
 original
-Datum poslednich zmen v souboru: 18. prosince 2019
+Datum poslednich zmen v souboru: 21. prosince 2019
 */
 
 #include "MK60D10.h" // for FitKIT
@@ -180,8 +180,9 @@ Function for adding interrupt handler and show next measured value on display
 */
 void PIT0_IRQHandler()
 {
-	displayNextMeasuredValue();
-	PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+	displayNextMeasuredValue(); // show next value on 7-segment display
+
+	PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag); // clear PIT status flags
 }
 
 /*
@@ -194,19 +195,24 @@ void PITinit()
 	// we have 4 numbers on display - 16666,667 / 4 = 4166,667
 	static uint64_t display_refresh_num_rate = 4167;
 
-	CLOCK_EnableClock(kCLOCK_Pit0);
+	CLOCK_EnableClock(kCLOCK_Pit0); // enable clock for PIT
 
+	// config PIT
 	pit_config_t PIT_config;
 	PIT_GetDefaultConfig(&PIT_config);
 	PIT_Init(PIT, &PIT_config);
 
-	// setting PIT0_IRQHandler as PIT interrupt handler
+	// enable PIT0_IRQHandler as PIT interrupt handler
 	EnableIRQ(PIT0_IRQn);
 	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 
+	// count timer period
 	uint64_t PIT_timer_period = USEC_TO_COUNT(display_refresh_num_rate, CLOCK_GetFreq(kCLOCK_BusClk));
-	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period); // refresh every 4167 microseconds with interrupt
-	PIT_StartTimer(PIT, kPIT_Chnl_0); // starting timer
+	// refresh every 4167 microseconds with interrupt
+	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t) PIT_timer_period);
+
+
+	PIT_StartTimer(PIT, kPIT_Chnl_0); // starting timer for PIT
 }
 
 
@@ -215,19 +221,24 @@ Function for init LPTMR for count time intervals and time during beat measuring
 */
 void LPTMRinit()
 {
-
+	// setting MCGIRCLK as clock
 	CLOCK_SetInternalRefClkConfig(kMCG_IrclkEnable, kMCG_IrcSlow, 0);
+	// get frequency of clock
 	clk_frequency = CLOCK_GetFreq(kCLOCK_McgInternalRefClk);
+
+	// enable clock
 	CLOCK_EnableClock(kCLOCK_Lptmr0);
 
+	// config LPTMR
 	lptmr_config_t LPTMR_config;
 	LPTMR_GetDefaultConfig(&LPTMR_config);
 
 	// config LPTMR clock source
 	LPTMR_config.prescalerClockSource = kLPTMR_PrescalerClock_0;
 
-	LPTMR_Init(LPTMR0, &LPTMR_config);
-	LPTMR_SetTimerPeriod(LPTMR0, 0xFFFF); // count until this value
+	LPTMR_Init(LPTMR0, &LPTMR_config); // init LPTMR
+	// count until value 0xFFFF
+	LPTMR_SetTimerPeriod(LPTMR0, 0xFFFF);
 }
 
 
@@ -236,8 +247,10 @@ Function for init ADC - convert analog signal to digital from module
 */
 void ADCinit()
 {
+	// enable clock
 	CLOCK_EnableClock(kCLOCK_Adc0);
 
+	// config ADC
 	adc16_config_t ADC_config;
 	ADC16_GetDefaultConfig(&ADC_config);
 	ADC_config.enableContinuousConversion = true;
@@ -247,7 +260,8 @@ void ADCinit()
 		ADC_config.resolution = kADC16_Resolution16Bit;
 	#endif
 
-	ADC16_Init(ADC0, &ADC_config);
+	ADC16_Init(ADC0, &ADC_config); // init ADC
+
 	ADC16_EnableHardwareTrigger(ADC0, false);
 	ADC16_SetHardwareAverage(ADC0, kADC16_HardwareAverageCount32);
 
@@ -377,13 +391,13 @@ unsigned int measureRate(uint32_t clk_frequency)
 	float max_human_rate = 220.0; // max bpm of human
 	float min_human_rate = 60.0; // min bpm of human
 
-	bool conversion_done = false; // bool for control whether conversion of signal is done
+	bool conversion_undone = true; // bool for control whether conversion of signal is done or not
 
-	while (conversion_done == false) // wait for finish conversion of signal
+	while (conversion_undone == true) // wait for finish conversion of signal
 	{
 		// get signal from module
-		uint32_t status_flags = ADC16_GetChannelStatusFlags(ADC0, 0);
-		conversion_done = (status_flags & kADC16_ChannelConversionDoneFlag);
+		uint32_t ADC_status_flags = ADC16_GetChannelStatusFlags(ADC0, 0);
+		conversion_undone = !((ADC_status_flags) & (kADC16_ChannelConversionDoneFlag));
 	}
 
 	uint32_t module_signal = ADC16_GetChannelConversionValue(ADC0, 0);
@@ -490,7 +504,7 @@ int main()
 
 	while (true)
 	{
-		unsigned int measured_average_value = measureRate(clk_frequency); // measure rate
-		sprintf(measured_average_value_str, "% *u", 4, measured_average_value); // display rate
+		unsigned int measured_average_value = measureRate(clk_frequency); // measure average rate
+		sprintf(measured_average_value_str, "% *u", 4, measured_average_value); // display average rate
 	}
 }
