@@ -221,7 +221,7 @@ Function for init LPTMR for count time intervals and time during beat measuring
 */
 void LPTMRinit()
 {
-	// setting MCGIRCLK as clock
+	// setting MCGIRCLK as clock for LPTMR
 	CLOCK_SetInternalRefClkConfig(kMCG_IrclkEnable, kMCG_IrcSlow, 0);
 	// get frequency of clock
 	clk_frequency = CLOCK_GetFreq(kCLOCK_McgInternalRefClk);
@@ -237,6 +237,7 @@ void LPTMRinit()
 	LPTMR_config.prescalerClockSource = kLPTMR_PrescalerClock_0;
 
 	LPTMR_Init(LPTMR0, &LPTMR_config); // init LPTMR
+
 	// count until value 0xFFFF
 	LPTMR_SetTimerPeriod(LPTMR0, 0xFFFF);
 }
@@ -262,7 +263,10 @@ void ADCinit()
 
 	ADC16_Init(ADC0, &ADC_config); // init ADC
 
+	// make hardware trigger feature not enabled
 	ADC16_EnableHardwareTrigger(ADC0, false);
+
+	// set hardware average mode, conversion result is doing automatically by using hardware
 	ADC16_SetHardwareAverage(ADC0, kADC16_HardwareAverageCount32);
 
 	// calibration of ADC
