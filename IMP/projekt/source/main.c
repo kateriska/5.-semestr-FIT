@@ -257,9 +257,10 @@ void ADCinit()
 	ADC_config.enableContinuousConversion = true;
 
 	// setting sample resolution - 16-bit
-	#if ((defined(FSL_FEATURE_ADC16_MAX_RESOLUTION)) && (FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16))
+	if (FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16)
+	{
 		ADC_config.resolution = kADC16_Resolution16Bit;
-	#endif
+	}
 
 	ADC16_Init(ADC0, &ADC_config); // init ADC
 
@@ -270,9 +271,7 @@ void ADCinit()
 	ADC16_SetHardwareAverage(ADC0, kADC16_HardwareAverageCount32);
 
 	// calibration of ADC
-	#if ((defined(FSL_FEATURE_ADC16_HAS_CALIBRATION)) && (FSL_FEATURE_ADC16_HAS_CALIBRATION))
-		ADC16_DoAutoCalibration(ADC0);
-	#endif
+	ADC16_DoAutoCalibration(ADC0);
 
 	// setting channel of ADC
 	adc16_channel_config_t ADC_channel_config =
@@ -281,10 +280,8 @@ void ADCinit()
 		.enableInterruptOnConversionCompleted = false,
 	};
 
-	// use differential sample mode
-	#if ((defined(FSL_FEATURE_ADC16_HAS_DIFF_MODE)) && (FSL_FEATURE_ADC16_HAS_DIFF_MODE))
-		ADC_channel_config.enableDifferentialConversion = false;
-	#endif
+	// forbid differential sample mode
+	ADC_channel_config.enableDifferentialConversion = false;
 
 	ADC16_SetChannelConfig(ADC0, 0, &ADC_channel_config);
 }
