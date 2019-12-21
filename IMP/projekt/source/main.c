@@ -310,12 +310,12 @@ float signalFiltering(float dt, float x_i_lowpass)
 	// variable for control x_0 index:
 	static int actual_x_index = 0;
 
-	float alpha_lowpass = dt / (tau + dt);
+	float alpha_lowpass = (dt / (tau + dt));
 
 	// control when index of x is 0 - no preceding index, this is first index of signal
 	if (actual_x_index == 0)
 	{
-		y_i_lowpass = x_i_lowpass * alpha_lowpass;
+		y_i_lowpass = (x_i_lowpass * alpha_lowpass);
 		y_i_preceding_lowpass = y_i_lowpass;
 
 		y_i_highpass = x_i_highpass;
@@ -340,7 +340,7 @@ float signalFiltering(float dt, float x_i_lowpass)
    	   Source: https://en.wikipedia.org/wiki/Low-pass_filter
 	 */
 
-	y_i_lowpass = (alpha_lowpass * x_i_lowpass) + ((1.0 - alpha_lowpass) * y_i_preceding_lowpass);
+	y_i_lowpass = ((alpha_lowpass * x_i_lowpass) + ((1.0 - alpha_lowpass) * y_i_preceding_lowpass));
 
 	x_i_highpass = y_i_lowpass;
 
@@ -358,10 +358,10 @@ float signalFiltering(float dt, float x_i_lowpass)
    	   Source: https://en.wikipedia.org/wiki/High-pass_filter
 	 */
 
-	float alpha_highpass = tau / (tau + dt);
+	float alpha_highpass = (tau / (tau + dt));
 
 
-	y_i_highpass = (alpha_highpass * y_i_preceding_highpass) + (alpha_highpass * (x_i_highpass - x_i_preceding_highpass));
+	y_i_highpass = ((alpha_highpass * y_i_preceding_highpass) + (alpha_highpass * (x_i_highpass - x_i_preceding_highpass)));
 
 	// store values as preceding values for next iteration
 	y_i_preceding_lowpass = y_i_lowpass;
@@ -405,7 +405,7 @@ unsigned int measureRate(uint32_t clk_frequency)
 	// time interval dt between measuring in microseconds
 	uint64_t dt = COUNT_TO_USEC((uint64_t) LPTMR_GetCurrentTimerCount(LPTMR0), clk_frequency);
 
-	measuring_time = measuring_time + dt; // counting time of measuring
+	measuring_time = (measuring_time + dt); // counting time of measuring
 
 	// restart of LPTMR timer
 	LPTMR_StopTimer(LPTMR0);
