@@ -2,6 +2,64 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+function downloadList() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiList.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+
+            if (obj.user != "barbora_podzimkova")
+            {
+              continue;
+            }
+
+            if (obj.booklist == "read")
+            {
+              document.getElementById("boxesread").innerHTML = document.getElementById("boxesread").innerHTML + "<p><img src=./img/" + obj.image + " style=width:70px;margin-right:15px;>" + "<h4>" + "<a href=" + obj.page + ".html>" + obj.title+ "</a></h4>" + "<p>" + obj.author + "</p><hr>";
+            }
+
+            else if (obj.booklist == "toread")
+            {
+              document.getElementById("boxestoread").innerHTML = document.getElementById("boxestoread").innerHTML + "<p><img src=./img/" + obj.image + " style=width:70px;margin-right:15px;>" + "<h4>" + "<a href=" + obj.page + ".html>" + obj.title+ "</a></h4>" + "<p>" + obj.author + "</p><hr>";
+            }
+
+          }
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadList();
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -36,62 +94,18 @@
     </section>
 
 
-    <section id="boxes">
-      <div class="container">
-        <h3>Pøeèteno</h3>
-        <div class="box">
-          <img src="./img/hungergames2.jpg">
-          <h3><a href="hunger_games.html">Hunger Games</a></h3>
-          <p>Suzanne Collins</p>
-        </div>
-        <div class="box">
-          <img src="./img/rur.jpg">
-          <h3><a href="rur.html">R.U.R.</a></h3>
-          <p>Karel Èapek</p>
-        </div>
-        <div class="box">
-          <img src="./img/krev.jpg">
-          <h3><a href="zla_krev.html">Zlá krev</a></h3>
-          <p>John Carreyrou</p>
-        </div>
-      </div>
-    </section>
+    <div class="container">
+      <div id="boxesread">
+      <h3>Pøeèteno</h3>
+    </div>
+  </div>
 
-    <section id="boxes">
-      <div class="container">
-        <div class="box">
-          <img src="./img/stastna.jpg">
-          <h3><a href="stastna_kniha.html">©»astná kniha</a></h3>
-          <p>Barbora ©»astná</p>
-        </div>
-        <div class="box">
-          <img src="./img/obama.jpg">
-          <h3><a href="muj_pribeh.html">Mùj pøíbìh</a></h3>
-          <p>Michelle Obama</p>
-        </div>
-        <div class="box">
-          <img src="./img/poznala.jpg">
-          <h3><a href="nez_jsem_te_poznala.html">Ne¾ jsem tì poznala</a></h3>
-          <p>Jojo Moyes</p>
-        </div>
-      </div>
-    </section>
+  <div class="container">
+    <div id="boxestoread">
+      <h3>Chci si pøeèíst</h3>
+    </div>
+  </div>
 
-    <section id="boxes">
-      <div class="container">
-        <h3>Chci si pøeèíst</h3>
-        <div class="box">
-          <img src="./img/divergence.jpg">
-          <h3><a href="divergence.html">Divergence</a></h3>
-          <p> Veronica Roth</p>
-        </div>
-        <div class="box">
-          <img src="./img/mleko.png">
-          <h3><a href="mleko_a_med.html">Mléko a med</a></h3>
-          <p>Rupi Kaur</p>
-        </div>
-      </div>
-    </section>
 
 
     <footer>

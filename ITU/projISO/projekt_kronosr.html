@@ -22,6 +22,29 @@ if (!xmlHttp) {
   return xmlHttp;
 }
 }
+function uploadToList() {
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
+
+    var title = "Projekt Kronos";
+    var page = "projekt_kronos";
+    var user = "katerina_fortova";
+    var author = "Pavel Bares";
+    var image = "kronos.jpeg";
+
+    var booklist_select = document.getElementById("mybooklist");
+    var index = booklist_select.selectedIndex;
+    var booklist = booklist_select.options[index].value;
+
+    xmlHttp.open("POST", "apiList.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    var message = "title=" + title + "&page=" + page + "&author=" + author + "&image=" + image + "&user=" + user + "&booklist=" + booklist;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false;
+}
 function uploadReview() {
   try {
     var xmlHttp = createXmlHttpRequestObject();
@@ -240,11 +263,13 @@ downloadReview();
     <section id="main">
   <div class="container">
     <div id="bookimage">
-      <select>
-        <option value="read">Pøeèteno</option>
+      <form onsubmit="return uploadToList()">
+      <select id="mybooklist">
         <option value="toread">Chci si pøeèíst</option>
-        <option value="toread">Odebrat z seznamu knih</option>
+        <option value="read">Pøeèteno</option>
       </select>
+      <input type="submit" class="button_3" value="Pøidat" >
+      </form>
         </div>
     </section>
 
