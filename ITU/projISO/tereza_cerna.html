@@ -58,6 +58,41 @@ function downloadList() {
 
 			xmlHttp.send(null);
 }
+function downloadModifyUser() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiAllUsers.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+
+            if (obj.user != "tereza_cerna")
+            {
+              continue;
+            }
+
+
+            document.getElementById("firstname").innerHTML = obj.firstname;
+            document.getElementById("lastname").innerHTML = obj.lastname;
+            document.getElementById("genres").innerHTML = obj.favouriteGenres;
+            document.getElementById("interests").innerHTML = obj.interests;
+          }
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadModifyUser();
 downloadList();
 </script>
   <head>
@@ -85,10 +120,10 @@ downloadList();
   <div class="container">
     <div id="bookimage">
     <p><img src="./img/tereza.jpg" alt="TerezaCerna" style="width:130px;margin-right:15px;">
-      <p><b>Jméno a pøíjmení:</b> Tereza Èerná</p>
+      <p><b>Jméno a pøíjmení:</b> <a id="firstname"></a> <a id="lastname"></a></p>
       <p><b>E-mail:</b> cerna@centrum.cz</p>
-      <p><b>Zájmy:</b> chov zvíøat, sociální studie, cestování</p>
-      <p><b>Oblíbené ¾ánry:</b> biografie, young adult</p>
+      <p><b>Zájmy:</b> <a id="interests"></a></p>
+      <p><b>Oblíbené ¾ánry:</b> <a id="genres"></a></p>
     </p>
         </div>
     </section>

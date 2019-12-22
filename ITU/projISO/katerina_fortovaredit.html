@@ -2,45 +2,117 @@
 
 <!DOCTYPE html>
 <html>
-<script>
-function formValidation() {
-  var firstname = document.forms["submitForm"]["firstname"].value;
-  var lastname = document.forms["submitForm"]["lastname"].value;
-  var email = document.forms["submitForm"]["email"].value;
-  var new_pwd = document.forms["submitForm"]["new_pwd"].value;
-  var new_pwd_repeat = document.forms["submitForm"]["new_pwd_repeat"].value;
+<script type="text/javascript">
 
-  if (firstname == "")
-  {
-    alert("Køestní jméno není vyplnìno!");
-    return false;
-  }
+var message_id = null;
 
-  if (lastname == "")
-  {
-    alert("Pøíjmení není vyplnìno!");
-    return false;
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
   }
-  if (email == "")
-  {
-    alert("Email není vyplnìn!");
-    return false;
-  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+function modifyUser() {
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
 
-  if (new_pwd == "")
-  {
-    alert("Heslo není vyplnìno!");
-    return false;
-  }
-  else if (new_pwd != new_pwd_repeat)
-  {
-    alert("Heslo se neshodují!");
-    return false;
-  }
+    var firstname = document.forms["submitForm"]["firstname"].value;
+    var lastname = document.forms["submitForm"]["lastname"].value;
+    var email = document.forms["submitForm"]["email"].value;
+    var new_pwd = document.forms["submitForm"]["new_pwd"].value;
+    var new_pwd_repeat = document.forms["submitForm"]["new_pwd_repeat"].value;
+    var interests = document.forms["submitForm"]["interests"].value;
+    var favouriteGenres = document.forms["submitForm"]["favouriteGenres"].value;
+    if (firstname == "")
+    {
+      alert("Køestní jméno není vyplnìno!");
+      return false;
+    }
 
+    if (lastname == "")
+    {
+      alert("Pøíjmení není vyplnìno!");
+      return false;
+    }
+    if (email == "")
+    {
+      alert("Email není vyplnìn!");
+      return false;
+    }
+
+    if (new_pwd != new_pwd_repeat)
+    {
+      alert("Heslo se neshodují!");
+      return false;
+    }
+
+    if (favouriteGenres == "")
+    {
+      favouriteGenres = "Uzivatel zatim nevyplnil svoje oblibene zanry."
+    }
+    if (interests == "")
+    {
+      interests = "Uzivatel zatim nevyplnil svoje zajmy."
+    }
+
+    var user = "katerina_fortova";
+
+    xmlHttp.open("POST", "apiUser.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    var message = "user=" + user + "&firstname=" + firstname + "&lastname=" + lastname + "&favouriteGenres=" + favouriteGenres + "&interests=" + interests;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+return false;
 
 }
+function downloadModifyUser() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiUser.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+
+            if (obj.user != "katerina_fortova")
+            {
+              continue;
+            }
+
+            document.forms["submitForm"]["firstname"].value = obj.firstname;
+            document.forms["submitForm"]["lastname"].value = obj.lastname;
+            document.forms["submitForm"]["favouriteGenres"].value = obj.favouriteGenres;
+            document.forms["submitForm"]["interests"].value = obj.interests;
+          }
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadModifyUser();
 </script>
+
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -64,15 +136,15 @@ function formValidation() {
 
     <section id="editprofile">
       <div class="container">
-        <form name="submitForm" action="katerina_fortovar.html" onsubmit="return formValidation()">
-          <h3>Jméno:*</h3><input type="text" name=firstname placeholder="Zadejte jméno" value="Kateøina"><br>
-          <h3>Pøíjmení:*</h3><input type="text" name=lastname placeholder="Zadejte pøíjmení" value="Foøtová"><br>
+        <form name="submitForm" onsubmit="return modifyUser()">
+          <h3>Jméno:*</h3><input type="text"  name=firstname placeholder="Zadejte jméno"><br>
+          <h3>Pøíjmení:*</h3><input type="text"  name=lastname placeholder="Zadejte pøíjmení"><br>
           <h3>E-mail:*</h3><input type="email" name=email placeholder="Zadejte e-mail" value="xforto00@stud.fit.vutbr.cz"><br>
           <h3>Heslo:*</h3><input type="password" name=new_pwd placeholder="Zadejte heslo"><br><br>
           <input type="password" name=new_pwd_repeat placeholder="Zadejte heslo znovu"><br>
           <h3>Profilová fotka:</h3><input type="file" ><br>
-          <h3>Zájmy:</h3><br><textarea name='desc' placeholder="Zadejte své zájmy..." >IT, sport, filmy, hudba</textarea><br>
-          <h3>Oblíbené ¾ánry:</h3><br><textarea name='desc' placeholder="Zadejte své oblíbené ¾ánry...">dystopie, young adult, thriller</textarea><br>
+          <h3>Zájmy:</h3><textarea name='interests'  placeholder="Zadejte své zájmy..." ></textarea><br>
+          <h3>Oblíbené ¾ánry:</h3><textarea name='favouriteGenres'  placeholder="Zadejte své oblíbené ¾ánry..."></textarea><br>
           <input type="submit" value="Potvrdit zmìny" class="button_2"/>
         </form>
       </div>
