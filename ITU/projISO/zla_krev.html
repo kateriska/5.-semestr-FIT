@@ -2,6 +2,68 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Zla krev")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + ".html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -56,14 +118,7 @@
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="tereza_cerna.html">Tereza Èerná</a></h4></p>
-      <p>Opravdu ú¾asný pøíbìh o ¾enì se snem (ale bez jakékoli pøedstavy, jak jej realizovat), která dokázala tahat za nos taková esa. Osobnì z toho mám jeden závìr: nejen ve smrti, ale i v hlouposti jsme si v¹ichni rovni.</p>
-    </p>
-    <br>
-      <p><h4> <a href="barbora_podzimkova.html">Barbora Podzimková</a></h4></p>
-      <p>Jen tì¾ko uvìøitelný pøíbìh o obrovském podvodu. Ze zaèátku jsem se trochu ztrácela v záplavì jmen, nicménì kdy¾ jsem se ve v¹ech tìch postavách zorientovala, tak jsem knihu zhltnula skoro jedním dechem.</p>
-    </p>
-    <br>
+
       <div>
     </div>
   </section>
@@ -72,7 +127,7 @@
 
 
     <footer>
-      <p>ÄŒtenÃ¡Å™skÃ½ klub Loreta 2019</p>
+      <p>Ètenáøský klub Loreta 2019</p>
     </footer>
   </body>
 </html>

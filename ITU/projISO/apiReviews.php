@@ -1,77 +1,58 @@
 <?php
 
 header('Content-type:application/json');
-$myFile = "commentsAPI.json";
+$file = "dataReviews.json";
 
-function insertReview($last_index_value, $myFile)
+function insertReview($last_index_value, $file)
 {
-if (array_key_exists('title', $_POST) && array_key_exists('review_text', $_POST) && array_key_exists('user', $_POST))
-{
-//  $file = file_get_contents($myFile);
-//  $data = json_decode($file, true);
+  if (array_key_exists('title', $_POST) && array_key_exists('review_text', $_POST) && array_key_exists('user', $_POST))
+  {
 
-// Get last id
-//$last_item    = end($data);
-//$last_item_id = $last_item['id'];
-//echo $last_item_id;
-   $title = $_POST['title'];
-   $review_text = $_POST['review_text'];
-   $user = $_POST['user'];
-   $value = $last_index_value + 1;
+    $title = $_POST['title'];
+    $review_text = $_POST['review_text'];
+    $user = $_POST['user'];
+    $value = $last_index_value + 1;
 
-   //echo 'Yes, it works!';
-   $array = array(
-     "id" => $value,
-     "title" => $title,
-     "user" => $user,
-     "review" => $review_text
-   );
-   //print_r($array);
+    $array = array(
+      "id" => $value,
+      "title" => $title,
+      "user" => $user,
+      "review" => $review_text
+    );
 
-   $jsondata =  json_encode($array);
-   file_put_contents($myFile, $jsondata.PHP_EOL, FILE_APPEND);
+
+    $jsondata =  json_encode($array);
+    file_put_contents($file, $jsondata.PHP_EOL, FILE_APPEND);
  }
 
-  // $id++;
-
-   //echo $jsondata;
 
  }
 
  $indexes_array = array();
 
- $fn = fopen($myFile,"r");
+ $fn = fopen($file,"r");
 
-  while(! feof($fn))  {
-	$result = fgets($fn);
-  if ($result == "")
+  while(! feof($fn))
   {
-    continue;
-  }
-  #echo $result;
-  $obj = json_decode($result);
-  array_push($indexes_array, $obj->{'id'}); // 12345
-	//echo $result;
+	   $result = fgets($fn);
+     if ($result == "")
+     {
+       continue;
+     }
+
+     $obj = json_decode($result);
+     array_push($indexes_array, $obj->{'id'});
   }
 
   fclose($fn);
-  #print_r($indexes_array);
   $last_index_position = count($indexes_array);
   $last_index_value = $indexes_array[$last_index_position - 1];
-  #echo $last_index_value;
-  insertReview($last_index_value, $myFile);
+  echo($last_index_value);
+  insertReview($last_index_value, $file);
 
-  $loaded_file = file_get_contents($myFile, true);
+  $loaded_file = file_get_contents($file, true);
   echo $loaded_file;
 
-
- //$data = json_decode($loaded_file, true);
- //echo $data;
-
- // Get last id
- //$last_item = end($data);
- //$last_item_id = $last_item['id'];
- //echo $last_item_id;
 
 
 

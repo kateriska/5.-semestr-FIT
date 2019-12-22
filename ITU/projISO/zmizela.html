@@ -2,6 +2,68 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Zmizela")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + ".html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -60,10 +122,7 @@
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="katerina_fortova.html">Kateøina Foøtová</a></h4></p>
-      <p>	Jeden z nejpùsobivìj¹ích románù, co jsem èetla. A¾ mi z toho v¹eho naskakuje husí kù¾e. Misky vah se celou dobu knihy tolikrát pøelejí, autorka manipuluje s ètenáøem, umí ¹okovat. Celý pøíbìh kvete jako hoøkosladká kvìtina, nemám prostì slov. Celá ta kní¾ka mi doslova vyrazila dech.</p>
-    </p>
-    <br>
+
         </div>
       </div>
     </section>

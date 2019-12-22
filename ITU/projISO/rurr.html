@@ -2,21 +2,85 @@
 
 <!DOCTYPE html>
 <html>
-<script>
+<script type="text/javascript">
 
-function addReview() {
-  var parent = document.getElementById('profileimage');
-  var review = document.forms["submitForm"]["review"].value;
-  if (review == "")
-  {
-    alert("Nesmíte zadat prázdnou recenzi!");
-    return false;
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
   }
-  var new_child = '<p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p><p>'+ review + '</p><br>';
-  parent.insertAdjacentHTML('beforeend', new_child);
-  var all_reviews = document.getElementById('profileimage');
-  all_reviews.scrollTop = all_reviews.scrollHeight;
 }
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+function uploadReview() {
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
+
+    var title = "R.U.R.";
+    var user = "katerina_fortova";
+
+    xmlHttp.open("POST", "apiReviews.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    xmlHttp.onreadystatechange = downloadReview;
+    var message = "title=" + title + "&user=" + user + "&review_text=" + document.getElementById("review").value;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false;
+}
+
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "R.U.R.")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + "r.html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
 </script>
 <script>
 var dislikes = 0;
@@ -104,25 +168,17 @@ function likeCounter()
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="katerina_fortovar.html">Kateøina Foøtová</a></h4></p>
-      <p>Unikátní kniha, stále aktuální, ètivá, s promy¹leným dìjem, jedno z nejlep¹ích ètení v rámci maturitní èetby.</p>
-    </p>
-    <br>
-      <p><h4> <a href="barbora_podzimkovar.html">Barbora Podzimková</a></h4></p>
-      <p>Velmi ètivé drama s pøíbìhem, jen¾ byl nadèasový a stále máme, co se z nìj uèit. Výhodou je, ¾e se to dá pøeèíst za chvíli a bude Vás to bavit a¾ do konce.</p>
-    </p>
-    <br>
+
         </div>
       </div>
     </section>
 
-
     <section id="main">
   <div class="container">
     <div id="sendreview">
-    <form name="submitForm" >
-      <br><textarea name='review' placeholder="Sem zadejte recenzi..."></textarea><br>
-      <input type="button" class="button_3" onclick="addReview()" value="Odeslat">
+    <form onsubmit="return uploadReview()">
+      <br><textarea id="review" placeholder="Sem zadejte recenzi..."></textarea><br>
+      <input type="submit" class="button_3" value="Odeslat" >
     </form>
     </div>
   </div>

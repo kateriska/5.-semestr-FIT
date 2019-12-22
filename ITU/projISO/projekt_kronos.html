@@ -2,6 +2,68 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Projekt Kronos")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + ".html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -61,14 +123,7 @@
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="katerina_fortova.html">Kateøina Foøtová</a></h4></p>
-      <p>Projekt Kronos je sice autorovým literárním debutem, av¹ak velmi vydaøeným a neskuteènì moc propracovaným. Setkáváme se s peèlivì vybudovaným fiktivním svìtem, av¹ak dìsivì známým a skuteèným, svìtem, který je zasazen do doby v letech 2052, tedy doby, které se ètenáøi je¹tì s nejvìt¹í pravdìpodobností do¾ijí. Prostøedí, které autor vykreslil, je temné, av¹ak mù¾e se klidnì stát realitou.</p>
-    </p>
-    <br>
-      <p><h4> <a href="robert_potocky.html">Robert Potocký</a></h4></p>
-      <p>Zajímavé, inovativní, procítìné sci-fi. My¹lenka, ¾e mìsto ¾ije a urèuje své ochránce je skvìlá, by» mi pøijde, ¾e zde v prvním díle nebyl vyu¾it potenciál. Ale vìøím, ¾e v dal¹í knize se to doplní. Kniha se èetla pøíjemnì, plynule, jen trochu to pøeskakování na úvodu mezi postavami bylo nepøehledné. Také nìkteré pasá¾e byly výborné oproti jiným, slab¹ím. A agentura co se stará o sirotky, nemohu si pomoct, pøi¹lo mi to jako kli¹é.</p>
-    </p>
-    <br>
+
       </div>
     </div>
   </section>

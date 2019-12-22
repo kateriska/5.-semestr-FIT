@@ -2,6 +2,68 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Hra o truny")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + ".html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -60,10 +122,7 @@ Jako strá¾ce severu lord Stark pova¾uje za prokletí, kdy¾ ho král Robert povìøí 
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="robert_potocky.html">Robert Potocký</a></h4></p>
-      <p>Ano, takhle kniha má ú¾asný svìt, jaký se jen tak nevidí. Autor v¹echno krásnì propracoval a promyslel. Muselo mu dát neskuteènì práce nìco takového stvoøit. Èetla jsem pomìrnì hodnì knih ze støedovìku, ale snad ¾ádný autor nedokázal tak vìrnì popsat toto období. Je opravdu vidìt, ¾e Martin tomu, o èem pí¹e rozumí a má rozsáhle znalosti. Jak jsem øekla, svìt je obdivuhodný, ale síla tohoto pøíbìhu tkví v postavách... </p>
-    </p>
-    <br>
+
         </div>
       </div>
     </section>

@@ -2,6 +2,68 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Nez jsem te poznala")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + ".html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -61,14 +123,8 @@
 <section id="main">
 <div class="container">
 <div id="profileimage">
-  <p><h4> <a href="tereza_cerna.html">Tereza Èerná</a></h4></p>
-  <p>Od kní¾ky se nedalo odtrhnout, i kdy¾ nároèná na city! Hlavní hrdinka ukázala velkou vynalézavost v pøístupu k nemocnému, který jí dál poznat její schopnosti a povzbuzoval ji, ale stál si za svým rozhodnutím, co¾ bylo pro v¹echny tì¾ké.</p>
-</p>
-<br>
-  <p><h4> <a href="barbora_podzimkova.html">Barbora Podzimková</a></h4></p>
-  <p>Smutný ale krásný pøíbìh. Nemám slov , jen doporuèuji si knihu pøeèíst.</p>
-</p>
-<br>
+
+
     </div>
   </div>
 </section>

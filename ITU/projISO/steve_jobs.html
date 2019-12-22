@@ -2,6 +2,68 @@
 
 <!DOCTYPE html>
 <html>
+<script type="text/javascript">
+
+var message_id = null;
+
+function createXmlHttpRequestObject() {
+var xmlHttp;
+try {
+  xmlHttp = new XMLHttpRequest();
+} catch (e) {
+  try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHttp");
+  } catch (e) {
+  }
+}
+if (!xmlHttp) {
+  alert ("Error creating the XMLHttpRequest object.");
+} else {
+  return xmlHttp;
+}
+}
+
+function downloadReview() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiReviews.php", true);
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+          obj = obj.substring(149, obj.length - 1);
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Steve Jobs")
+            {
+              continue;
+            }
+            if (message_id !== null && obj.id <= message_id)
+            {
+							continue;
+				    }
+            document.getElementById("profileimage").innerHTML = document.getElementById("profileimage").innerHTML + "<h4>" + "<a href=" + obj.user + ".html>" + obj.user+ "</a></h4>" + "<p>" + obj.review + "</p><hr>";
+            message_id = obj.id;
+          }
+
+        document.getElementById("profileimage").scrollTop = document.getElementById("profileimage").scrollHeight;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+downloadReview();
+//setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
+
+</script>
   <head>
     <meta charset="iso-8859-2">
     <meta name="viewport" content="width=device-width">
@@ -59,16 +121,7 @@ V dobì, kdy se spoleènosti po celém svìtì sna¾í vybudovat ekonomiku digitálního 
     <section id="main">
   <div class="container">
     <div id="profileimage">
-      <p><h4> <a href="katerina_fortova.html">Kateøina Foøtová</a></h4></p>
-      <p>Pomìrnì detailní pohled na pracovní i soukromou stránku Steva Jobse s relativnì dobrým vyvá¾ením obou souèástí jeho ¾ivota. Vìt¹í pozornost je ale pøece jen vìnována profesnímu ¾ivotu, tak¾e nìkteré otázky nad vnitøní motivací èi pohnutkami z osobního ¾ivota zùstanou nezodpovìzené. Vìt¹ina je ale zodpovìzena uspokojivì.</p>
-    </p>
-    <br>
-      <p><h4> <a href="robert_potocky.html">Robert Potocký</a></h4></p>
-      <p>Skvìle napsaný ¾ivotopis velkého mu¾e. Jobs tady není popsaný nijak idealizovanì, nebo pøímo zápornì. Je popsaný velice naturalisticky a uvìøitelnì. Nemáte pøi ètení pocit, ¾e by autor zámìrnì zatajoval, nebo zvelièoval èásti Jobsova ¾ivota.
 
-Celkovì skvìlá kniha a i pøes svou délku velice ètivá. Pokud vás zajímá technologie, umìní/design, nebo jste jen zvìdaví jak vznikla jedna z nejvìt¹ích firem souèasnosti, urèitì doporuèuji!</p>
-    </p>
-    <br>
       </div>
     </div>
   </section>
