@@ -158,6 +158,12 @@ function uploadReview() {
     var title = "Divergence";
     var user = "katerina_fortova";
 
+    if (document.getElementById("review").value == "")
+    {
+      alert("Nesmíte zadat prázdnou recenzi!");
+      return false;
+    }
+
     xmlHttp.open("POST", "apiReviews.php", true);
 		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
     xmlHttp.onreadystatechange = downloadReview;
