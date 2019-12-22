@@ -1,8 +1,11 @@
 <?php
 
+// Autor: Katerina Fortova (xforto00)
+
 header('Content-type:application/json');
 $file = "dataLikes.json";
 
+// function for create json with new like inserted for specific book
 function insertLike($file)
 {
   if (array_key_exists('title', $_POST))

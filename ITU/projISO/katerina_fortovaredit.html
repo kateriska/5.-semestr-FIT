@@ -3,9 +3,7 @@
 <!DOCTYPE html>
 <html>
 <script type="text/javascript">
-
-var message_id = null;
-
+// creates request object
 function createXmlHttpRequestObject() {
 var xmlHttp;
 try {
@@ -22,6 +20,7 @@ if (!xmlHttp) {
   return xmlHttp;
 }
 }
+// send details about modifiations of this user
 function modifyUser() {
   try {
     var xmlHttp = createXmlHttpRequestObject();
@@ -77,6 +76,7 @@ function modifyUser() {
 return false;
 
 }
+// downloads last data of this user and prefill form with them
 function downloadModifyUser() {
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "apiUser.php", true);

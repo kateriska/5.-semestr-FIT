@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html>
 <script type="text/javascript">
+// create request object for Ajax
 function createXmlHttpRequestObject() {
 var xmlHttp;
 try {
@@ -19,6 +20,7 @@ if (!xmlHttp) {
   return xmlHttp;
 }
 }
+// function for download to-read and read lists for user with specific books
 function downloadList() {
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "apiList.php", true);
@@ -58,6 +60,7 @@ function downloadList() {
 
 			xmlHttp.send(null);
 }
+// download informations about this user
 function downloadModifyUser() {
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "apiAllUsers.php", true);

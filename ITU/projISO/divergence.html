@@ -5,7 +5,7 @@
 <script type="text/javascript">
 
 var message_id = null;
-
+// create request object for Ajax
 function createXmlHttpRequestObject() {
 var xmlHttp;
 try {
@@ -22,7 +22,7 @@ if (!xmlHttp) {
   return xmlHttp;
 }
 }
-
+// downloads review for this book
 function downloadReview() {
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "apiReviews.php", true);
@@ -60,6 +60,7 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+// function for download likes for this book
 function downloadLike() {
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "apiLikes.php", true);
@@ -94,6 +95,7 @@ function downloadLike() {
 
 			xmlHttp.send(null);
 }
+// function for download dislikes for this book
 function downloadDislike() {
   const xmlHttp = createXmlHttpRequestObject();
 	xmlHttp.open("GET", "apiDislikes.php", true);

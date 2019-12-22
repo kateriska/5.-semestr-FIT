@@ -1,8 +1,11 @@
 <?php
 
+// Autor: Katerina Fortova (xforto00)
+
 header('Content-type:application/json');
 $file = "dataReviews.json";
 
+// function for create new json with new review for book written by user
 function insertReview($last_index_value, $file)
 {
   if (array_key_exists('title', $_POST) && array_key_exists('review_text', $_POST) && array_key_exists('user', $_POST))

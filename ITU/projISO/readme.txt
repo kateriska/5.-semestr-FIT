@@ -10,6 +10,8 @@ Z dùvodu velikosti implementovaného archivu nebylo mo¾né implementovat slo¾ku s 
 Archiv s obrázky je dostupný na adrese: https://drive.google.com/file/d/1bShOI0iuRwAoyAYq_jM8ClZNtlx1korR/view?usp=sharing
 Je následnì nutné vytvoøit novou slo¾ku img v koøenovém adresáøi projektu a do ní pøíslu¹né obrázky vlo¾it
 
+Pro spu¹tìní je nutný server s PHP.
+
 *** Spu¹tìní programu ***
 Projekt je dostupný na ¹kolním serveru Eva na adrese:
 http://www.stud.fit.vutbr.cz/~xforto00/ITUprojekt/

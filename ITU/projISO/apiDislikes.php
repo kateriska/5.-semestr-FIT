@@ -1,8 +1,11 @@
 <?php
 
+// Autor: Katerina Fortova (xforto00)
+
 header('Content-type:application/json');
 $file = "dataDislikes.json";
 
+// function for create json with new dislike inserted for specific book
 function insertDislike($file)
 {
   if (array_key_exists('title', $_POST))

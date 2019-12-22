@@ -1,8 +1,11 @@
 <?php
 
+// Autor: Katerina Fortova (xforto00)
+
 header('Content-type:application/json');
 $file = "dataUser.json";
 
+// function for insert new changes for user to json
 function insertChangesUser($file)
 {
   if (array_key_exists('user', $_POST) && array_key_exists('firstname', $_POST) && array_key_exists('lastname', $_POST) && array_key_exists('favouriteGenres', $_POST) && array_key_exists('interests', $_POST))
