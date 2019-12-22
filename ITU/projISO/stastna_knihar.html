@@ -78,27 +78,117 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function uploadLike()
+{
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
+
+    var title = "Stastna kniha";
+
+    xmlHttp.open("POST", "apiLikes.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    xmlHttp.onreadystatechange = downloadLike;
+    var message = "title=" + title;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false;
+}
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Stastna kniha")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+function uploadDislike()
+{
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
+
+    var title = "Stastna kniha";
+
+    xmlHttp.open("POST", "apiDislikes.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    xmlHttp.onreadystatechange = downloadDislike;
+    var message = "title=" + title;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false;
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Stastna kniha")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
 </script>
 
-<script>
-var dislikes = 1;
-function dislikeCounter()
-{
-    dislikes += 1;
-    document.getElementById("dislikes").innerHTML = dislikes;
-};
-</script>
-<script>
-var likes = 0;
-function likeCounter()
-{
-    likes += 1;
-    document.getElementById("likes").innerHTML = likes;
-};
-</script>
 
   <head>
     <meta charset="iso-8859-2">
@@ -125,10 +215,10 @@ function likeCounter()
       <div class="container">
         <h1>©»astná kniha</h1>
         <form>
-              <button onclick="dislikeCounter()" type="button" class="button_1">Nelíbilo se</button>
+              <button onclick="uploadDislike()" type="button" class="button_1">Nelíbilo se</button>
         </form>
         <form>
-              <button  onclick="likeCounter()" type="button" class="button_1">Líbilo se</button>
+              <button  onclick="uploadLike()" type="button" class="button_1">Líbilo se</button>
         </form>
 
       </div>
@@ -140,7 +230,7 @@ function likeCounter()
     <p><img src="./img/stastna.jpg" alt="StastnaKniha" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>Barbora ©»astná</p>
       <p><b>®ánr: </b>Humor</p>
-      <p><b>Hodnocení: </b>Líbilo se: <a id="likes">0</a>  Nelíbilo se: <a id="dislikes">1</a></p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Taky vás nìkdy napadlo, ¾e byste chtìli zmìnit svùj ¾ivot? Odjet meditovat do Indie? Chovat bio ovce na ©umavì? Zachraòovat dìti v Africe? Pracovat v baru na støedomoøské plá¾i? Taky mì to napadlo, ale, upøímnì øeèeno... nechtìlo se mi. Místo toho jsem vyzkou¹ela rùzné zpùsoby, jak být ¹»astnìj¹í, a pøitom si nechat svùj ¾ivot takový, jaký je: s man¾elem a dvìma dìtmi, s bytem na hypotéku a normální pracovní dobou. A zjistila jsem, ¾e ¹tìstí si nechci schovávat na Vánoce, na dovolenou nebo na nìkdy jindy.</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/stastna-kniha-572633"><b>Koupit knihu online</b></a></p>

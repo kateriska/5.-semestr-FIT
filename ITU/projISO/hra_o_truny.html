@@ -60,6 +60,77 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Hra o truny")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Hra o truny")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
@@ -99,7 +170,7 @@ downloadReview();
     <p><img src="./img/hra.jpg" alt="HraOTruny" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>George R. R. Martin</p>
       <p><b>®ánr: </b>Fantasy</p>
-      <p><b>Hodnocení­: </b>Líbilo se: 1 Nelíbilo se: 0</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Úvodní èást epického fantasy eposu odehrávajícího se ve svìtì temného støedovìku, mezi stateènými rytíøi, mocnými èarodìji, draky, zlovlky a èarostromy...
 Jako strá¾ce severu lord Stark pova¾uje za prokletí, kdy¾ ho král Robert povìøí úøadem poboèníka vladaøe a vy¹le ho na jih, odkud se zatím nikdo z jeho rodiny nevrátil. Bezejmenní staøí bohové nemají na jihu ¾ádnou moc, Starkova rodina je brzy rozdìlena a poboèník sám je polapen do sítì nebezpeèných intrik. Ba co hùø, v exilu ve Svobodných mìstech za moøem dospìl pomstou posedlý chlapec. Jako dìdic ¹íleného Draèího krále, jeho¾ rodina byla vyvra¾dìna, si dìlá nárok na trùn.
 </p>

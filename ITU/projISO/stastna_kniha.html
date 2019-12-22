@@ -60,6 +60,77 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Stastna kniha")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Stastna kniha")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
@@ -99,7 +170,7 @@ downloadReview();
     <p><img src="./img/stastna.jpg" alt="StastnaKniha" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>Barbora ©»astná</p>
       <p><b>®ánr: </b>Humor</p>
-      <p><b>Hodnocení­: </b>Líbilo se: 0 Nelíbilo se: 1</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Taky vás nìkdy napadlo, ¾e byste chtìli zmìnit svùj ¾ivot? Odjet meditovat do Indie? Chovat bio ovce na ©umavì? Zachraòovat dìti v Africe? Pracovat v baru na støedomoøské plá¾i? Taky mì to napadlo, ale, upøímnì øeèeno... nechtìlo se mi. Místo toho jsem vyzkou¹ela rùzné zpùsoby, jak být ¹»astnìj¹í, a pøitom si nechat svùj ¾ivot takový, jaký je: s man¾elem a dvìma dìtmi, s bytem na hypotéku a normální pracovní dobou. A zjistila jsem, ¾e ¹tìstí si nechci schovávat na Vánoce, na dovolenou nebo na nìkdy jindy.</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/stastna-kniha-572633"><b>Koupit knihu online</b></a></p>

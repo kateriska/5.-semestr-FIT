@@ -79,18 +79,117 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function uploadLike()
+{
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
+
+    var title = "Hunger Games";
+
+    xmlHttp.open("POST", "apiLikes.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    xmlHttp.onreadystatechange = downloadLike;
+    var message = "title=" + title;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false;
+}
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Hunger Games")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+function uploadDislike()
+{
+  try {
+    var xmlHttp = createXmlHttpRequestObject();
+
+    var title = "Hunger Games";
+
+    xmlHttp.open("POST", "apiDislikes.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+    xmlHttp.onreadystatechange = downloadDislike;
+    var message = "title=" + title;
+		xmlHttp.send(message);
+  } catch (e) {
+    alert(e.toString());
+  }
+  return false;
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Hunger Games")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
 </script>
-<script>
-var likes = 2;
-function likeCounter()
-{
-    likes += 1;
-    document.getElementById("likes").innerHTML = likes;
-};
-</script>
+
 
   <head>
     <meta charset="iso-8859-2">
@@ -117,12 +216,11 @@ function likeCounter()
       <div class="container">
         <h1>Hunger Games</h1>
         <form>
-              <button onclick="dislikeCounter()" type="button" class="button_1">Nelíbilo se</button>
+              <button onclick="uploadDislike()" type="button" class="button_1">Nelíbilo se</button>
         </form>
         <form>
-              <button  onclick="likeCounter()" type="button" class="button_1">Líbilo se</button>
+              <button  onclick="uploadLike()" type="button" class="button_1">Líbilo se</button>
         </form>
-
 
       </div>
     </section>
@@ -133,7 +231,7 @@ function likeCounter()
     <p><img src="./img/hungergames2.jpg" alt="HungerGames" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>Suzanne Collins</p>
       <p><b>®ánr: </b>Dystopie</p>
-      <p><b>Hodnocení: </b>Líbilo se: <a id="likes">2</a>  Nelíbilo se: <a id="dislikes">0</a></p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Dokázali byste pøe¾ít v divoèinì, kde se v¹ichni sna¾í o to, abyste nespatøili dal¹í úsvit? V troskách zemì, kdysi známé jako Severní Amerika, se rozkládá Panem s nablýskaným hlavním mìstem Kapitolem a dvanácti okolními kraji. Kapitol jim vládne krutou a tvrdou rukou a udr¾uje si jejich poslu¹nost tím, ¾e je nutí, aby ka¾dý rok vysílaly jednoho chlapce a jednu dívku ve vìku mezi dvanácti a osmnácti lety jako úèastníky Hladových her - boje na ¾ivot a na smrt pøená¹eného televizí. ©estnáctiletá Katniss Everdeenová, která bydlí sama se svou matkou a mlad¹í sestrou, pova¾uje úèast ve hrách za rozsudek smrti, kdy¿ se nabízí jako dobrovolnice, aby nahradila svou sestru, její¾ jméno bylo vylosováno pro leto¹ní roèník. Katniss se ale u¾ v minulosti ocitla na pokraji smrti - a je odbornicí na pøe¾ití. Ani¾ by chtìla, stává se soutì¾ící.</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/hunger-games-arena-smrti-595555"><b>Koupit knihu online</b></a></p>

@@ -60,6 +60,77 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Muj pribeh")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Muj pribeh")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
@@ -99,7 +170,7 @@ downloadReview();
     <p><img src="./img/obama.jpg" alt="MujPribeh" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>Michelle Obama</p>
       <p><b>®ánr: </b>Autobiografie</p>
-      <p><b>Hodnocení­: </b>Líbilo se: 2 Nelíbilo se: 0</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Michelle Obamová se díky svému ¾ivotu naplnìnému smyslem a úspìchy stala jednou z nejikoniètìj¹ích a nejpodmanivìj¹ích ¾en na¹í éry. Jako první dáma Spojených státù amerických a první Afroamerièanka v této roli pomohla nastolit nejvlídnìj¹í a nejpøístupnìj¹í atmosféru v Bílém domì v historii a vybudovala si pozici silné zastánkynì práv ¾en ve Spojených státech i po celém svìtì.</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/muj-pribeh-147477712"><b>Koupit knihu online</b></a></p>

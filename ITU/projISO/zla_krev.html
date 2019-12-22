@@ -60,6 +60,77 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Zla krev")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Zla krev")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
@@ -98,7 +169,7 @@ downloadReview();
     <p><img src="./img/krev.jpg" alt="ZlaKrev" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>John Carreyrou</p>
       <p><b>®ánr: </b>Populárnì-nauèné</p>
-      <p><b>Hodnocení: </b>Líbilo se: 2 Nelíbilo se: 0</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Seznamte se s nej¾havìj¹ím startupem v Silicon Valley zalo¾eným Elizabeth Holmesovou, která se po roce studia rozhodla opustit Stanford, aby se mohla plnì vìnovat svému pøelomovému vynálezu. Svou vizí mnohé uchvátila natolik, ¾e ji zaèali oznaèovat za Steva Jobse v sukních. Velké ambice, bohulibé poslání, strhující nad¹ení a skvìlý tým zajistily firmì pøízeò investorù, kteøí do ní nalili nìkolik set milionù dolarù. Hodnota Theranosu vystoupala k neuvìøitelným devíti miliardám dolarù.</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/zla-krev-187612374"><b>Koupit knihu online</b></a></p>

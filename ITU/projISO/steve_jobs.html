@@ -60,6 +60,77 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Steve Jobs")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Steve Jobs")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
@@ -102,7 +173,7 @@ downloadReview();
     <p><img src="./img/jobs.jpg" alt="SteveJobs" style="width:220px;margin-right:15px;">
       <p><b>Autor: </b>Walter Isaacson</p>
       <p><b>®ánr: </b>Biografie</p>
-      <p><b>Hodnocení: </b>Líbilo se: 2 Nelíbilo se: 0</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Na podkladì více ne¾ ètyøiceti rozhovorù s Jobsem provedených v prùbìhu dvou let - a stejnì tak interview s více ne¾ stovkou èlenù jeho rodiny, pøátel, konkurentù, soupeøù i kolegù - pojednává tato kniha o ¾ivotì plném vrcholù i propastí a o pronikavì intenzivní osobnosti tvoøivého podnikatele, jeho¾ vá¹eò pro dokonalost a ¾elezné odhodlání zcela pøevrátilo ¹est odvìtví lidské èinnosti: osobní poèítaèe, kreslené filmy, hudbu, telefony, poèítaèové tablety a digitální tisk.
 V dobì, kdy se spoleènosti po celém svìtì sna¾í vybudovat ekonomiku digitálního vìku, stojí Jobs v popøedí jako nejvy¹¹í ikona v oboru vynalézání nových vìcí a pøedstavivosti uvedené do praxe.</p>
     </p>

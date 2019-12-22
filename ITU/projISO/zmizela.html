@@ -60,6 +60,77 @@ function downloadReview() {
 
 			xmlHttp.send(null);
 }
+function downloadLike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiLikes.php", true);
+  var sum_likes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Zmizela")
+            {
+              continue;
+            }
+
+            sum_likes = obj.like + sum_likes;
+
+          }
+
+        document.getElementById("likes").innerHTML = sum_likes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+function downloadDislike() {
+  const xmlHttp = createXmlHttpRequestObject();
+	xmlHttp.open("GET", "apiDislikes.php", true);
+  var sum_dislikes = 0;
+	xmlHttp.onreadystatechange = function()
+  {
+	   if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+     {
+          var obj = xmlHttp.responseText;
+
+          var lines = obj.split("\n");
+          for (var i in lines)
+          {
+            if (lines[i] == "")
+            {
+              continue;
+            }
+
+            var obj = JSON.parse(lines[i]);
+            if (obj.title != "Zmizela")
+            {
+              continue;
+            }
+
+            sum_dislikes = obj.dislike + sum_dislikes;
+
+          }
+
+        document.getElementById("dislikes").innerHTML = sum_dislikes;
+      }
+			};
+
+			xmlHttp.send(null);
+}
+
+downloadLike();
+downloadDislike();
 downloadReview();
 //setInterval(downloadReview, 7000); // periodic repeating every 2 seconds
 
@@ -99,7 +170,7 @@ downloadReview();
     <p><img src="./img/zmizela.jpg" alt="Zmizelá" style="width:230px;margin-right:15px;">
       <p><b>Autor: </b>Gillian Flynn</p>
       <p><b>®ánr: </b>Thriller</p>
-      <p><b>Hodnocení: </b>Líbilo se: 1 Nelíbilo se: 0</p>
+      <p><b>Hodnocení: </b>Líbilo se: <a id="likes"></a>  Nelíbilo se: <a id="dislikes"></a></p>
       <p>Zdálo se to jako ideální man¾elství. Zdání ale mù¾e vra¾ednì klamat. Amy Dunnová zmizela v den pátého výroèí svatby. Nick, její mu¾, byl po sérii nalezených dùkazù obvinìn z vra¾dy své ¾eny. Nick prohla¹uje, ¾e nic nespáchal, Amyini pøátelé a zápisky v jejím deníku tvrdí opak. Kdo má pravdu? Jak ji poznat? A pokud je Nick nevinný, kam se podìla Amy?</p>
     </p>
     <p><a href="https://www.knihydobrovsky.cz/zmizela-55579957"><b>Koupit knihu online</b></a></p>
