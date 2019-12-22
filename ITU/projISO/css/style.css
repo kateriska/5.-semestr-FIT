@@ -282,6 +282,40 @@ a
   font-family: 'Roboto', sans-serif;
 }
 
+#boxesread
+{
+  margin-top: 20px;
+}
+
+#boxesread .boxread
+{
+  float: left;
+  text-align: center;
+  width: 30%;
+  padding: 10px;
+}
+#boxesread .boxread img
+{
+  width: 90px;
+}
+
+#boxestoread
+{
+  margin-top: 20px;
+}
+
+#boxestoread .boxtoread
+{
+  float: left;
+  text-align: center;
+  width: 30%;
+  padding: 10px;
+}
+#boxestoread .boxtoread img
+{
+  width: 90px;
+}
+
 #boxes
 {
   margin-top: 20px;
